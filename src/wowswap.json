@@ -1,0 +1,436 @@
+{
+  "name": "wowswap",
+  "timestamp": "2021-01-02T11:41:29.665Z",
+  "version": {
+    "major": 1,
+    "minor": 1,
+    "patch": 3
+  },
+  "tags": {},
+  "logoURI": "/images/coins/wbnb.png",
+  "keywords": ["wowswap", "default"],
+  "reserves": {
+    "56": {
+      "0xe9e7CEA3DedcA5984780Bafc599bD69ADd087D56": "0x410D4833A995e5d9ac80eB115f4dA70f1C569189",
+      "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c": "0xd34AC87492339C478F88230051b0fcEbEcbD599c"
+    },
+    "57": {
+      "0x22A4Cc8c2C6881983ceBAb4d23cd952654Be2F1D": "0xaA5c6417b137C5492909C1875AA42AFB866651CE",
+      "0x47a55BACaCf2572818080e2185B2Ecf9Fd6C74Dc": "0xc31A632bB9bE7BB669b141E9040102dE208F0ee7"
+    },
+    "97": {
+      "0xf7b959ee5955d24eA6DA36b44f1D96DC62f105Ef": "0x3DF205116593402E03AA4f6ac816E40557966691",
+      "0xB8758A521Bacee8fFC3D471A4D7d9200850eeB8c": "0x17ab81f60B268bf0fb2E870C7Ab20acdE7A6679A"
+    }
+  },
+  "tokens": [
+    {
+      "address": "0xe9e7CEA3DedcA5984780Bafc599bD69ADd087D56",
+      "name": "BUSD Token",
+      "symbol": "BUSD",
+      "decimals": 18,
+      "lendable": true,
+      "chainId": 56,
+      "reserve": "0x410D4833A995e5d9ac80eB115f4dA70f1C569189",
+      "proxies": {}
+    },
+    {
+      "address": "0x4DA996C5Fe84755C80e108cf96Fe705174c5e36A",
+      "name": "WOWswap",
+      "symbol": "WOW",
+      "decimals": 18,
+      "lendable": false,
+      "chainId": 56,
+      "reserve": "0x0000000000000000000000000000000000000000",
+      "proxies": {
+        "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c": "0xAA9143935dFB54DC74708b27Fd5F12dDa5A71BCD"
+      }
+    },
+    {
+      "address": "0x0E09FaBB73Bd3Ade0a17ECC321fD13a19e81cE82",
+      "name": "PancakeSwap Token",
+      "symbol": "Cake",
+      "decimals": 18,
+      "lendable": false,
+      "chainId": 56,
+      "reserve": "0x0000000000000000000000000000000000000000",
+      "proxies": {
+        "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c": "0x09e8ea702f177ecAA802A6Ca78Acc7D95e9140fF",
+        "0xe9e7CEA3DedcA5984780Bafc599bD69ADd087D56": "0x28352d992db15ECBe49F65FB8ab2BFB24a6D73ED"
+      }
+    },
+    {
+      "address": "0x2170Ed0880ac9A755fd29B2688956BD959F933F8",
+      "name": "Ethereum Token",
+      "symbol": "ETH",
+      "decimals": 18,
+      "lendable": false,
+      "chainId": 56,
+      "reserve": "0x0000000000000000000000000000000000000000",
+      "proxies": {
+        "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c": "0x97D60871802F8CCD2aa0Ec6530eC302a9D9459C5"
+      }
+    },
+    {
+      "address": "0x7130d2A12B9BCbFAe4f2634d864A1Ee1Ce3Ead9c",
+      "name": "BTCB Token",
+      "symbol": "BTCB",
+      "decimals": 18,
+      "lendable": false,
+      "chainId": 56,
+      "reserve": "0x0000000000000000000000000000000000000000",
+      "proxies": {
+        "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c": "0x1eDEFB5bA8EBd570C8179A85ff2144C80988Ac11"
+      }
+    },
+    {
+      "address": "0xa184088a740c695E156F91f5cC086a06bb78b827",
+      "name": "AUTOv2",
+      "symbol": "AUTO",
+      "decimals": 18,
+      "lendable": false,
+      "chainId": 56,
+      "reserve": "0x0000000000000000000000000000000000000000",
+      "proxies": {
+        "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c": "0xF09F2d19a04D421Ca17DB7c698344Bb5114EEa8A"
+      }
+    },
+    {
+      "address": "0x5Ac52EE5b2a633895292Ff6d8A89bB9190451587",
+      "name": "BSCX",
+      "symbol": "BSCX",
+      "decimals": 18,
+      "lendable": false,
+      "chainId": 56,
+      "reserve": "0x0000000000000000000000000000000000000000",
+      "proxies": {
+        "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c": "0xAc00D4EA0112734776FE19A95FB77Bcf4aF4E70b"
+      }
+    },
+    {
+      "address": "0x7083609fCE4d1d8Dc0C979AAb8c869Ea2C873402",
+      "name": "Polkadot Token",
+      "symbol": "DOT",
+      "decimals": 18,
+      "lendable": false,
+      "chainId": 56,
+      "reserve": "0x0000000000000000000000000000000000000000",
+      "proxies": {
+        "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c": "0x90d684Ba751B911771670E83765011E7908faaa9"
+      }
+    },
+    {
+      "address": "0x190b589cf9Fb8DDEabBFeae36a813FFb2A702454",
+      "name": "bDollar",
+      "symbol": "BDO",
+      "decimals": 18,
+      "lendable": false,
+      "chainId": 56,
+      "reserve": "0x0000000000000000000000000000000000000000",
+      "proxies": {
+        "0xe9e7CEA3DedcA5984780Bafc599bD69ADd087D56": "0xdFAd57585f9A492D3EB2b6304BC250c5419CCD85"
+      }
+    },
+    {
+      "address": "0xBf5140A22578168FD562DCcF235E5D43A02ce9B1",
+      "name": "Uniswap",
+      "symbol": "UNI",
+      "decimals": 18,
+      "lendable": false,
+      "chainId": 56,
+      "reserve": "0x0000000000000000000000000000000000000000",
+      "proxies": {
+        "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c": "0x8ce00108C47Ea36a4De42724d76C4b05Ce8b20fB"
+      }
+    },
+    {
+      "address": "0xcF6BB5389c92Bdda8a3747Ddb454cB7a64626C63",
+      "name": "Venus",
+      "symbol": "XVS",
+      "decimals": 18,
+      "lendable": false,
+      "chainId": 56,
+      "reserve": "0x0000000000000000000000000000000000000000",
+      "proxies": {
+        "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c": "0x4915C19511078E19ae825379Da931d9E32D98db7"
+      }
+    },
+    {
+      "address": "0xD41FDb03Ba84762dD66a0af1a6C8540FF1ba5dfb",
+      "name": "SafePal Token",
+      "symbol": "SFP",
+      "decimals": 18,
+      "lendable": false,
+      "chainId": 56,
+      "reserve": "0x0000000000000000000000000000000000000000",
+      "proxies": {
+        "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c": "0x273a2641593ef9eB9B1413634Caf7aC3016916A5"
+      }
+    },
+    {
+      "address": "0x8b303d5BbfBbf46F1a4d9741E491e06986894e18",
+      "name": "Woonkly Power",
+      "symbol": "WOOP",
+      "decimals": 18,
+      "lendable": false,
+      "chainId": 56,
+      "reserve": "0x0000000000000000000000000000000000000000",
+      "proxies": {
+        "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c": "0xABE1190B393aE99ECC903AA4A9ECb4dB90a316F4"
+      }
+    },
+    {
+      "address": "0xCa3F508B8e4Dd382eE878A314789373D80A5190A",
+      "name": "beefy.finance",
+      "symbol": "BIFI",
+      "decimals": 18,
+      "lendable": false,
+      "chainId": 56,
+      "reserve": "0x0000000000000000000000000000000000000000",
+      "proxies": {
+        "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c": "0x3F89Aa5f2B13ca1d607e3AF4878154F775A1C32B"
+      }
+    },
+    {
+      "address": "0x728C5baC3C3e370E372Fc4671f9ef6916b814d8B",
+      "name": "UNFI",
+      "symbol": "UNFI",
+      "decimals": 18,
+      "lendable": false,
+      "chainId": 56,
+      "reserve": "0x0000000000000000000000000000000000000000",
+      "proxies": {
+        "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c": "0x6E1eEe7158688a34d355c06BbE8A2F3916A2af4f"
+      }
+    },
+    {
+      "address": "0x2090c8295769791ab7A3CF1CC6e0AA19F35e441A",
+      "name": "Fuel Token",
+      "symbol": "Fuel",
+      "decimals": 18,
+      "lendable": false,
+      "chainId": 56,
+      "reserve": "0x0000000000000000000000000000000000000000",
+      "proxies": {
+        "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c": "0x0B90636f32285B620840c9bAE3100B37f8A67655"
+      }
+    },
+    {
+      "address": "0xa1faa113cbE53436Df28FF0aEe54275c13B40975",
+      "name": "AlphaToken",
+      "symbol": "ALPHA",
+      "decimals": 18,
+      "lendable": false,
+      "chainId": 56,
+      "reserve": "0x0000000000000000000000000000000000000000",
+      "proxies": {
+        "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c": "0x868c3Ba5c9DFAbd0Bb7AE67034448226df4Ba69E"
+      }
+    },
+    {
+      "address": "0xf859Bf77cBe8699013d6Dbc7C2b926Aaf307F830",
+      "name": "Berry Tributes",
+      "symbol": "BRY",
+      "decimals": 18,
+      "lendable": false,
+      "chainId": 56,
+      "reserve": "0x0000000000000000000000000000000000000000",
+      "proxies": {
+        "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c": "0x7DA8705F8B6e21ABE520d3300b40864736F75b9f"
+      }
+    },
+    {
+      "address": "0x4B0F1812e5Df2A09796481Ff14017e6005508003",
+      "name": "Trust Wallet",
+      "symbol": "TWT",
+      "decimals": 18,
+      "lendable": false,
+      "chainId": 56,
+      "reserve": "0x0000000000000000000000000000000000000000",
+      "proxies": {
+        "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c": "0x36be824db339e1522A6d347366c792d90a9c6af8"
+      }
+    },
+    {
+      "address": "0x47BEAd2563dCBf3bF2c9407fEa4dC236fAbA485A",
+      "name": "Swipe",
+      "symbol": "SXP",
+      "decimals": 18,
+      "lendable": false,
+      "chainId": 56,
+      "reserve": "0x0000000000000000000000000000000000000000",
+      "proxies": {
+        "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c": "0x5eFE8C5A8F6DCe6793e84aD71333b433BA0613F3"
+      }
+    },
+    {
+      "address": "0x1D2F0da169ceB9fC7B3144628dB156f3F6c60dBE",
+      "name": "XRP Token",
+      "symbol": "XRP",
+      "decimals": 18,
+      "lendable": false,
+      "chainId": 56,
+      "reserve": "0x0000000000000000000000000000000000000000",
+      "proxies": {
+        "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c": "0xa8a02b7bD17a1d1D1Ae73CC926E700d6bA341445"
+      }
+    },
+    {
+      "address": "0xF8A0BF9cF54Bb92F17374d9e9A321E6a111a51bD",
+      "name": "ChainLink Token",
+      "symbol": "LINK",
+      "decimals": 18,
+      "lendable": false,
+      "chainId": 56,
+      "reserve": "0x0000000000000000000000000000000000000000",
+      "proxies": {
+        "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c": "0x58eb5187B10AeEB57BcFbec80f5a4FffE66af35f"
+      }
+    },
+    {
+      "address": "0xAD6cAEb32CD2c308980a548bD0Bc5AA4306c6c18",
+      "name": "Band Protocol Token",
+      "symbol": "BAND",
+      "decimals": 18,
+      "lendable": false,
+      "chainId": 56,
+      "reserve": "0x0000000000000000000000000000000000000000",
+      "proxies": {
+        "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c": "0x5c46E0CE4b5FBC511a00Ca0D196d1d5CCa0f69FC"
+      }
+    },
+    {
+      "address": "0x88f1A5ae2A3BF98AEAF342D26B30a79438c9142e",
+      "name": "yearn.finance",
+      "symbol": "YFI",
+      "decimals": 18,
+      "lendable": false,
+      "chainId": 56,
+      "reserve": "0x0000000000000000000000000000000000000000",
+      "proxies": {
+        "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c": "0x28f14a5abD57d1947DeCC2c3ff9865805d11B9f8"
+      }
+    },
+    {
+      "address": "0x3EE2200Efb3400fAbB9AacF31297cBdD1d435D47",
+      "name": "Cardano Token",
+      "symbol": "ADA",
+      "decimals": 18,
+      "lendable": false,
+      "chainId": 56,
+      "reserve": "0x0000000000000000000000000000000000000000",
+      "proxies": {
+        "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c": "0xF8694882AF245134C0f1fD25FBD9FCCC86FB98B2"
+      }
+    },
+    {
+      "address": "0x0D8Ce2A99Bb6e3B7Db580eD848240e4a0F9aE153",
+      "name": "Filecoin",
+      "symbol": "FIL",
+      "decimals": 18,
+      "lendable": false,
+      "chainId": 56,
+      "reserve": "0x0000000000000000000000000000000000000000",
+      "proxies": {
+        "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c": "0x889594BD75eD3827Ad97A0B8ec2a54640308eca4"
+      }
+    },
+    {
+      "address": "0xb59490aB09A0f526Cc7305822aC65f2Ab12f9723",
+      "name": "Litentry",
+      "symbol": "LIT",
+      "decimals": 18,
+      "lendable": false,
+      "chainId": 56,
+      "reserve": "0x0000000000000000000000000000000000000000",
+      "proxies": {
+        "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c": "0x6EEF38d9CF9977A88787a9C1E69b949B5e641eeF"
+      }
+    },
+    {
+      "address": "0x0Eb3a705fc54725037CC9e008bDede697f62F335",
+      "name": "Cosmos Token",
+      "symbol": "ATOM",
+      "decimals": 18,
+      "lendable": false,
+      "chainId": 56,
+      "reserve": "0x0000000000000000000000000000000000000000",
+      "proxies": {
+        "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c": "0x61B3e92D4270Bbe1E94775982F4dC1075cac6644"
+      }
+    },
+    {
+      "address": "0x4338665CBB7B2485A8855A139b75D5e34AB0DB94",
+      "name": "Litecoin Token",
+      "symbol": "LTC",
+      "decimals": 18,
+      "lendable": false,
+      "chainId": 56,
+      "reserve": "0x0000000000000000000000000000000000000000",
+      "proxies": {
+        "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c": "0xb6b49Fac089FeE025888345e27dDf54795E55b2D"
+      }
+    },
+
+
+    {
+      "address": "0xB8758A521Bacee8fFC3D471A4D7d9200850eeB8c",
+      "name": "Binance USD",
+      "symbol": "BUSD",
+      "decimals": 18,
+      "lendable": true,
+      "chainId": 97,
+      "reserve": "0x17ab81f60B268bf0fb2E870C7Ab20acdE7A6679A",
+      "proxies": {}
+    },
+    {
+      "address": "0xDf6153B1000a45289FCE88Bbc00bac78A48b6e67",
+      "name": "WOW Swap Token",
+      "symbol": "WOW",
+      "decimals": 18,
+      "lendable": false,
+      "chainId": 97,
+      "reserve": "0x0000000000000000000000000000000000000000",
+      "proxies": {
+        "0xf7b959ee5955d24eA6DA36b44f1D96DC62f105Ef": "0x92e5b396886a9577E60af3844C2830A6dDb99b43"
+      }
+    },
+    {
+      "address": "0x9575dB357Aba5F3225Be7262D5199f455578b73d",
+      "name": "Pancake Token",
+      "symbol": "CAKE",
+      "decimals": 18,
+      "lendable": false,
+      "chainId": 97,
+      "reserve": "0x0000000000000000000000000000000000000000",
+      "proxies": {
+        "0xf7b959ee5955d24eA6DA36b44f1D96DC62f105Ef": "0x18010506Fd83673930fA26c2C6e98d41778f5c19",
+        "0xB8758A521Bacee8fFC3D471A4D7d9200850eeB8c": "0x0F1989864b672e18022d7f084B5fc4742cf340E2"
+      }
+    },
+    {
+      "address": "0x67f51FA5d39F5cd65a94C4b845F73151dAe16155",
+      "name": "Wrapped Ether",
+      "symbol": "ETH",
+      "decimals": 18,
+      "lendable": false,
+      "chainId": 97,
+      "reserve": "0x0000000000000000000000000000000000000000",
+      "proxies": {
+        "0xf7b959ee5955d24eA6DA36b44f1D96DC62f105Ef": "0x6074e1456ADbCe43A9BbF59075f30C2d28cdEDaE"
+      }
+    },
+    {
+      "address": "0xbfaED3DcBAe0553D452F938F39Aab9533163F651",
+      "name": "Bdo",
+      "symbol": "BDO",
+      "decimals": 6,
+      "lendable": false,
+      "chainId": 97,
+      "reserve": "0x0000000000000000000000000000000000000000",
+      "proxies": {
+        "0xB8758A521Bacee8fFC3D471A4D7d9200850eeB8c": "0xF64Ae29E8dBF7146057c3826cab65aaE042dA292"
+      }
+    }
+  ]
+}

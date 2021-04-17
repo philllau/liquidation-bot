@@ -1,0 +1,22 @@
+{
+  "name": "wow-liquidation-bot",
+  "version": "0.0.1",
+  "description": "WOWSwap Liquidation bot",
+  "main": "index.js",
+  "repository": "https://github.com/wowswap-io/liquidation-bot",
+  "author": "Aler Denisov <aler.zampillo@gmail.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/deep-diff": "1.0.0",
+    "@types/node": "14.14.37",
+    "ts-node": "9.1.1",
+    "typescript": "4.2.3"
+  },
+  "dependencies": {
+    "bignumber.js": "9.0.1",
+    "deep-diff": "1.0.2",
+    "ethers": "5.1.0",
+    "p-limit": "3.1.0",
+    "threads": "1.6.3"
+  }
+}
