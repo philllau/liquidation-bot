@@ -19,8 +19,7 @@
       "merge_logs": true,
       "node_args": "--require=tsconfig-paths/register",
       "env": {
-        "NODE_ENV": "production",
-        "PRIVATE_KEY": "0000000000000000000000000000000000000000000000000000000000C0FFEE"
+        "NODE_ENV": "production"
       }
     }
   ]
