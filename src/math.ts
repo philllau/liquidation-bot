@@ -17,12 +17,17 @@ export const MAX_UINT_AMOUNT =
 export const ONE_YEAR = "31536000";
 export const ONE_HOUR = "3600";
 
-export const bn = (n: BigNumber.Value) => new BigNumber(n)
-export const ray = (n: BigNumber.Value) => bn(RAY).multipliedBy(n)
-export const percent = (n: BigNumber.Value) => bn(PERCENTAGE_FACTOR).multipliedBy(n)
-export const wad = (n: BigNumber.Value) => bn(WAD).multipliedBy(n)
-export const amount = (n: BigNumber.Value, decimals = 18) => bn(10).pow(decimals).multipliedBy(n)
-export const toBN = (value: BigNumberish) => bn(ethers.BigNumber.from(value).toString())
+export const bn = (n: BigNumber.Value, base?: number) => new BigNumber(n, base);
+export const ray = (n: BigNumber.Value, base?: number) =>
+  bn(RAY).multipliedBy(bn(n, base));
+export const percent = (n: BigNumber.Value, base?: number) =>
+  bn(PERCENTAGE_FACTOR).multipliedBy(bn(n, base));
+export const wad = (n: BigNumber.Value, base?: number) =>
+  bn(WAD).multipliedBy(bn(n, base));
+export const amount = (n: BigNumber.Value, decimals = 18, base?: number) =>
+  bn(10).pow(decimals).multipliedBy(bn(n, base));
+export const toBN = (value: BigNumberish) =>
+  bn(ethers.BigNumber.from(value).toString());
 
 declare module "bignumber.js" {
   interface BigNumber {
@@ -48,8 +53,8 @@ declare module "bignumber.js" {
 }
 
 BigNumber.prototype.valueOf = function (): string {
-  return this.toFixed()
-}
+  return this.toFixed();
+};
 
 BigNumber.prototype.add = function (n: BigNumber.Value): BigNumber {
   return this.plus(n);

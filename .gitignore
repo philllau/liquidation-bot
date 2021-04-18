@@ -1,2 +1,5 @@
 node_modules
 report*.json
+lib
+.logs
+.pm2

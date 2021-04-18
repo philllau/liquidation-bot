@@ -2,7 +2,7 @@ import { JsonRpcProvider } from "@ethersproject/providers";
 import { Wallet } from "@ethersproject/wallet";
 import { diff } from "deep-diff";
 import { BigNumber, BytesLike, constants, Contract, Signer } from "ethers";
-import { map, Observable, Subject } from "observable-fns";
+import { map, Observable, Subject, Subscription } from "observable-fns";
 import BN from "bignumber.js";
 import { bn, toBN } from "./math";
 import {
@@ -25,12 +25,16 @@ import {
 } from "./types";
 import { byteToAddress, mapAll, retry, sleep } from "./utils";
 
+function isMineRoutine(params: ExecutionParams, taskId: number) {
+  return taskId % params.dispatchSize === params.dispatchId;
+}
+
 export function infRetry<T>(fn: () => Promise<T>): Promise<T> {
-  return retry(fn, { n: Infinity, minWait: 500, maxWait: 500 }).promise;
+  return retry(fn, { n: Infinity, minWait: 250, maxWait: 250 }).promise;
 }
 
 export function fewRetry<T>(fn: () => Promise<T>): Promise<T> {
-  return retry(fn, { n: 3, minWait: 500, maxWait: 500 }).promise;
+  return retry(fn, { n: 3, minWait: 250, maxWait: 250 }).promise;
 }
 
 class TokenInfo {
@@ -102,6 +106,8 @@ class PairWrapper {
 }
 
 class Position {
+  public updateStream?: Subscription<number>;
+
   private dirty: boolean = true;
   private state?: {
     lendable: string;
@@ -271,6 +277,8 @@ class Multisender {
 }
 
 type InitializeParams = {
+  dispatchId: number;
+  dispatchSize: number;
   provider: JsonRpcProvider;
   signer: Signer;
   multicall: string;
@@ -386,7 +394,22 @@ async function createPairChannel(params: ExecutionParams) {
       async () => {
         if (await infRetry(() => wrapper.tryInitialize())) {
           findContractSubscription.unsubscribe();
-          pairs.next(wrapper);
+
+          const routineId = bn(wrapper.contract.address.substr(2).toLowerCase(), 16)
+            .mod(Number.MAX_SAFE_INTEGER)
+            .decimalPlaces(0)
+            .toNumber();
+
+          console.log(routineId);
+
+          if (isMineRoutine(params, routineId)) {
+            console.log(
+              `[${params.dispatchId}] Process pair ${wrapper.address}`
+            );
+            pairs.next(wrapper);
+          } else {
+            console.log(`[${params.dispatchId}] Skip pair ${wrapper.address}`);
+          }
         }
       }
     );
@@ -436,7 +459,7 @@ async function createPositionsChannel(params: ExecutionParams) {
     const transfers = pair.contract.filters.Transfer(null, null, null);
 
     const end = await infRetry(() => params.provider.getBlockNumber());
-    const BATCH_SIZE = 150;
+    const BATCH_SIZE = 500;
 
     const onEvent = (ev: {
       args: { from: string; to: string; value: BigNumber };
@@ -454,16 +477,23 @@ async function createPositionsChannel(params: ExecutionParams) {
       });
 
     for (let from = fetchedFrom; from < end; from += BATCH_SIZE) {
-      const transferEvents = await infRetry(() =>
-        pair.contract
+      const transferEvents = await infRetry(() => {
+        console.log(
+          `Fetching events from ${pair.contract.address} from ${from} to ${
+            from + BATCH_SIZE
+          } [${end - from} left]`
+        );
+        return pair.contract
           .queryFilter(transfers, from, Math.min(end, from + BATCH_SIZE))
           .catch((e) => {
             console.error(
-              `Failed query events from ${pair.lendable} ${pair.tradable} at ${from} \n ISSUE: ${e}`
+              `Failed query events from ${pair.contract.address} at ${from} [${
+                end - from
+              } left] \n ISSUE: ${e.reason}`
             );
             throw e;
-          })
-      );
+          });
+      });
 
       transferEvents.map(onEvent);
       pair.lastUpdate = Math.min(end, from + BATCH_SIZE);
@@ -490,13 +520,15 @@ async function run(params: ExecutionParams) {
 
   params.channels.positions!.subscribe(async (position) => {
     position.appear();
-    const onNewBlock = params.channels.height!.subscribe(() =>
+
+    if (position.updateStream) position.updateStream.unsubscribe();
+
+    position.updateStream = params.channels.height!.subscribe(() =>
       updatePosition()
     );
 
     const updatePosition = async () => {
       const state = await infRetry(() => position.getPositionState());
-      console.log(`Position: ${state.value.toFixed()} ${state.amount.toFixed()}`)
       if (state.value.gt(0)) {
         if (state.health.eq(0)) {
           console.log(`Trying to liquidate position ${state.value.toFixed()}`);
@@ -510,17 +542,17 @@ async function run(params: ExecutionParams) {
             console.error(e);
           }
         } else {
-          console.log(
-            `Position ${position.pair.lendable} ${position.pair.tradable} ${
-              position.trader
-            } ${state.value.toFixed()} and health is: ${state.health.toFixed()}`
-          );
+          // console.log(
+          //   `Position ${position.pair.lendable} ${position.pair.tradable} ${
+          //     position.trader
+          //   } ${state.value.toFixed()} and health is: ${state.health.toFixed()}`
+          // );
         }
       } else {
-        console.log(
-          `Empty position ${position.pair.lendable} ${position.pair.tradable} ${position.trader}`
-        );
-        onNewBlock.unsubscribe();
+        // console.log(
+        //   `Empty position ${position.pair.lendable} ${position.pair.tradable} ${position.trader}`
+        // );
+        position.updateStream?.unsubscribe();
       }
     };
 
@@ -565,13 +597,18 @@ async function initialize(params: InitializeParams) {
 }
 
 const [, , providerUrl, routerAddress, multicall, sleepMs] = process.argv;
-const { PRIVATE_KEY } = process.env;
+const { PRIVATE_KEY, pm_id, instances } = process.env;
+
+const dispatchSize = instances ? parseInt(instances) : 1;
+const dispatchId = pm_id ? parseInt(pm_id) : 0;
 
 console.log({
   providerUrl,
   routerAddress,
   sleepMs,
   PRIVATE_KEY,
+  dispatchId,
+  dispatchSize,
 });
 
 const provider = new JsonRpcProvider(providerUrl);
@@ -590,4 +627,6 @@ initialize({
   multicall,
   sleep: parseInt(sleepMs || "1000"),
   startBlock: 6506800,
+  dispatchId,
+  dispatchSize,
 });
