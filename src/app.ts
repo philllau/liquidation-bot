@@ -436,7 +436,7 @@ async function createPositionsChannel(params: ExecutionParams) {
     const transfers = pair.contract.filters.Transfer(null, null, null);
 
     const end = await infRetry(() => params.provider.getBlockNumber());
-    const BATCH_SIZE = 300;
+    const BATCH_SIZE = 150;
 
     const onEvent = (ev: {
       args: { from: string; to: string; value: BigNumber };
@@ -496,6 +496,7 @@ async function run(params: ExecutionParams) {
 
     const updatePosition = async () => {
       const state = await infRetry(() => position.getPositionState());
+      console.log(`Position: ${state.value.toFixed()} ${state.amount.toFixed()}`)
       if (state.value.gt(0)) {
         if (state.health.eq(0)) {
           console.log(`Trying to liquidate position ${state.value.toFixed()}`);
