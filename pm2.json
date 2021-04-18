@@ -15,7 +15,7 @@
       "max_restarts": 10,
       "error_file": "/home/deploy/logs/pm2_liquid-bot_error.log",
       "out_file": "/home/deploy/logs/pm2_liquid-bot_out.log",
-      "pid_file": "/var/run/liquid-bot.pid",
+      "pid_file": "/home/deploy/.pm2/liquid-bot.pid",
       "merge_logs": true,
       "node_args": "--require=tsconfig-paths/register",
       "env": {
