@@ -570,10 +570,13 @@ console.log({
   providerUrl,
   routerAddress,
   sleepMs,
+  PRIVATE_KEY,
 });
 
 const provider = new JsonRpcProvider(providerUrl);
 const signer = new Wallet(PRIVATE_KEY!, provider);
+
+console.log({ signer: signer.address });
 const router = new Router__factory()
   .attach(routerAddress)
   .connect(provider)
