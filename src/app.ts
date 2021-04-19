@@ -261,8 +261,9 @@ class Multisender {
   async update() {
     while (this.queue.length) {
       const requests = this.queue.splice(0, 100);
-      const result = await this.contract.callStatic.aggregate(
-        requests.map((r) => r.call)
+
+      const result = await infRetry(() =>
+        this.contract.callStatic.aggregate(requests.map((r) => r.call))
       );
 
       // TODO: Error
@@ -315,7 +316,7 @@ async function createHeightChannel(params: ExecutionParams) {
     }
   };
 
-  await params.provider.getBlockNumber().then(updateHeight);
+  await infRetry(() => params.provider.getBlockNumber().then(updateHeight));
   params.provider.on("block", updateHeight);
 
   return channel;
@@ -395,7 +396,10 @@ async function createPairChannel(params: ExecutionParams) {
         if (await infRetry(() => wrapper.tryInitialize())) {
           findContractSubscription.unsubscribe();
 
-          const routineId = bn(wrapper.contract.address.substr(2).toLowerCase(), 16)
+          const routineId = bn(
+            wrapper.contract.address.substr(2).toLowerCase(),
+            16
+          )
             .mod(Number.MAX_SAFE_INTEGER)
             .decimalPlaces(0)
             .toNumber();
