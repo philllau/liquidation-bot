@@ -82,3 +82,15 @@ export function retry<T>(
     },
   };
 }
+
+export function isMineRoutine(id: number, instances: number, taskId: number) {
+  return taskId % instances === id;
+}
+
+export function infRetry<T>(fn: () => Promise<T>): Promise<T> {
+  return retry(fn, { n: Infinity, minWait: 250, maxWait: 250 }).promise;
+}
+
+export function fewRetry<T>(fn: () => Promise<T>): Promise<T> {
+  return retry(fn, { n: 3, minWait: 250, maxWait: 250 }).promise;
+}

@@ -9,11 +9,12 @@
     "removeComments": true,
     "strict": true,
     "noUnusedLocals": true,
-    "baseUrl": "src",
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,
+    "experimentalDecorators": true,
+    "inlineSourceMap": true
   }
 }
