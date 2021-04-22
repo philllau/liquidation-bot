@@ -1,4 +1,3 @@
-import { classToPlain } from "class-transformer";
 import { Diff, diff, DiffArray, DiffNew } from "deep-diff";
 import { map, Observable } from "observable-fns";
 import { IERC20Detailed__factory } from "../types";
@@ -37,9 +36,6 @@ export class TokenMonitor extends AbstractMonitor<Token> {
           }
         })
     );
-
-    console.log(await this.lendableTokens.then(token => classToPlain(token)))
-
     this.context.getChannel(HeightMonitor).then((channel) =>
       channel
         .pipe(
@@ -57,6 +53,7 @@ export class TokenMonitor extends AbstractMonitor<Token> {
           }
         })
     );
+
     return this.channel;
   }
 
@@ -76,7 +73,6 @@ export class TokenMonitor extends AbstractMonitor<Token> {
 
         let instance = await repository.get(address);
         if (!instance) {
-          console.log(`Loading token at ${address}`);
           instance = new Token();
           instance.lendable = isLendable;
           instance.address = address;

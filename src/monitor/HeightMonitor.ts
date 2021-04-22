@@ -1,5 +1,4 @@
 import { Observable } from "observable-fns";
-import { ExecutionContext } from ".";
 import { infRetry } from "../utils";
 import { AbstractMonitor } from "./AbstractMonitor";
 
@@ -13,10 +12,10 @@ export class HeightMonitor extends AbstractMonitor<number> {
     }
   }
 
-  async run(context: ExecutionContext): Promise<Observable<number>> {
-    this.latest = context.startBlock;
-    await infRetry(() => context.provider.getBlockNumber().then(this.onHeight.bind(this)));
-    context.provider.on("block", this.onHeight.bind(this));
+  async run(): Promise<Observable<number>> {
+    this.latest = this.context.startBlock;
+    await infRetry(() => this.context.provider.getBlockNumber().then(this.onHeight.bind(this)));
+    this.context.provider.on("block", this.onHeight.bind(this));
 
     return this.channel;
   }

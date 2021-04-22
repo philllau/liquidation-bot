@@ -30,11 +30,13 @@ const router = new Router__factory()
 
 run({
   provider,
+  providerUrl,
   signer,
   router,
   multicall,
   sleep: parseInt(sleepMs || "1000"),
-  startBlock: 6506800,
+  // startBlock: 6506800,
+  startBlock: 6503236,
   dispatchId,
   dispatchSize,
 });

@@ -19,7 +19,8 @@ export abstract class AbstractIndex<
   ) {
     this.reference = new this.ctor();
     this.prefix = Buffer.alloc(INDEX_PREFIX_SIZE, 0);
-    Buffer.from(this.ctor.name.toString()).copy(this.prefix);
+    this.prefix.writeUInt8('P'.charCodeAt(0))
+    Buffer.from(this.ctor.name.toString()).copy(this.prefix, 1);
     const tmp = Buffer.from(key.toString());
     tmp.copy(this.prefix, MODEL_PREFIX_SIZE);
 

@@ -1,6 +1,12 @@
+import { Exclude } from "class-transformer";
 import "reflect-metadata";
 import { DatastoreCtor } from "./connection";
-import { AbstractIndex, RangeIndex, UniqueIndex } from "./indexes";
+import {
+  AbstractIndex,
+  MODEL_PREFIX_SIZE,
+  RangeIndex,
+  UniqueIndex,
+} from "./indexes";
 
 export enum DatastoreMeta {
   Indexes = "datastore:indexes",
@@ -17,8 +23,11 @@ const IndexCtors = {
   [IndexTypes.Unique]: UniqueIndex,
 };
 
+const MODEL_KEY_PREFIX = 8;
+
 export type KeyDefinition = {
   size: number;
+  name: string;
   key: string;
   transform: (v: any) => Buffer;
 };
@@ -34,7 +43,7 @@ export type IndexDefinition = {
   key: string;
   type: IndexTypes;
   size: number;
-  ctor: DatastoreCtor<any>,
+  ctor: DatastoreCtor<any>;
   getter: (value: any) => Buffer;
 };
 
@@ -74,11 +83,13 @@ export const Key = (props?: Partial<KeyDefinition>): PropertyDecorator => (
   target,
   propertyKey
 ) => {
+  const name = props?.name || target.constructor.name;
   const size = props?.size || 64;
   const key = propertyKey.toString();
   const transform = props?.transform || defaultKeyTransform(size);
   const keyDefinition: KeyDefinition = {
-    size,
+    size: size + MODEL_KEY_PREFIX,
+    name,
     key,
     transform,
   };
@@ -138,6 +149,19 @@ const GenericIndex = (props: IndexDefinition, target: Object) => {
 export abstract class DatastoreDocument<
   TSelf extends DatastoreDocument<TSelf>
 > {
+  @Exclude()
+  private prefix: Buffer;
+  
+  constructor() {
+    this.prefix = Buffer.alloc(MODEL_PREFIX_SIZE, 0);
+    this.prefix.writeUInt8(255, 0);
+    const def = this.getKeyDefinition();
+    if (!def) {
+      throw new Error(`${this.constructor.name} doesn't have @Key()`);
+    }
+
+    Buffer.from(def.name).copy(this.prefix, 1);
+  }
   public getKeyDefinition(): KeyDefinition {
     return Reflect.getMetadata(DatastoreMeta.Key, this);
   }
@@ -151,7 +175,25 @@ export abstract class DatastoreDocument<
     def = def || this.getKeyDefinition();
     value = value || this.getKeyValue(def);
 
-    return def.transform(value);
+    const buffer = Buffer.alloc(def.size);
+    this.prefix.copy(buffer);
+    def.transform(value).copy(buffer, MODEL_PREFIX_SIZE);
+
+    return buffer;
+  }
+
+  public getKeyBounds(def?: KeyDefinition): [Buffer, Buffer] {
+    def = def || this.getKeyDefinition();
+    const [lower, upper] = [
+      Buffer.alloc(def.size, 0),
+      Buffer.alloc(def.size, 255),
+    ];
+
+    this.prefix.copy(lower);
+    this.prefix.copy(upper);
+    
+
+    return [lower, upper];
   }
 
   public getIndexes(): AbstractIndex<TSelf, keyof TSelf>[] {

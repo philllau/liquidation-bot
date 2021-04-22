@@ -1,7 +1,7 @@
 import BigNumber from "bignumber.js";
 import { Expose, Transform } from "class-transformer";
-import { bn, oneRay, ray } from "../math";
 import { DatastoreDocument, Index, Key } from "../db/document";
+import { bn, ray } from "../math";
 
 function BigNumberTransform() {
   return Transform((params) => {
@@ -79,12 +79,13 @@ const HexIndex = (size: number) =>
 
 const AddressIndex = () => HexIndex(20);
 
-const BooleanIndex = () => Index({
-  size: 1,
-  getter: (value: boolean) => {
-    return Buffer.alloc(1, value ? 1 : 0)
-  }
-})
+const BooleanIndex = () =>
+  Index({
+    size: 1,
+    getter: (value: boolean) => {
+      return Buffer.alloc(1, value ? 1 : 0);
+    },
+  });
 
 const BigNumberIndex = (size: number = 32) =>
   Index({
@@ -106,7 +107,8 @@ export class Token extends DatastoreDocument<Token> {
   symbol!: string;
   @BooleanIndex()
   lendable!: boolean;
-
+  @BooleanIndex()
+  tradable!: boolean;
   decimals!: number;
 }
 
@@ -117,16 +119,17 @@ export class Pair extends DatastoreDocument<Pair> {
   lendable!: string;
   @AddressIndex()
   tradable!: string;
+
+  @Index()
+  updateAt!: number;
 }
 
-export class Transfer extends DatastoreDocument<Transfer> {
-  
-}
+export class Transfer extends DatastoreDocument<Transfer> {}
 
 export class Position extends DatastoreDocument<Position> {
-  @Key()
+  @HexKey(40)
   get id() {
-    return [this.pair, this.trader].join("_");
+    return Position.toId(this.pair, this.trader);
   }
 
   @AddressIndex()
@@ -139,6 +142,8 @@ export class Position extends DatastoreDocument<Position> {
   pair!: string;
   @Index()
   updateAt!: number;
+  @Index()
+  appearAt!: number;
 
   @BigNumberIndex()
   @BigNumberTransform()
@@ -176,11 +181,12 @@ export class Position extends DatastoreDocument<Position> {
     );
   }
 
-  toString() {
-    return this.health.div(oneRay).toFixed()
+  static toId(pair: string, trader: string) {
+    pair = pair.startsWith("0x") ? pair.substr(2) : pair;
+    trader = trader.startsWith("0x") ? trader.substr(2) : trader;
+    return [pair, trader].join("");
   }
 }
-
 
 export class State extends DatastoreDocument<State> {
   @Key()

@@ -20,7 +20,7 @@ export class DatastoreConnection {
 
   getRepository<T extends DatastoreDocument<T>>(ctor: DatastoreCtor<T>) {
     if (!this.dbs[ctor.name]) {
-      this.dbs[ctor.name] = new DatastoreRepository(ctor, this, this.db);
+      this.dbs[ctor.name] = new DatastoreRepository(ctor, this.db);
     }
     return this.dbs[ctor.name] as DatastoreRepository<T>;
   }

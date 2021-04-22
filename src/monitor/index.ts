@@ -1,6 +1,6 @@
 import { Observable } from "observable-fns";
 import { JsonRpcProvider } from "@ethersproject/providers";
-import { Signer } from "ethers";
+import { Signer, Wallet } from "ethers";
 import {
   PairFactory,
   PairFactory__factory,
@@ -18,6 +18,8 @@ import { TokenMonitor } from "./TokenMonitor";
 import { connect } from "../db/datastore";
 import { HeightMonitor } from "./HeightMonitor";
 import { AbstractMonitor } from "./AbstractMonitor";
+import { PairMonitor } from "./PairMonitor";
+import { PositionMonitor } from "./PositionMonitor";
 
 export type Ctor<T> = new (context: ExecutionContext) => T;
 
@@ -25,6 +27,7 @@ export type InitializeParams = Readonly<{
   dispatchId: number;
   dispatchSize: number;
   provider: JsonRpcProvider;
+  providerUrl: string;
   signer: Signer;
   multicall: string;
   router: Router;
@@ -32,7 +35,12 @@ export type InitializeParams = Readonly<{
   startBlock: number;
 }>;
 
-const monitors = [HeightMonitor, TokenMonitor] as const;
+const monitors = [
+  HeightMonitor,
+  TokenMonitor,
+  PairMonitor,
+  PositionMonitor,
+] as const;
 
 type InstanceType<T> = T extends Ctor<infer TInstance> ? TInstance : never;
 
@@ -49,6 +57,9 @@ export class ExecutionContext implements InitializeParams {
   }
   get provider() {
     return this.params.provider;
+  }
+  get providerUrl() {
+    return this.params.providerUrl;
   }
   get signer() {
     return this.params.signer;
@@ -111,6 +122,8 @@ export class ExecutionContext implements InitializeParams {
     this.runMonitor(HeightMonitor);
     this.sender = new Multisender(this, this.multicall);
     this.runMonitor(TokenMonitor);
+    this.runMonitor(PairMonitor);
+    this.runMonitor(PositionMonitor);
   }
 
   async runMonitor<T extends typeof monitors[number]>(ctor: T) {
@@ -119,7 +132,9 @@ export class ExecutionContext implements InitializeParams {
       throw new Error(`Monitor of ${ctor.name} not found`);
     }
 
-    this.channels[index] = this.getMonitor(ctor).run(this) as Promise<Observable<ChannelType<T>>>
+    this.channels[index] = this.getMonitor(ctor).run() as Promise<
+      Observable<ChannelType<T>>
+    >;
   }
 
   getMonitor<T extends typeof monitors[number]>(ctor: T): InstanceType<T> {
@@ -147,6 +162,13 @@ export class ExecutionContext implements InitializeParams {
 
     const channel = this.channels[index];
     return channel as Promise<Observable<ChannelType<T>>>;
+  }
+
+  getNewConnection() {
+    const provider = new JsonRpcProvider(this.providerUrl);
+    const signer = Wallet.createRandom().connect(provider);
+
+    return signer;
   }
 }
 

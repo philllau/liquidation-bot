@@ -1,7 +1,7 @@
 import { AbstractBatch, AbstractIteratorOptions } from "abstract-leveldown";
 import { classToPlain, plainToClass } from "class-transformer";
 import { LevelUp } from "levelup";
-import { DatastoreConnection, DatastoreCtor } from "./connection";
+import { DatastoreCtor } from "./connection";
 import { DatastoreDocument } from "./document";
 
 type ops<TDoc extends DatastoreDocument<TDoc>, TKey extends keyof TDoc> = {
@@ -17,16 +17,34 @@ type FieldComparator<
   TKey extends keyof TDoc
 > = { [key in keyof ops<TDoc, TKey>]?: ops<TDoc, TKey>[key] } | TDoc[TKey];
 
+export const printBuffer = (buf: Buffer) => {
+  const result: string[] = [];
+
+  result.push("");
+  result.push("PRINT BUFFER: " + buf.length);
+  result.push(buf.toString("hex"));
+  result.push(buf.toString());
+  result.push(
+    Array.from(buf)
+      .map((byte) =>
+        Array(8)
+          .fill("0")
+          .map((v, o) => (byte >> o) & 1)
+          .reverse()
+          .join("")
+      )
+      .join(" ")
+  );
+  result.push("");
+
+  return result.join("\n");
+};
+
 export class DatastoreRepository<T extends DatastoreDocument<T>> {
   private referenceInstance: T;
 
-  constructor(
-    private ctor: DatastoreCtor<T>,
-    private connection: DatastoreConnection,
-    private db: LevelUp
-  ) {
+  constructor(private ctor: DatastoreCtor<T>, private db: LevelUp) {
     this.referenceInstance = new ctor();
-    console.log({ connection: this.connection });
   }
 
   private valueToInstance(data: Buffer): T {
@@ -41,9 +59,10 @@ export class DatastoreRepository<T extends DatastoreDocument<T>> {
   private setIndexesOperations(instance: T): AbstractBatch[] {
     const indexes = instance.getIndexes();
     return indexes.map((index) => {
+      const key = index.getIndexKey(instance);
       return {
         type: "put",
-        key: index.getIndexKey(instance),
+        key,
         value: instance.getKey(),
       };
     });
@@ -89,7 +108,33 @@ export class DatastoreRepository<T extends DatastoreDocument<T>> {
     }
 
     operations.push(...this.setIndexesOperations(instance));
+
     this.db.batch(operations);
+  }
+
+  all(): Promise<T[]> {
+    return new Promise((resolve, reject) => {
+      const values: T[] = [];
+      const [lower, upper] = this.referenceInstance.getKeyBounds();
+
+      this.db
+        .createReadStream({
+          gt: lower,
+          lt: upper,
+          keys: true,
+          values: true,
+        })
+        .on("data", (answer) => {
+          values.push(this.valueToInstance(answer.value));
+        })
+        .on("error", (error) => {
+          reject(error);
+        })
+        .on("close", () => {})
+        .on("end", () => {
+          resolve(values);
+        });
+    });
   }
 
   find<TKey extends keyof T>(
@@ -123,11 +168,11 @@ export class DatastoreRepository<T extends DatastoreDocument<T>> {
           options.gte = index.getLowerBound(this.referenceInstance);
           options.lt = index.getUpperBound(this.referenceInstance);
           index.setKeyMin(options.lt);
-          index.setValue(options.le, rule.$lt);
+          index.setValue(options.lt, rule.$lt);
         } else if ("$lte" in rule && rule.$lte) {
           options.gt = index.getLowerBound(this.referenceInstance);
           options.lte = index.getUpperBound(this.referenceInstance);
-          index.setValue(options.le, rule.$lte);
+          index.setValue(options.lte, rule.$lte);
         } else if ("$eq" in rule && rule.$eq) {
           options.gte = index.getLowerBound(this.referenceInstance);
           options.lte = index.getUpperBound(this.referenceInstance);

@@ -1,11 +1,11 @@
-import { BytesLike, Contract } from "ethers";
+import { BigNumber, BytesLike, Contract } from "ethers";
 import { ExecutionContext } from ".";
 import { Multicall, Multicall__factory } from "../types";
 import { infRetry } from "../utils";
 import { HeightMonitor } from "./HeightMonitor";
 
 interface CallRequest {
-  onResult: (response: string) => void;
+  onResult: (response: string, height: BigNumber) => void;
   call: Call;
 }
 interface Call {
@@ -22,23 +22,73 @@ type CallResult<
     : R
   : never;
 
+type CallAnswer<
+  TContract extends Contract,
+  TMethod extends keyof TContract["functions"]
+> = {
+  result: CallResult<TContract, TMethod>;
+  blockHeight: BigNumber;
+};
+
 export class Multisender {
   private contract: Multicall;
   private latestBlock: number = 0;
   private queue: Array<CallRequest> = [];
+  private processing: boolean = false;
 
   constructor(protected params: ExecutionContext, address: string) {
     this.contract = new Multicall__factory(params.signer).attach(address);
 
     this.params.getChannel(HeightMonitor).then((channel) =>
       channel.subscribe((value) => {
-
         if (this.latestBlock < value) {
           this.latestBlock = value;
           this.update();
         }
       })
     );
+  }
+
+  async callWithBlock<
+    T extends Contract,
+    TMethod extends keyof T["functions"],
+    TResult extends CallAnswer<T, TMethod>
+  >(
+    contract: T,
+    methodName: TMethod,
+    ...args: Parameters<T["functions"][TMethod]>
+  ): Promise<TResult> {
+    return new Promise((resolve, reject) => {
+      this.queue.push({
+        call: {
+          target: contract.address,
+          callData: contract.interface.encodeFunctionData(
+            methodName as string,
+            args
+          ),
+        },
+        onResult: (encoded: string, blockHeight: BigNumber) => {
+          try {
+            const typedResult = contract.interface.decodeFunctionResult(
+              methodName as string,
+              encoded
+            );
+
+            const result =
+              Array.isArray(typedResult) && typedResult.length === 1
+                ? typedResult[0]
+                : typedResult;
+
+            resolve({
+              result,
+              blockHeight,
+            } as any);
+          } catch (e) {
+            reject(new Error("Failed decode: " + encoded));
+          }
+        },
+      });
+    });
   }
 
   async call<
@@ -50,7 +100,7 @@ export class Multisender {
     methodName: TMethod,
     ...args: Parameters<T["functions"][TMethod]>
   ): Promise<TResult> {
-    return new Promise<TResult>((resolve, reject) => {
+    return new Promise((resolve, reject) => {
       this.queue.push({
         call: {
           target: contract.address,
@@ -80,6 +130,8 @@ export class Multisender {
   }
 
   async update() {
+    if (this.processing) return;
+    this.processing = true;
     while (this.queue.length) {
       const requests = this.queue.splice(0, 100);
 
@@ -87,13 +139,15 @@ export class Multisender {
         this.contract.callStatic.aggregate(requests.map((r) => r.call))
       );
 
-      // TODO: Error
-
       requests.forEach((request, index) =>
-        request.onResult(result.returnData[index])
+        request.onResult(result.returnData[index], result.blockNumber)
       );
 
       this.latestBlock = result.blockNumber.toNumber();
     }
+
+    this.processing = false;
+
+    setTimeout(this.update.bind(this), 100);
   }
 }
