@@ -34,6 +34,7 @@ interface ReserveInterface extends ethers.utils.Interface {
     "decimals()": FunctionFragment;
     "decreaseAllowance(address,uint256)": FunctionFragment;
     "deposit(address)": FunctionFragment;
+    "fill()": FunctionFragment;
     "getAvailableLiquidity()": FunctionFragment;
     "getBorrowRate()": FunctionFragment;
     "getConfig()": FunctionFragment;
@@ -97,6 +98,7 @@ interface ReserveInterface extends ethers.utils.Interface {
     values: [string, BigNumberish]
   ): string;
   encodeFunctionData(functionFragment: "deposit", values: [string]): string;
+  encodeFunctionData(functionFragment: "fill", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "getAvailableLiquidity",
     values?: undefined
@@ -210,6 +212,7 @@ interface ReserveInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "deposit", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "fill", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "getAvailableLiquidity",
     data: BytesLike
@@ -292,6 +295,7 @@ interface ReserveInterface extends ethers.utils.Interface {
     "Approval(address,address,uint256)": EventFragment;
     "Borrow(address,address,uint256)": EventFragment;
     "Deposit(address,address,uint256)": EventFragment;
+    "Fill(address,uint256)": EventFragment;
     "Liquidate(address,address)": EventFragment;
     "OwnershipTransferred(address,address)": EventFragment;
     "Repay(address,address,uint256)": EventFragment;
@@ -302,6 +306,7 @@ interface ReserveInterface extends ethers.utils.Interface {
   getEvent(nameOrSignatureOrTopic: "Approval"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Borrow"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Deposit"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "Fill"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Liquidate"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "OwnershipTransferred"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Repay"): EventFragment;
@@ -463,6 +468,10 @@ export class Reserve extends Contract {
       investor: string,
       overrides?: Overrides
     ): Promise<ContractTransaction>;
+
+    fill(overrides?: Overrides): Promise<ContractTransaction>;
+
+    "fill()"(overrides?: Overrides): Promise<ContractTransaction>;
 
     getAvailableLiquidity(overrides?: CallOverrides): Promise<[BigNumber]>;
 
@@ -898,6 +907,10 @@ export class Reserve extends Contract {
     overrides?: Overrides
   ): Promise<ContractTransaction>;
 
+  fill(overrides?: Overrides): Promise<ContractTransaction>;
+
+  "fill()"(overrides?: Overrides): Promise<ContractTransaction>;
+
   getAvailableLiquidity(overrides?: CallOverrides): Promise<BigNumber>;
 
   "getAvailableLiquidity()"(overrides?: CallOverrides): Promise<BigNumber>;
@@ -1302,6 +1315,10 @@ export class Reserve extends Contract {
       overrides?: CallOverrides
     ): Promise<void>;
 
+    fill(overrides?: CallOverrides): Promise<void>;
+
+    "fill()"(overrides?: CallOverrides): Promise<void>;
+
     getAvailableLiquidity(overrides?: CallOverrides): Promise<BigNumber>;
 
     "getAvailableLiquidity()"(overrides?: CallOverrides): Promise<BigNumber>;
@@ -1623,6 +1640,14 @@ export class Reserve extends Contract {
       { reserve: string; investor: string; amount: BigNumber }
     >;
 
+    Fill(
+      reserve: string | null,
+      amount: null
+    ): TypedEventFilter<
+      [string, BigNumber],
+      { reserve: string; amount: BigNumber }
+    >;
+
     Liquidate(
       reserve: string | null,
       trader: string | null
@@ -1772,6 +1797,10 @@ export class Reserve extends Contract {
       investor: string,
       overrides?: Overrides
     ): Promise<BigNumber>;
+
+    fill(overrides?: Overrides): Promise<BigNumber>;
+
+    "fill()"(overrides?: Overrides): Promise<BigNumber>;
 
     getAvailableLiquidity(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -2104,6 +2133,10 @@ export class Reserve extends Contract {
       investor: string,
       overrides?: Overrides
     ): Promise<PopulatedTransaction>;
+
+    fill(overrides?: Overrides): Promise<PopulatedTransaction>;
+
+    "fill()"(overrides?: Overrides): Promise<PopulatedTransaction>;
 
     getAvailableLiquidity(
       overrides?: CallOverrides

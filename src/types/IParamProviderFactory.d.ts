@@ -23,15 +23,19 @@ import { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
 
 interface IParamProviderFactoryInterface extends ethers.utils.Interface {
   functions: {
-    "createPairParamProvider(address,address)": FunctionFragment;
+    "createPairParamProvider(address[])": FunctionFragment;
     "createReserveParamProvider(address)": FunctionFragment;
     "getPairParamProvider(address,address)": FunctionFragment;
     "getReserveParamProvider(address)": FunctionFragment;
+    "getRoutablePairParamProvider(address,address,address)": FunctionFragment;
+    "setSwapRouter(address)": FunctionFragment;
+    "upgradePairParamProvider(address[])": FunctionFragment;
+    "upgradeReserveParamProvider(address)": FunctionFragment;
   };
 
   encodeFunctionData(
     functionFragment: "createPairParamProvider",
-    values: [string, string]
+    values: [string[]]
   ): string;
   encodeFunctionData(
     functionFragment: "createReserveParamProvider",
@@ -43,6 +47,22 @@ interface IParamProviderFactoryInterface extends ethers.utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "getReserveParamProvider",
+    values: [string]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "getRoutablePairParamProvider",
+    values: [string, string, string]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "setSwapRouter",
+    values: [string]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "upgradePairParamProvider",
+    values: [string[]]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "upgradeReserveParamProvider",
     values: [string]
   ): string;
 
@@ -60,6 +80,22 @@ interface IParamProviderFactoryInterface extends ethers.utils.Interface {
   ): Result;
   decodeFunctionResult(
     functionFragment: "getReserveParamProvider",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "getRoutablePairParamProvider",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "setSwapRouter",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "upgradePairParamProvider",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "upgradeReserveParamProvider",
     data: BytesLike
   ): Result;
 
@@ -111,14 +147,12 @@ export class IParamProviderFactory extends Contract {
 
   functions: {
     createPairParamProvider(
-      lendable: string,
-      tradable: string,
+      path: string[],
       overrides?: Overrides
     ): Promise<ContractTransaction>;
 
-    "createPairParamProvider(address,address)"(
-      lendable: string,
-      tradable: string,
+    "createPairParamProvider(address[])"(
+      path: string[],
       overrides?: Overrides
     ): Promise<ContractTransaction>;
 
@@ -153,17 +187,59 @@ export class IParamProviderFactory extends Contract {
       lendable: string,
       overrides?: CallOverrides
     ): Promise<[string]>;
+
+    getRoutablePairParamProvider(
+      lendable: string,
+      proxyLendable: string,
+      tradable: string,
+      overrides?: CallOverrides
+    ): Promise<[string]>;
+
+    "getRoutablePairParamProvider(address,address,address)"(
+      lendable: string,
+      proxyLendable: string,
+      tradable: string,
+      overrides?: CallOverrides
+    ): Promise<[string]>;
+
+    setSwapRouter(
+      swapRouter: string,
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
+
+    "setSwapRouter(address)"(
+      swapRouter: string,
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
+
+    upgradePairParamProvider(
+      path: string[],
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
+
+    "upgradePairParamProvider(address[])"(
+      path: string[],
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
+
+    upgradeReserveParamProvider(
+      lendable: string,
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
+
+    "upgradeReserveParamProvider(address)"(
+      lendable: string,
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
   };
 
   createPairParamProvider(
-    lendable: string,
-    tradable: string,
+    path: string[],
     overrides?: Overrides
   ): Promise<ContractTransaction>;
 
-  "createPairParamProvider(address,address)"(
-    lendable: string,
-    tradable: string,
+  "createPairParamProvider(address[])"(
+    path: string[],
     overrides?: Overrides
   ): Promise<ContractTransaction>;
 
@@ -199,16 +275,58 @@ export class IParamProviderFactory extends Contract {
     overrides?: CallOverrides
   ): Promise<string>;
 
+  getRoutablePairParamProvider(
+    lendable: string,
+    proxyLendable: string,
+    tradable: string,
+    overrides?: CallOverrides
+  ): Promise<string>;
+
+  "getRoutablePairParamProvider(address,address,address)"(
+    lendable: string,
+    proxyLendable: string,
+    tradable: string,
+    overrides?: CallOverrides
+  ): Promise<string>;
+
+  setSwapRouter(
+    swapRouter: string,
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
+
+  "setSwapRouter(address)"(
+    swapRouter: string,
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
+
+  upgradePairParamProvider(
+    path: string[],
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
+
+  "upgradePairParamProvider(address[])"(
+    path: string[],
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
+
+  upgradeReserveParamProvider(
+    lendable: string,
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
+
+  "upgradeReserveParamProvider(address)"(
+    lendable: string,
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
+
   callStatic: {
     createPairParamProvider(
-      lendable: string,
-      tradable: string,
+      path: string[],
       overrides?: CallOverrides
     ): Promise<string>;
 
-    "createPairParamProvider(address,address)"(
-      lendable: string,
-      tradable: string,
+    "createPairParamProvider(address[])"(
+      path: string[],
       overrides?: CallOverrides
     ): Promise<string>;
 
@@ -243,20 +361,59 @@ export class IParamProviderFactory extends Contract {
       lendable: string,
       overrides?: CallOverrides
     ): Promise<string>;
+
+    getRoutablePairParamProvider(
+      lendable: string,
+      proxyLendable: string,
+      tradable: string,
+      overrides?: CallOverrides
+    ): Promise<string>;
+
+    "getRoutablePairParamProvider(address,address,address)"(
+      lendable: string,
+      proxyLendable: string,
+      tradable: string,
+      overrides?: CallOverrides
+    ): Promise<string>;
+
+    setSwapRouter(swapRouter: string, overrides?: CallOverrides): Promise<void>;
+
+    "setSwapRouter(address)"(
+      swapRouter: string,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    upgradePairParamProvider(
+      path: string[],
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    "upgradePairParamProvider(address[])"(
+      path: string[],
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    upgradeReserveParamProvider(
+      lendable: string,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    "upgradeReserveParamProvider(address)"(
+      lendable: string,
+      overrides?: CallOverrides
+    ): Promise<void>;
   };
 
   filters: {};
 
   estimateGas: {
     createPairParamProvider(
-      lendable: string,
-      tradable: string,
+      path: string[],
       overrides?: Overrides
     ): Promise<BigNumber>;
 
-    "createPairParamProvider(address,address)"(
-      lendable: string,
-      tradable: string,
+    "createPairParamProvider(address[])"(
+      path: string[],
       overrides?: Overrides
     ): Promise<BigNumber>;
 
@@ -290,19 +447,61 @@ export class IParamProviderFactory extends Contract {
     "getReserveParamProvider(address)"(
       lendable: string,
       overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    getRoutablePairParamProvider(
+      lendable: string,
+      proxyLendable: string,
+      tradable: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "getRoutablePairParamProvider(address,address,address)"(
+      lendable: string,
+      proxyLendable: string,
+      tradable: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    setSwapRouter(
+      swapRouter: string,
+      overrides?: Overrides
+    ): Promise<BigNumber>;
+
+    "setSwapRouter(address)"(
+      swapRouter: string,
+      overrides?: Overrides
+    ): Promise<BigNumber>;
+
+    upgradePairParamProvider(
+      path: string[],
+      overrides?: Overrides
+    ): Promise<BigNumber>;
+
+    "upgradePairParamProvider(address[])"(
+      path: string[],
+      overrides?: Overrides
+    ): Promise<BigNumber>;
+
+    upgradeReserveParamProvider(
+      lendable: string,
+      overrides?: Overrides
+    ): Promise<BigNumber>;
+
+    "upgradeReserveParamProvider(address)"(
+      lendable: string,
+      overrides?: Overrides
     ): Promise<BigNumber>;
   };
 
   populateTransaction: {
     createPairParamProvider(
-      lendable: string,
-      tradable: string,
+      path: string[],
       overrides?: Overrides
     ): Promise<PopulatedTransaction>;
 
-    "createPairParamProvider(address,address)"(
-      lendable: string,
-      tradable: string,
+    "createPairParamProvider(address[])"(
+      path: string[],
       overrides?: Overrides
     ): Promise<PopulatedTransaction>;
 
@@ -336,6 +535,50 @@ export class IParamProviderFactory extends Contract {
     "getReserveParamProvider(address)"(
       lendable: string,
       overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    getRoutablePairParamProvider(
+      lendable: string,
+      proxyLendable: string,
+      tradable: string,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    "getRoutablePairParamProvider(address,address,address)"(
+      lendable: string,
+      proxyLendable: string,
+      tradable: string,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    setSwapRouter(
+      swapRouter: string,
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
+
+    "setSwapRouter(address)"(
+      swapRouter: string,
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
+
+    upgradePairParamProvider(
+      path: string[],
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
+
+    "upgradePairParamProvider(address[])"(
+      path: string[],
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
+
+    upgradeReserveParamProvider(
+      lendable: string,
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
+
+    "upgradeReserveParamProvider(address)"(
+      lendable: string,
+      overrides?: Overrides
     ): Promise<PopulatedTransaction>;
   };
 }

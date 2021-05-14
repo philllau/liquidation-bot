@@ -29,18 +29,21 @@ interface IParamProviderInterface extends ethers.utils.Interface {
     "liquidationReward()": FunctionFragment;
     "maxLeverageFactor()": FunctionFragment;
     "maxLiquidationReward()": FunctionFragment;
+    "maxPriceThreshold()": FunctionFragment;
     "maxRateMultiplier()": FunctionFragment;
     "minPositionDeposit()": FunctionFragment;
     "minWOWBalance(uint256)": FunctionFragment;
     "optimalSlope()": FunctionFragment;
     "optimalUtilization()": FunctionFragment;
     "poolUtilizationAllowance()": FunctionFragment;
+    "priceGuard()": FunctionFragment;
     "setBaseBorrowRate(uint256)": FunctionFragment;
     "setExcessSlope(uint256)": FunctionFragment;
     "setLiquidationMargin(uint256)": FunctionFragment;
     "setLiquidationReward(uint256)": FunctionFragment;
     "setMaxLeverageFactor(uint256)": FunctionFragment;
     "setMaxLiquidationReward(uint256)": FunctionFragment;
+    "setMaxPriceThreshold(uint256)": FunctionFragment;
     "setMaxRateMultiplier(uint256)": FunctionFragment;
     "setMinPositionDeposit(uint256)": FunctionFragment;
     "setMinWOWBalance(uint256,uint256)": FunctionFragment;
@@ -48,8 +51,11 @@ interface IParamProviderInterface extends ethers.utils.Interface {
     "setOptimalUtilization(uint256)": FunctionFragment;
     "setParameters(tuple)": FunctionFragment;
     "setPoolUtilizationAllowance(uint256)": FunctionFragment;
+    "setPriceGuard(address)": FunctionFragment;
+    "setSwapRouter(address)": FunctionFragment;
     "setTraderProfitFee(uint256)": FunctionFragment;
     "setTreasureFactor(uint256)": FunctionFragment;
+    "swapRouter()": FunctionFragment;
     "traderProfitFee()": FunctionFragment;
     "treasureFactor()": FunctionFragment;
   };
@@ -79,6 +85,10 @@ interface IParamProviderInterface extends ethers.utils.Interface {
     values?: undefined
   ): string;
   encodeFunctionData(
+    functionFragment: "maxPriceThreshold",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
     functionFragment: "maxRateMultiplier",
     values?: undefined
   ): string;
@@ -103,6 +113,10 @@ interface IParamProviderInterface extends ethers.utils.Interface {
     values?: undefined
   ): string;
   encodeFunctionData(
+    functionFragment: "priceGuard",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
     functionFragment: "setBaseBorrowRate",
     values: [BigNumberish]
   ): string;
@@ -124,6 +138,10 @@ interface IParamProviderInterface extends ethers.utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "setMaxLiquidationReward",
+    values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "setMaxPriceThreshold",
     values: [BigNumberish]
   ): string;
   encodeFunctionData(
@@ -169,12 +187,24 @@ interface IParamProviderInterface extends ethers.utils.Interface {
     values: [BigNumberish]
   ): string;
   encodeFunctionData(
+    functionFragment: "setPriceGuard",
+    values: [string]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "setSwapRouter",
+    values: [string]
+  ): string;
+  encodeFunctionData(
     functionFragment: "setTraderProfitFee",
     values: [BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "setTreasureFactor",
     values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "swapRouter",
+    values?: undefined
   ): string;
   encodeFunctionData(
     functionFragment: "traderProfitFee",
@@ -210,6 +240,10 @@ interface IParamProviderInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
+    functionFragment: "maxPriceThreshold",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "maxRateMultiplier",
     data: BytesLike
   ): Result;
@@ -233,6 +267,7 @@ interface IParamProviderInterface extends ethers.utils.Interface {
     functionFragment: "poolUtilizationAllowance",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "priceGuard", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "setBaseBorrowRate",
     data: BytesLike
@@ -255,6 +290,10 @@ interface IParamProviderInterface extends ethers.utils.Interface {
   ): Result;
   decodeFunctionResult(
     functionFragment: "setMaxLiquidationReward",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "setMaxPriceThreshold",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -286,6 +325,14 @@ interface IParamProviderInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
+    functionFragment: "setPriceGuard",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "setSwapRouter",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "setTraderProfitFee",
     data: BytesLike
   ): Result;
@@ -293,6 +340,7 @@ interface IParamProviderInterface extends ethers.utils.Interface {
     functionFragment: "setTreasureFactor",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "swapRouter", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "traderProfitFee",
     data: BytesLike
@@ -373,6 +421,10 @@ export class IParamProvider extends Contract {
 
     "maxLiquidationReward()"(overrides?: CallOverrides): Promise<[BigNumber]>;
 
+    maxPriceThreshold(overrides?: Overrides): Promise<ContractTransaction>;
+
+    "maxPriceThreshold()"(overrides?: Overrides): Promise<ContractTransaction>;
+
     maxRateMultiplier(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     "maxRateMultiplier()"(overrides?: CallOverrides): Promise<[BigNumber]>;
@@ -404,6 +456,10 @@ export class IParamProvider extends Contract {
     "poolUtilizationAllowance()"(
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
+
+    priceGuard(overrides?: CallOverrides): Promise<[string]>;
+
+    "priceGuard()"(overrides?: CallOverrides): Promise<[string]>;
 
     setBaseBorrowRate(
       value: BigNumberish,
@@ -461,6 +517,16 @@ export class IParamProvider extends Contract {
     ): Promise<ContractTransaction>;
 
     "setMaxLiquidationReward(uint256)"(
+      value: BigNumberish,
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
+
+    setMaxPriceThreshold(
+      value: BigNumberish,
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
+
+    "setMaxPriceThreshold(uint256)"(
       value: BigNumberish,
       overrides?: Overrides
     ): Promise<ContractTransaction>;
@@ -561,6 +627,26 @@ export class IParamProvider extends Contract {
       overrides?: Overrides
     ): Promise<ContractTransaction>;
 
+    setPriceGuard(
+      priceGuard: string,
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
+
+    "setPriceGuard(address)"(
+      priceGuard: string,
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
+
+    setSwapRouter(
+      swapRouter: string,
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
+
+    "setSwapRouter(address)"(
+      swapRouter: string,
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
+
     setTraderProfitFee(
       value: BigNumberish,
       overrides?: Overrides
@@ -580,6 +666,10 @@ export class IParamProvider extends Contract {
       value: BigNumberish,
       overrides?: Overrides
     ): Promise<ContractTransaction>;
+
+    swapRouter(overrides?: CallOverrides): Promise<[string]>;
+
+    "swapRouter()"(overrides?: CallOverrides): Promise<[string]>;
 
     traderProfitFee(overrides?: CallOverrides): Promise<[BigNumber]>;
 
@@ -614,6 +704,10 @@ export class IParamProvider extends Contract {
 
   "maxLiquidationReward()"(overrides?: CallOverrides): Promise<BigNumber>;
 
+  maxPriceThreshold(overrides?: Overrides): Promise<ContractTransaction>;
+
+  "maxPriceThreshold()"(overrides?: Overrides): Promise<ContractTransaction>;
+
   maxRateMultiplier(overrides?: CallOverrides): Promise<BigNumber>;
 
   "maxRateMultiplier()"(overrides?: CallOverrides): Promise<BigNumber>;
@@ -643,6 +737,10 @@ export class IParamProvider extends Contract {
   poolUtilizationAllowance(overrides?: CallOverrides): Promise<BigNumber>;
 
   "poolUtilizationAllowance()"(overrides?: CallOverrides): Promise<BigNumber>;
+
+  priceGuard(overrides?: CallOverrides): Promise<string>;
+
+  "priceGuard()"(overrides?: CallOverrides): Promise<string>;
 
   setBaseBorrowRate(
     value: BigNumberish,
@@ -700,6 +798,16 @@ export class IParamProvider extends Contract {
   ): Promise<ContractTransaction>;
 
   "setMaxLiquidationReward(uint256)"(
+    value: BigNumberish,
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
+
+  setMaxPriceThreshold(
+    value: BigNumberish,
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
+
+  "setMaxPriceThreshold(uint256)"(
     value: BigNumberish,
     overrides?: Overrides
   ): Promise<ContractTransaction>;
@@ -800,6 +908,26 @@ export class IParamProvider extends Contract {
     overrides?: Overrides
   ): Promise<ContractTransaction>;
 
+  setPriceGuard(
+    priceGuard: string,
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
+
+  "setPriceGuard(address)"(
+    priceGuard: string,
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
+
+  setSwapRouter(
+    swapRouter: string,
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
+
+  "setSwapRouter(address)"(
+    swapRouter: string,
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
+
   setTraderProfitFee(
     value: BigNumberish,
     overrides?: Overrides
@@ -819,6 +947,10 @@ export class IParamProvider extends Contract {
     value: BigNumberish,
     overrides?: Overrides
   ): Promise<ContractTransaction>;
+
+  swapRouter(overrides?: CallOverrides): Promise<string>;
+
+  "swapRouter()"(overrides?: CallOverrides): Promise<string>;
 
   traderProfitFee(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -853,6 +985,10 @@ export class IParamProvider extends Contract {
 
     "maxLiquidationReward()"(overrides?: CallOverrides): Promise<BigNumber>;
 
+    maxPriceThreshold(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "maxPriceThreshold()"(overrides?: CallOverrides): Promise<BigNumber>;
+
     maxRateMultiplier(overrides?: CallOverrides): Promise<BigNumber>;
 
     "maxRateMultiplier()"(overrides?: CallOverrides): Promise<BigNumber>;
@@ -882,6 +1018,10 @@ export class IParamProvider extends Contract {
     poolUtilizationAllowance(overrides?: CallOverrides): Promise<BigNumber>;
 
     "poolUtilizationAllowance()"(overrides?: CallOverrides): Promise<BigNumber>;
+
+    priceGuard(overrides?: CallOverrides): Promise<string>;
+
+    "priceGuard()"(overrides?: CallOverrides): Promise<string>;
 
     setBaseBorrowRate(
       value: BigNumberish,
@@ -939,6 +1079,16 @@ export class IParamProvider extends Contract {
     ): Promise<void>;
 
     "setMaxLiquidationReward(uint256)"(
+      value: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    setMaxPriceThreshold(
+      value: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    "setMaxPriceThreshold(uint256)"(
       value: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
@@ -1039,6 +1189,20 @@ export class IParamProvider extends Contract {
       overrides?: CallOverrides
     ): Promise<void>;
 
+    setPriceGuard(priceGuard: string, overrides?: CallOverrides): Promise<void>;
+
+    "setPriceGuard(address)"(
+      priceGuard: string,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    setSwapRouter(swapRouter: string, overrides?: CallOverrides): Promise<void>;
+
+    "setSwapRouter(address)"(
+      swapRouter: string,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
     setTraderProfitFee(
       value: BigNumberish,
       overrides?: CallOverrides
@@ -1058,6 +1222,10 @@ export class IParamProvider extends Contract {
       value: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
+
+    swapRouter(overrides?: CallOverrides): Promise<string>;
+
+    "swapRouter()"(overrides?: CallOverrides): Promise<string>;
 
     traderProfitFee(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -1095,6 +1263,10 @@ export class IParamProvider extends Contract {
 
     "maxLiquidationReward()"(overrides?: CallOverrides): Promise<BigNumber>;
 
+    maxPriceThreshold(overrides?: Overrides): Promise<BigNumber>;
+
+    "maxPriceThreshold()"(overrides?: Overrides): Promise<BigNumber>;
+
     maxRateMultiplier(overrides?: CallOverrides): Promise<BigNumber>;
 
     "maxRateMultiplier()"(overrides?: CallOverrides): Promise<BigNumber>;
@@ -1124,6 +1296,10 @@ export class IParamProvider extends Contract {
     poolUtilizationAllowance(overrides?: CallOverrides): Promise<BigNumber>;
 
     "poolUtilizationAllowance()"(overrides?: CallOverrides): Promise<BigNumber>;
+
+    priceGuard(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "priceGuard()"(overrides?: CallOverrides): Promise<BigNumber>;
 
     setBaseBorrowRate(
       value: BigNumberish,
@@ -1181,6 +1357,16 @@ export class IParamProvider extends Contract {
     ): Promise<BigNumber>;
 
     "setMaxLiquidationReward(uint256)"(
+      value: BigNumberish,
+      overrides?: Overrides
+    ): Promise<BigNumber>;
+
+    setMaxPriceThreshold(
+      value: BigNumberish,
+      overrides?: Overrides
+    ): Promise<BigNumber>;
+
+    "setMaxPriceThreshold(uint256)"(
       value: BigNumberish,
       overrides?: Overrides
     ): Promise<BigNumber>;
@@ -1281,6 +1467,26 @@ export class IParamProvider extends Contract {
       overrides?: Overrides
     ): Promise<BigNumber>;
 
+    setPriceGuard(
+      priceGuard: string,
+      overrides?: Overrides
+    ): Promise<BigNumber>;
+
+    "setPriceGuard(address)"(
+      priceGuard: string,
+      overrides?: Overrides
+    ): Promise<BigNumber>;
+
+    setSwapRouter(
+      swapRouter: string,
+      overrides?: Overrides
+    ): Promise<BigNumber>;
+
+    "setSwapRouter(address)"(
+      swapRouter: string,
+      overrides?: Overrides
+    ): Promise<BigNumber>;
+
     setTraderProfitFee(
       value: BigNumberish,
       overrides?: Overrides
@@ -1300,6 +1506,10 @@ export class IParamProvider extends Contract {
       value: BigNumberish,
       overrides?: Overrides
     ): Promise<BigNumber>;
+
+    swapRouter(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "swapRouter()"(overrides?: CallOverrides): Promise<BigNumber>;
 
     traderProfitFee(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -1347,6 +1557,10 @@ export class IParamProvider extends Contract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
+    maxPriceThreshold(overrides?: Overrides): Promise<PopulatedTransaction>;
+
+    "maxPriceThreshold()"(overrides?: Overrides): Promise<PopulatedTransaction>;
+
     maxRateMultiplier(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     "maxRateMultiplier()"(
@@ -1390,6 +1604,10 @@ export class IParamProvider extends Contract {
     "poolUtilizationAllowance()"(
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
+
+    priceGuard(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    "priceGuard()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     setBaseBorrowRate(
       value: BigNumberish,
@@ -1447,6 +1665,16 @@ export class IParamProvider extends Contract {
     ): Promise<PopulatedTransaction>;
 
     "setMaxLiquidationReward(uint256)"(
+      value: BigNumberish,
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
+
+    setMaxPriceThreshold(
+      value: BigNumberish,
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
+
+    "setMaxPriceThreshold(uint256)"(
       value: BigNumberish,
       overrides?: Overrides
     ): Promise<PopulatedTransaction>;
@@ -1547,6 +1775,26 @@ export class IParamProvider extends Contract {
       overrides?: Overrides
     ): Promise<PopulatedTransaction>;
 
+    setPriceGuard(
+      priceGuard: string,
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
+
+    "setPriceGuard(address)"(
+      priceGuard: string,
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
+
+    setSwapRouter(
+      swapRouter: string,
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
+
+    "setSwapRouter(address)"(
+      swapRouter: string,
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
+
     setTraderProfitFee(
       value: BigNumberish,
       overrides?: Overrides
@@ -1566,6 +1814,10 @@ export class IParamProvider extends Contract {
       value: BigNumberish,
       overrides?: Overrides
     ): Promise<PopulatedTransaction>;
+
+    swapRouter(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    "swapRouter()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     traderProfitFee(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 

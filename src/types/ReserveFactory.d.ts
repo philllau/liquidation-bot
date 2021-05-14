@@ -35,6 +35,7 @@ interface ReserveFactoryInterface extends ethers.utils.Interface {
     "reserveBytecodeHash()": FunctionFragment;
     "sweepFee(address,address)": FunctionFragment;
     "transferOwnership(address)": FunctionFragment;
+    "upgrade()": FunctionFragment;
   };
 
   encodeFunctionData(functionFragment: "REVISION", values?: undefined): string;
@@ -76,6 +77,7 @@ interface ReserveFactoryInterface extends ethers.utils.Interface {
     functionFragment: "transferOwnership",
     values: [string]
   ): string;
+  encodeFunctionData(functionFragment: "upgrade", values?: undefined): string;
 
   decodeFunctionResult(functionFragment: "REVISION", data: BytesLike): Result;
   decodeFunctionResult(
@@ -110,6 +112,7 @@ interface ReserveFactoryInterface extends ethers.utils.Interface {
     functionFragment: "transferOwnership",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "upgrade", data: BytesLike): Result;
 
   events: {
     "OwnershipTransferred(address,address)": EventFragment;
@@ -188,13 +191,13 @@ export class ReserveFactory extends Contract {
     ): Promise<[string]>;
 
     initialize(
-      poolFactory: string,
+      pairFactory: string,
       paramProviderFactory: string,
       overrides?: Overrides
     ): Promise<ContractTransaction>;
 
     "initialize(address,address)"(
-      poolFactory: string,
+      pairFactory: string,
       paramProviderFactory: string,
       overrides?: Overrides
     ): Promise<ContractTransaction>;
@@ -252,6 +255,10 @@ export class ReserveFactory extends Contract {
       newOwner: string,
       overrides?: Overrides
     ): Promise<ContractTransaction>;
+
+    upgrade(overrides?: Overrides): Promise<ContractTransaction>;
+
+    "upgrade()"(overrides?: Overrides): Promise<ContractTransaction>;
   };
 
   REVISION(overrides?: CallOverrides): Promise<BigNumber>;
@@ -280,13 +287,13 @@ export class ReserveFactory extends Contract {
   ): Promise<string>;
 
   initialize(
-    poolFactory: string,
+    pairFactory: string,
     paramProviderFactory: string,
     overrides?: Overrides
   ): Promise<ContractTransaction>;
 
   "initialize(address,address)"(
-    poolFactory: string,
+    pairFactory: string,
     paramProviderFactory: string,
     overrides?: Overrides
   ): Promise<ContractTransaction>;
@@ -345,6 +352,10 @@ export class ReserveFactory extends Contract {
     overrides?: Overrides
   ): Promise<ContractTransaction>;
 
+  upgrade(overrides?: Overrides): Promise<ContractTransaction>;
+
+  "upgrade()"(overrides?: Overrides): Promise<ContractTransaction>;
+
   callStatic: {
     REVISION(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -372,13 +383,13 @@ export class ReserveFactory extends Contract {
     ): Promise<string>;
 
     initialize(
-      poolFactory: string,
+      pairFactory: string,
       paramProviderFactory: string,
       overrides?: CallOverrides
     ): Promise<void>;
 
     "initialize(address,address)"(
-      poolFactory: string,
+      pairFactory: string,
       paramProviderFactory: string,
       overrides?: CallOverrides
     ): Promise<void>;
@@ -436,6 +447,10 @@ export class ReserveFactory extends Contract {
       newOwner: string,
       overrides?: CallOverrides
     ): Promise<void>;
+
+    upgrade(overrides?: CallOverrides): Promise<void>;
+
+    "upgrade()"(overrides?: CallOverrides): Promise<void>;
   };
 
   filters: {
@@ -475,13 +490,13 @@ export class ReserveFactory extends Contract {
     ): Promise<BigNumber>;
 
     initialize(
-      poolFactory: string,
+      pairFactory: string,
       paramProviderFactory: string,
       overrides?: Overrides
     ): Promise<BigNumber>;
 
     "initialize(address,address)"(
-      poolFactory: string,
+      pairFactory: string,
       paramProviderFactory: string,
       overrides?: Overrides
     ): Promise<BigNumber>;
@@ -536,6 +551,10 @@ export class ReserveFactory extends Contract {
       newOwner: string,
       overrides?: Overrides
     ): Promise<BigNumber>;
+
+    upgrade(overrides?: Overrides): Promise<BigNumber>;
+
+    "upgrade()"(overrides?: Overrides): Promise<BigNumber>;
   };
 
   populateTransaction: {
@@ -570,13 +589,13 @@ export class ReserveFactory extends Contract {
     ): Promise<PopulatedTransaction>;
 
     initialize(
-      poolFactory: string,
+      pairFactory: string,
       paramProviderFactory: string,
       overrides?: Overrides
     ): Promise<PopulatedTransaction>;
 
     "initialize(address,address)"(
-      poolFactory: string,
+      pairFactory: string,
       paramProviderFactory: string,
       overrides?: Overrides
     ): Promise<PopulatedTransaction>;
@@ -638,5 +657,9 @@ export class ReserveFactory extends Contract {
       newOwner: string,
       overrides?: Overrides
     ): Promise<PopulatedTransaction>;
+
+    upgrade(overrides?: Overrides): Promise<PopulatedTransaction>;
+
+    "upgrade()"(overrides?: Overrides): Promise<PopulatedTransaction>;
   };
 }

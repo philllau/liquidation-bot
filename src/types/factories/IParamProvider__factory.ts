@@ -97,6 +97,19 @@ const _abi = [
   },
   {
     inputs: [],
+    name: "maxPriceThreshold",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [],
     name: "maxRateMultiplier",
     outputs: [
       {
@@ -180,6 +193,19 @@ const _abi = [
     type: "function",
   },
   {
+    inputs: [],
+    name: "priceGuard",
+    outputs: [
+      {
+        internalType: "address",
+        name: "",
+        type: "address",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
     inputs: [
       {
         internalType: "uint256",
@@ -253,6 +279,19 @@ const _abi = [
       },
     ],
     name: "setMaxLiquidationReward",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "value",
+        type: "uint256",
+      },
+    ],
+    name: "setMaxPriceThreshold",
     outputs: [],
     stateMutability: "nonpayable",
     type: "function",
@@ -413,6 +452,32 @@ const _abi = [
   {
     inputs: [
       {
+        internalType: "address",
+        name: "priceGuard",
+        type: "address",
+      },
+    ],
+    name: "setPriceGuard",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "swapRouter",
+        type: "address",
+      },
+    ],
+    name: "setSwapRouter",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
         internalType: "uint256",
         name: "value",
         type: "uint256",
@@ -434,6 +499,19 @@ const _abi = [
     name: "setTreasureFactor",
     outputs: [],
     stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "swapRouter",
+    outputs: [
+      {
+        internalType: "address",
+        name: "",
+        type: "address",
+      },
+    ],
+    stateMutability: "view",
     type: "function",
   },
   {

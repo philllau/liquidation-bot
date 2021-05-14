@@ -51,13 +51,12 @@ export class Multisender {
 
   async callWithBlock<
     T extends Contract,
-    TMethod extends keyof T["functions"],
-    TResult extends CallAnswer<T, TMethod>
+    TMethod extends keyof T["functions"]
   >(
     contract: T,
     methodName: TMethod,
     ...args: Parameters<T["functions"][TMethod]>
-  ): Promise<TResult> {
+  ): Promise<CallAnswer<T, TMethod>> {
     return new Promise((resolve, reject) => {
       this.queue.push({
         call: {
@@ -69,20 +68,29 @@ export class Multisender {
         },
         onResult: (encoded: string, blockHeight: BigNumber) => {
           try {
-            const typedResult = contract.interface.decodeFunctionResult(
-              methodName as string,
-              encoded
-            );
+            // hack
+            const [success, data] = [
+              Buffer.from(encoded.slice(2, 4), "hex"),
+              Buffer.from(encoded.slice(4), "hex"),
+            ];
+            if (success.readUInt8()) {
+              const typedResult = contract.interface.decodeFunctionResult(
+                methodName as string,
+                data
+              );
 
-            const result =
-              Array.isArray(typedResult) && typedResult.length === 1
-                ? typedResult[0]
-                : typedResult;
+              const result =
+                Array.isArray(typedResult) && typedResult.length === 1
+                  ? typedResult[0]
+                  : typedResult;
 
-            resolve({
-              result,
-              blockHeight,
-            } as any);
+              resolve({
+                result,
+                blockHeight,
+              } as any);
+            } else {
+              reject(new Error(`Unsuccess call: ${contract.constructor.name} ${contract.address} ${methodName}(${args.join(", ")}) –> ${data.toString()}`));
+            }
           } catch (e) {
             reject(new Error("Failed decode: " + encoded));
           }
@@ -93,40 +101,13 @@ export class Multisender {
 
   async call<
     T extends Contract,
-    TMethod extends keyof T["functions"],
-    TResult extends CallResult<T, TMethod>
+    TMethod extends keyof T["functions"]
   >(
     contract: T,
     methodName: TMethod,
     ...args: Parameters<T["functions"][TMethod]>
-  ): Promise<TResult> {
-    return new Promise((resolve, reject) => {
-      this.queue.push({
-        call: {
-          target: contract.address,
-          callData: contract.interface.encodeFunctionData(
-            methodName as string,
-            args
-          ),
-        },
-        onResult: (result: string) => {
-          try {
-            const typedResult = contract.interface.decodeFunctionResult(
-              methodName as string,
-              result
-            ) as TResult;
-
-            resolve(
-              Array.isArray(typedResult) && typedResult.length === 1
-                ? typedResult[0]
-                : typedResult
-            );
-          } catch (e) {
-            reject(new Error("Failed decode: " + result));
-          }
-        },
-      });
-    });
+  ): Promise<CallResult<T, TMethod>> {
+    return this.callWithBlock<T, TMethod>(contract, methodName,...args).then(({result}) => result)
   }
 
   async update() {
@@ -136,7 +117,12 @@ export class Multisender {
       const requests = this.queue.splice(0, 100);
 
       const result = await infRetry(() =>
-        this.contract.callStatic.aggregate(requests.map((r) => r.call))
+        this.contract.callStatic
+          .aggregate(requests.map((r) => r.call))
+          .catch((e) => {
+            console.log(e);
+            throw e;
+          })
       );
 
       requests.forEach((request, index) =>

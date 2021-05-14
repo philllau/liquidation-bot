@@ -9,6 +9,7 @@ import { Token } from "./models";
 export class TokenMonitor extends AbstractMonitor<Token> {
   public lendables: string[] = [];
   public tradables: string[] = [];
+  public proxies: string[] = [];
 
   get lendableTokens(): Promise<Token[]> {
     return this.context.db.getRepository(Token).find("lendable", true);
@@ -16,6 +17,10 @@ export class TokenMonitor extends AbstractMonitor<Token> {
 
   get tradableTokens(): Promise<Token[]> {
     return this.context.db.getRepository(Token).find("lendable", false);
+  }
+
+  get proxyTokens(): Promise<Token[]> {
+    return this.context.db.getRepository(Token).find("proxy", true);
   }
 
   async run(): Promise<Observable<Token>> {
@@ -49,6 +54,24 @@ export class TokenMonitor extends AbstractMonitor<Token> {
           const difference = diff(this.tradables, values);
           if (difference) {
             this.tradables = values;
+            this.parseDifference(difference as any, false);
+          }
+        })
+    );
+
+    this.context.getChannel(HeightMonitor).then((channel) =>
+      channel
+        .pipe(
+          map(() =>
+            this.context.sender
+              .call(this.context.pairFactory, "getAllProxyLendables")
+              .then(mapAll(byteToAddress))
+          )
+        )
+        .subscribe((values) => {
+          const difference = diff(this.proxies, values);
+          if (difference) {
+            this.proxies = values;
             this.parseDifference(difference as any, false);
           }
         })

@@ -77,6 +77,25 @@ const _abi = [
         type: "address",
       },
       {
+        indexed: false,
+        internalType: "uint256",
+        name: "amount",
+        type: "uint256",
+      },
+    ],
+    name: "Fill",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: "address",
+        name: "reserve",
+        type: "address",
+      },
+      {
         indexed: true,
         internalType: "address",
         name: "trader",
@@ -240,6 +259,13 @@ const _abi = [
       },
     ],
     name: "deposit",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "fill",
     outputs: [],
     stateMutability: "nonpayable",
     type: "function",

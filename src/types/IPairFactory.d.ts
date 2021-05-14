@@ -23,15 +23,23 @@ import { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
 
 interface IPairFactoryInterface extends ethers.utils.Interface {
   functions: {
+    "getAllProxyLendables()": FunctionFragment;
     "getAllTradables()": FunctionFragment;
     "getOrCreatePair(address,address)": FunctionFragment;
+    "getOrCreateRoutablePair(address,address,address)": FunctionFragment;
     "getPair(address,address)": FunctionFragment;
+    "getRoutablePair(address,address,address)": FunctionFragment;
     "isPair(address)": FunctionFragment;
-    "pairBytecodeHash()": FunctionFragment;
+    "registerProxyLendable(address)": FunctionFragment;
+    "registerProxyLendables(address[])": FunctionFragment;
     "registerTradable(address)": FunctionFragment;
     "registerTradables(address[])": FunctionFragment;
   };
 
+  encodeFunctionData(
+    functionFragment: "getAllProxyLendables",
+    values?: undefined
+  ): string;
   encodeFunctionData(
     functionFragment: "getAllTradables",
     values?: undefined
@@ -41,13 +49,25 @@ interface IPairFactoryInterface extends ethers.utils.Interface {
     values: [string, string]
   ): string;
   encodeFunctionData(
+    functionFragment: "getOrCreateRoutablePair",
+    values: [string, string, string]
+  ): string;
+  encodeFunctionData(
     functionFragment: "getPair",
     values: [string, string]
   ): string;
+  encodeFunctionData(
+    functionFragment: "getRoutablePair",
+    values: [string, string, string]
+  ): string;
   encodeFunctionData(functionFragment: "isPair", values: [string]): string;
   encodeFunctionData(
-    functionFragment: "pairBytecodeHash",
-    values?: undefined
+    functionFragment: "registerProxyLendable",
+    values: [string]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "registerProxyLendables",
+    values: [string[]]
   ): string;
   encodeFunctionData(
     functionFragment: "registerTradable",
@@ -59,6 +79,10 @@ interface IPairFactoryInterface extends ethers.utils.Interface {
   ): string;
 
   decodeFunctionResult(
+    functionFragment: "getAllProxyLendables",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "getAllTradables",
     data: BytesLike
   ): Result;
@@ -66,10 +90,22 @@ interface IPairFactoryInterface extends ethers.utils.Interface {
     functionFragment: "getOrCreatePair",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(
+    functionFragment: "getOrCreateRoutablePair",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "getPair", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "getRoutablePair",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "isPair", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "pairBytecodeHash",
+    functionFragment: "registerProxyLendable",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "registerProxyLendables",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -128,6 +164,12 @@ export class IPairFactory extends Contract {
   interface: IPairFactoryInterface;
 
   functions: {
+    getAllProxyLendables(overrides?: Overrides): Promise<ContractTransaction>;
+
+    "getAllProxyLendables()"(
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
+
     getAllTradables(overrides?: Overrides): Promise<ContractTransaction>;
 
     "getAllTradables()"(overrides?: Overrides): Promise<ContractTransaction>;
@@ -144,6 +186,20 @@ export class IPairFactory extends Contract {
       overrides?: Overrides
     ): Promise<ContractTransaction>;
 
+    getOrCreateRoutablePair(
+      lendable: string,
+      proxyLendable: string,
+      tradable: string,
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
+
+    "getOrCreateRoutablePair(address,address,address)"(
+      lendable: string,
+      proxyLendable: string,
+      tradable: string,
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
+
     getPair(
       lendable: string,
       tradable: string,
@@ -156,6 +212,20 @@ export class IPairFactory extends Contract {
       overrides?: CallOverrides
     ): Promise<[string]>;
 
+    getRoutablePair(
+      lendable: string,
+      proxyLendable: string,
+      tradable: string,
+      overrides?: CallOverrides
+    ): Promise<[string]>;
+
+    "getRoutablePair(address,address,address)"(
+      lendable: string,
+      proxyLendable: string,
+      tradable: string,
+      overrides?: CallOverrides
+    ): Promise<[string]>;
+
     isPair(pair: string, overrides?: CallOverrides): Promise<[boolean]>;
 
     "isPair(address)"(
@@ -163,9 +233,25 @@ export class IPairFactory extends Contract {
       overrides?: CallOverrides
     ): Promise<[boolean]>;
 
-    pairBytecodeHash(overrides?: CallOverrides): Promise<[string]>;
+    registerProxyLendable(
+      token: string,
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
 
-    "pairBytecodeHash()"(overrides?: CallOverrides): Promise<[string]>;
+    "registerProxyLendable(address)"(
+      token: string,
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
+
+    registerProxyLendables(
+      tokens: string[],
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
+
+    "registerProxyLendables(address[])"(
+      tokens: string[],
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
 
     registerTradable(
       token: string,
@@ -188,6 +274,10 @@ export class IPairFactory extends Contract {
     ): Promise<ContractTransaction>;
   };
 
+  getAllProxyLendables(overrides?: Overrides): Promise<ContractTransaction>;
+
+  "getAllProxyLendables()"(overrides?: Overrides): Promise<ContractTransaction>;
+
   getAllTradables(overrides?: Overrides): Promise<ContractTransaction>;
 
   "getAllTradables()"(overrides?: Overrides): Promise<ContractTransaction>;
@@ -204,6 +294,20 @@ export class IPairFactory extends Contract {
     overrides?: Overrides
   ): Promise<ContractTransaction>;
 
+  getOrCreateRoutablePair(
+    lendable: string,
+    proxyLendable: string,
+    tradable: string,
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
+
+  "getOrCreateRoutablePair(address,address,address)"(
+    lendable: string,
+    proxyLendable: string,
+    tradable: string,
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
+
   getPair(
     lendable: string,
     tradable: string,
@@ -216,13 +320,43 @@ export class IPairFactory extends Contract {
     overrides?: CallOverrides
   ): Promise<string>;
 
+  getRoutablePair(
+    lendable: string,
+    proxyLendable: string,
+    tradable: string,
+    overrides?: CallOverrides
+  ): Promise<string>;
+
+  "getRoutablePair(address,address,address)"(
+    lendable: string,
+    proxyLendable: string,
+    tradable: string,
+    overrides?: CallOverrides
+  ): Promise<string>;
+
   isPair(pair: string, overrides?: CallOverrides): Promise<boolean>;
 
   "isPair(address)"(pair: string, overrides?: CallOverrides): Promise<boolean>;
 
-  pairBytecodeHash(overrides?: CallOverrides): Promise<string>;
+  registerProxyLendable(
+    token: string,
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
 
-  "pairBytecodeHash()"(overrides?: CallOverrides): Promise<string>;
+  "registerProxyLendable(address)"(
+    token: string,
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
+
+  registerProxyLendables(
+    tokens: string[],
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
+
+  "registerProxyLendables(address[])"(
+    tokens: string[],
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
 
   registerTradable(
     token: string,
@@ -245,6 +379,10 @@ export class IPairFactory extends Contract {
   ): Promise<ContractTransaction>;
 
   callStatic: {
+    getAllProxyLendables(overrides?: CallOverrides): Promise<string[]>;
+
+    "getAllProxyLendables()"(overrides?: CallOverrides): Promise<string[]>;
+
     getAllTradables(overrides?: CallOverrides): Promise<string[]>;
 
     "getAllTradables()"(overrides?: CallOverrides): Promise<string[]>;
@@ -261,6 +399,20 @@ export class IPairFactory extends Contract {
       overrides?: CallOverrides
     ): Promise<string>;
 
+    getOrCreateRoutablePair(
+      lendable: string,
+      proxyLendable: string,
+      tradable: string,
+      overrides?: CallOverrides
+    ): Promise<string>;
+
+    "getOrCreateRoutablePair(address,address,address)"(
+      lendable: string,
+      proxyLendable: string,
+      tradable: string,
+      overrides?: CallOverrides
+    ): Promise<string>;
+
     getPair(
       lendable: string,
       tradable: string,
@@ -273,6 +425,20 @@ export class IPairFactory extends Contract {
       overrides?: CallOverrides
     ): Promise<string>;
 
+    getRoutablePair(
+      lendable: string,
+      proxyLendable: string,
+      tradable: string,
+      overrides?: CallOverrides
+    ): Promise<string>;
+
+    "getRoutablePair(address,address,address)"(
+      lendable: string,
+      proxyLendable: string,
+      tradable: string,
+      overrides?: CallOverrides
+    ): Promise<string>;
+
     isPair(pair: string, overrides?: CallOverrides): Promise<boolean>;
 
     "isPair(address)"(
@@ -280,34 +446,51 @@ export class IPairFactory extends Contract {
       overrides?: CallOverrides
     ): Promise<boolean>;
 
-    pairBytecodeHash(overrides?: CallOverrides): Promise<string>;
-
-    "pairBytecodeHash()"(overrides?: CallOverrides): Promise<string>;
-
-    registerTradable(
+    registerProxyLendable(
       token: string,
       overrides?: CallOverrides
-    ): Promise<boolean>;
+    ): Promise<void>;
+
+    "registerProxyLendable(address)"(
+      token: string,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    registerProxyLendables(
+      tokens: string[],
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    "registerProxyLendables(address[])"(
+      tokens: string[],
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    registerTradable(token: string, overrides?: CallOverrides): Promise<void>;
 
     "registerTradable(address)"(
       token: string,
       overrides?: CallOverrides
-    ): Promise<boolean>;
+    ): Promise<void>;
 
     registerTradables(
       tokens: string[],
       overrides?: CallOverrides
-    ): Promise<boolean>;
+    ): Promise<void>;
 
     "registerTradables(address[])"(
       tokens: string[],
       overrides?: CallOverrides
-    ): Promise<boolean>;
+    ): Promise<void>;
   };
 
   filters: {};
 
   estimateGas: {
+    getAllProxyLendables(overrides?: Overrides): Promise<BigNumber>;
+
+    "getAllProxyLendables()"(overrides?: Overrides): Promise<BigNumber>;
+
     getAllTradables(overrides?: Overrides): Promise<BigNumber>;
 
     "getAllTradables()"(overrides?: Overrides): Promise<BigNumber>;
@@ -324,6 +507,20 @@ export class IPairFactory extends Contract {
       overrides?: Overrides
     ): Promise<BigNumber>;
 
+    getOrCreateRoutablePair(
+      lendable: string,
+      proxyLendable: string,
+      tradable: string,
+      overrides?: Overrides
+    ): Promise<BigNumber>;
+
+    "getOrCreateRoutablePair(address,address,address)"(
+      lendable: string,
+      proxyLendable: string,
+      tradable: string,
+      overrides?: Overrides
+    ): Promise<BigNumber>;
+
     getPair(
       lendable: string,
       tradable: string,
@@ -336,6 +533,20 @@ export class IPairFactory extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
+    getRoutablePair(
+      lendable: string,
+      proxyLendable: string,
+      tradable: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "getRoutablePair(address,address,address)"(
+      lendable: string,
+      proxyLendable: string,
+      tradable: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
     isPair(pair: string, overrides?: CallOverrides): Promise<BigNumber>;
 
     "isPair(address)"(
@@ -343,9 +554,25 @@ export class IPairFactory extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    pairBytecodeHash(overrides?: CallOverrides): Promise<BigNumber>;
+    registerProxyLendable(
+      token: string,
+      overrides?: Overrides
+    ): Promise<BigNumber>;
 
-    "pairBytecodeHash()"(overrides?: CallOverrides): Promise<BigNumber>;
+    "registerProxyLendable(address)"(
+      token: string,
+      overrides?: Overrides
+    ): Promise<BigNumber>;
+
+    registerProxyLendables(
+      tokens: string[],
+      overrides?: Overrides
+    ): Promise<BigNumber>;
+
+    "registerProxyLendables(address[])"(
+      tokens: string[],
+      overrides?: Overrides
+    ): Promise<BigNumber>;
 
     registerTradable(token: string, overrides?: Overrides): Promise<BigNumber>;
 
@@ -366,6 +593,12 @@ export class IPairFactory extends Contract {
   };
 
   populateTransaction: {
+    getAllProxyLendables(overrides?: Overrides): Promise<PopulatedTransaction>;
+
+    "getAllProxyLendables()"(
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
+
     getAllTradables(overrides?: Overrides): Promise<PopulatedTransaction>;
 
     "getAllTradables()"(overrides?: Overrides): Promise<PopulatedTransaction>;
@@ -382,6 +615,20 @@ export class IPairFactory extends Contract {
       overrides?: Overrides
     ): Promise<PopulatedTransaction>;
 
+    getOrCreateRoutablePair(
+      lendable: string,
+      proxyLendable: string,
+      tradable: string,
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
+
+    "getOrCreateRoutablePair(address,address,address)"(
+      lendable: string,
+      proxyLendable: string,
+      tradable: string,
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
+
     getPair(
       lendable: string,
       tradable: string,
@@ -390,6 +637,20 @@ export class IPairFactory extends Contract {
 
     "getPair(address,address)"(
       lendable: string,
+      tradable: string,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    getRoutablePair(
+      lendable: string,
+      proxyLendable: string,
+      tradable: string,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    "getRoutablePair(address,address,address)"(
+      lendable: string,
+      proxyLendable: string,
       tradable: string,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
@@ -404,10 +665,24 @@ export class IPairFactory extends Contract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    pairBytecodeHash(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    registerProxyLendable(
+      token: string,
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
 
-    "pairBytecodeHash()"(
-      overrides?: CallOverrides
+    "registerProxyLendable(address)"(
+      token: string,
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
+
+    registerProxyLendables(
+      tokens: string[],
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
+
+    "registerProxyLendables(address[])"(
+      tokens: string[],
+      overrides?: Overrides
     ): Promise<PopulatedTransaction>;
 
     registerTradable(

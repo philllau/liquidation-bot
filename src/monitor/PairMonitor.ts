@@ -9,16 +9,26 @@ import { TokenMonitor } from "./TokenMonitor";
 
 export class PairMonitor extends AbstractMonitor<Pair> {
   private repository!: DatastoreRepository<Pair>;
-  private unfoundPairs: Array<{ lendable: Token; tradable: Token }> = [];
+  private unfoundPairs: Array<{
+    lendable: Token;
+    tradable: Token;
+    proxy?: Token;
+  }> = [];
   private lendables: Token[] = [];
   private tradables: Token[] = [];
+  private proxies: Token[] = [];
   private processing = false;
 
   async run(): Promise<Observable<Pair>> {
     this.repository = this.context.db.getRepository(Pair);
 
-    (await this.context.getChannel(TokenMonitor)).subscribe((token) =>
-      token.lendable ? this.onNewLendable(token) : this.onNewTradable(token)
+    (await this.context.getChannel(TokenMonitor)).subscribe(
+      (token) => {
+        if (token.lendable) this.onNewLendable(token);
+        if (token.proxy) this.onNewProxy(token);
+        this.onNewTradable(token);
+      }
+      // token.lendable ? this.onNewLendable(token) : this.onNewTradable(token)
     );
 
     (await this.context.getChannel(HeightMonitor)).subscribe(
@@ -37,6 +47,20 @@ export class PairMonitor extends AbstractMonitor<Pair> {
       .filter((lendable) => tradable.address !== lendable.address)
       .forEach((lendable) => this.unfoundPairs.push({ lendable, tradable }));
 
+    this.lendables
+      .filter((lendable) => lendable.address !== tradable.address)
+      .forEach((lendable) =>
+        this.proxies
+          .filter(
+            (proxy) =>
+              proxy.address !== tradable.address &&
+              proxy.address !== lendable.address
+          )
+          .forEach((proxy) =>
+            this.unfoundPairs.push({ lendable, proxy, tradable })
+          )
+      );
+
     this.update();
   }
 
@@ -48,6 +72,42 @@ export class PairMonitor extends AbstractMonitor<Pair> {
     this.tradables
       .filter((tradable) => tradable.address !== lendable.address)
       .forEach((tradable) => this.unfoundPairs.push({ lendable, tradable }));
+
+    this.proxies
+      .filter((proxy) => proxy.address !== lendable.address)
+      .forEach((proxy) =>
+        this.tradables
+          .filter(
+            (tradable) =>
+              tradable.address !== proxy.address &&
+              tradable.address !== lendable.address
+          )
+          .forEach((tradable) =>
+            this.unfoundPairs.push({ lendable, proxy, tradable })
+          )
+      );
+
+    this.update();
+  }
+
+  onNewProxy(proxy: Token): void {
+    if (this.proxies.some((known) => known.address === proxy.address)) {
+      return console.error("Already known proxy?", classToPlain(proxy));
+    }
+    this.proxies.push(proxy);
+    this.lendables
+      .filter((lendable) => lendable.address !== proxy.address)
+      .forEach((lendable) =>
+        this.tradables
+          .filter(
+            (tradable) =>
+              tradable.address !== proxy.address &&
+              tradable.address !== lendable.address
+          )
+          .forEach((tradable) =>
+            this.unfoundPairs.push({ lendable, proxy, tradable })
+          )
+      );
 
     this.update();
   }

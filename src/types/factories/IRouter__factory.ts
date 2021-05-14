@@ -126,6 +126,109 @@ const _abi = [
   {
     inputs: [
       {
+        internalType: "address",
+        name: "lendable",
+        type: "address",
+      },
+      {
+        internalType: "address",
+        name: "proxyLendable",
+        type: "address",
+      },
+      {
+        internalType: "address",
+        name: "tradable",
+        type: "address",
+      },
+      {
+        internalType: "uint256",
+        name: "amount",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "leverageFactor",
+        type: "uint256",
+      },
+    ],
+    name: "calculateOpenProxyPosition",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "maxAmountIn",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "borrowAmount",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "borrowRate",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "liquidationCost",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "lendable",
+        type: "address",
+      },
+      {
+        internalType: "address",
+        name: "proxyLendable",
+        type: "address",
+      },
+      {
+        internalType: "address",
+        name: "tradable",
+        type: "address",
+      },
+      {
+        internalType: "address",
+        name: "trader",
+        type: "address",
+      },
+      {
+        internalType: "uint256",
+        name: "amountIn",
+        type: "uint256",
+      },
+    ],
+    name: "calculateProxyBalance",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "profit",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "debtPayable",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "protocolFee",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
         internalType: "uint256",
         name: "amountIn",
         type: "uint256",
@@ -209,6 +312,55 @@ const _abi = [
   {
     inputs: [
       {
+        internalType: "uint256",
+        name: "amountIn",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "amountOutMin",
+        type: "uint256",
+      },
+      {
+        internalType: "address",
+        name: "lendable",
+        type: "address",
+      },
+      {
+        internalType: "address",
+        name: "proxyLendable",
+        type: "address",
+      },
+      {
+        internalType: "address",
+        name: "tradable",
+        type: "address",
+      },
+      {
+        internalType: "address",
+        name: "trader",
+        type: "address",
+      },
+      {
+        internalType: "uint256",
+        name: "deadline",
+        type: "uint256",
+      },
+    ],
+    name: "closeProxyPosition",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
         internalType: "address",
         name: "lendable",
         type: "address",
@@ -246,6 +398,153 @@ const _abi = [
     inputs: [
       {
         internalType: "address",
+        name: "trader",
+        type: "address",
+      },
+      {
+        internalType: "address",
+        name: "lendable",
+        type: "address",
+      },
+      {
+        internalType: "address",
+        name: "tradable",
+        type: "address",
+      },
+    ],
+    name: "getPosition",
+    outputs: [
+      {
+        components: [
+          {
+            internalType: "uint256",
+            name: "amount",
+            type: "uint256",
+          },
+          {
+            internalType: "uint256",
+            name: "value",
+            type: "uint256",
+          },
+          {
+            internalType: "uint256",
+            name: "selfValue",
+            type: "uint256",
+          },
+          {
+            internalType: "uint256",
+            name: "principalDebt",
+            type: "uint256",
+          },
+          {
+            internalType: "uint256",
+            name: "currentDebt",
+            type: "uint256",
+          },
+          {
+            internalType: "uint256",
+            name: "rate",
+            type: "uint256",
+          },
+          {
+            internalType: "uint256",
+            name: "currentCost",
+            type: "uint256",
+          },
+          {
+            internalType: "uint256",
+            name: "liquidationCost",
+            type: "uint256",
+          },
+        ],
+        internalType: "struct Position",
+        name: "position",
+        type: "tuple",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "trader",
+        type: "address",
+      },
+      {
+        internalType: "address",
+        name: "lendable",
+        type: "address",
+      },
+      {
+        internalType: "address",
+        name: "proxyLendable",
+        type: "address",
+      },
+      {
+        internalType: "address",
+        name: "tradable",
+        type: "address",
+      },
+    ],
+    name: "getProxyPosition",
+    outputs: [
+      {
+        components: [
+          {
+            internalType: "uint256",
+            name: "amount",
+            type: "uint256",
+          },
+          {
+            internalType: "uint256",
+            name: "value",
+            type: "uint256",
+          },
+          {
+            internalType: "uint256",
+            name: "selfValue",
+            type: "uint256",
+          },
+          {
+            internalType: "uint256",
+            name: "principalDebt",
+            type: "uint256",
+          },
+          {
+            internalType: "uint256",
+            name: "currentDebt",
+            type: "uint256",
+          },
+          {
+            internalType: "uint256",
+            name: "rate",
+            type: "uint256",
+          },
+          {
+            internalType: "uint256",
+            name: "currentCost",
+            type: "uint256",
+          },
+          {
+            internalType: "uint256",
+            name: "liquidationCost",
+            type: "uint256",
+          },
+        ],
+        internalType: "struct Position",
+        name: "position",
+        type: "tuple",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
         name: "lendable",
         type: "address",
       },
@@ -261,6 +560,34 @@ const _abi = [
       },
     ],
     name: "liquidatePosition",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "lendable",
+        type: "address",
+      },
+      {
+        internalType: "address",
+        name: "proxyLendable",
+        type: "address",
+      },
+      {
+        internalType: "address",
+        name: "tradable",
+        type: "address",
+      },
+      {
+        internalType: "address",
+        name: "trader",
+        type: "address",
+      },
+    ],
+    name: "liquidateProxyPosition",
     outputs: [],
     stateMutability: "nonpayable",
     type: "function",
@@ -351,6 +678,60 @@ const _abi = [
       },
     ],
     stateMutability: "payable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "amountIn",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "leverageFactor",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "amountOutMin",
+        type: "uint256",
+      },
+      {
+        internalType: "address",
+        name: "lendable",
+        type: "address",
+      },
+      {
+        internalType: "address",
+        name: "proxyLendable",
+        type: "address",
+      },
+      {
+        internalType: "address",
+        name: "tradable",
+        type: "address",
+      },
+      {
+        internalType: "address",
+        name: "trader",
+        type: "address",
+      },
+      {
+        internalType: "uint256",
+        name: "deadline",
+        type: "uint256",
+      },
+    ],
+    name: "openProxyPosition",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "nonpayable",
     type: "function",
   },
   {

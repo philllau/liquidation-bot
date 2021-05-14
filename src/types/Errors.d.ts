@@ -42,15 +42,7 @@ interface ErrorsInterface extends ethers.utils.Interface {
     "P_INSUFFICIENT_POSITION_DEPOSIT()": FunctionFragment;
     "P_INSUFFICIENT_WOW_BALANCE()": FunctionFragment;
     "P_INVALID_LEVERAGE_FACTOR()": FunctionFragment;
-    "RC_INVALID_DECIMALS()": FunctionFragment;
-    "RC_INVALID_LIQ_BONUS()": FunctionFragment;
-    "RC_INVALID_LIQ_THRESHOLD()": FunctionFragment;
-    "RC_INVALID_LTV()": FunctionFragment;
-    "RC_INVALID_RESERVE_FACTOR()": FunctionFragment;
-    "RL_ALREADY_INITIALIZED()": FunctionFragment;
-    "RL_LIQUIDITY_RATE_OVERFLOW()": FunctionFragment;
-    "RL_STABLE_BORROW_RATE_OVERFLOW()": FunctionFragment;
-    "RL_VARIABLE_BORROW_RATE_OVERFLOW()": FunctionFragment;
+    "P_PRICE_THRESHOLD_OVERFLOW()": FunctionFragment;
     "RT_FORBIDDEN_TRANSFER()": FunctionFragment;
     "RT_PAIR_NOT_FOUND()": FunctionFragment;
     "RT_RESERVE_NOT_FOUND()": FunctionFragment;
@@ -142,39 +134,7 @@ interface ErrorsInterface extends ethers.utils.Interface {
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "RC_INVALID_DECIMALS",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "RC_INVALID_LIQ_BONUS",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "RC_INVALID_LIQ_THRESHOLD",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "RC_INVALID_LTV",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "RC_INVALID_RESERVE_FACTOR",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "RL_ALREADY_INITIALIZED",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "RL_LIQUIDITY_RATE_OVERFLOW",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "RL_STABLE_BORROW_RATE_OVERFLOW",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "RL_VARIABLE_BORROW_RATE_OVERFLOW",
+    functionFragment: "P_PRICE_THRESHOLD_OVERFLOW",
     values?: undefined
   ): string;
   encodeFunctionData(
@@ -291,39 +251,7 @@ interface ErrorsInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "RC_INVALID_DECIMALS",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "RC_INVALID_LIQ_BONUS",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "RC_INVALID_LIQ_THRESHOLD",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "RC_INVALID_LTV",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "RC_INVALID_RESERVE_FACTOR",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "RL_ALREADY_INITIALIZED",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "RL_LIQUIDITY_RATE_OVERFLOW",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "RL_STABLE_BORROW_RATE_OVERFLOW",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "RL_VARIABLE_BORROW_RATE_OVERFLOW",
+    functionFragment: "P_PRICE_THRESHOLD_OVERFLOW",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -504,49 +432,9 @@ export class Errors extends Contract {
 
     "P_INVALID_LEVERAGE_FACTOR()"(overrides?: CallOverrides): Promise<[string]>;
 
-    RC_INVALID_DECIMALS(overrides?: CallOverrides): Promise<[string]>;
+    P_PRICE_THRESHOLD_OVERFLOW(overrides?: CallOverrides): Promise<[string]>;
 
-    "RC_INVALID_DECIMALS()"(overrides?: CallOverrides): Promise<[string]>;
-
-    RC_INVALID_LIQ_BONUS(overrides?: CallOverrides): Promise<[string]>;
-
-    "RC_INVALID_LIQ_BONUS()"(overrides?: CallOverrides): Promise<[string]>;
-
-    RC_INVALID_LIQ_THRESHOLD(overrides?: CallOverrides): Promise<[string]>;
-
-    "RC_INVALID_LIQ_THRESHOLD()"(overrides?: CallOverrides): Promise<[string]>;
-
-    RC_INVALID_LTV(overrides?: CallOverrides): Promise<[string]>;
-
-    "RC_INVALID_LTV()"(overrides?: CallOverrides): Promise<[string]>;
-
-    RC_INVALID_RESERVE_FACTOR(overrides?: CallOverrides): Promise<[string]>;
-
-    "RC_INVALID_RESERVE_FACTOR()"(overrides?: CallOverrides): Promise<[string]>;
-
-    RL_ALREADY_INITIALIZED(overrides?: CallOverrides): Promise<[string]>;
-
-    "RL_ALREADY_INITIALIZED()"(overrides?: CallOverrides): Promise<[string]>;
-
-    RL_LIQUIDITY_RATE_OVERFLOW(overrides?: CallOverrides): Promise<[string]>;
-
-    "RL_LIQUIDITY_RATE_OVERFLOW()"(
-      overrides?: CallOverrides
-    ): Promise<[string]>;
-
-    RL_STABLE_BORROW_RATE_OVERFLOW(
-      overrides?: CallOverrides
-    ): Promise<[string]>;
-
-    "RL_STABLE_BORROW_RATE_OVERFLOW()"(
-      overrides?: CallOverrides
-    ): Promise<[string]>;
-
-    RL_VARIABLE_BORROW_RATE_OVERFLOW(
-      overrides?: CallOverrides
-    ): Promise<[string]>;
-
-    "RL_VARIABLE_BORROW_RATE_OVERFLOW()"(
+    "P_PRICE_THRESHOLD_OVERFLOW()"(
       overrides?: CallOverrides
     ): Promise<[string]>;
 
@@ -667,45 +555,9 @@ export class Errors extends Contract {
 
   "P_INVALID_LEVERAGE_FACTOR()"(overrides?: CallOverrides): Promise<string>;
 
-  RC_INVALID_DECIMALS(overrides?: CallOverrides): Promise<string>;
+  P_PRICE_THRESHOLD_OVERFLOW(overrides?: CallOverrides): Promise<string>;
 
-  "RC_INVALID_DECIMALS()"(overrides?: CallOverrides): Promise<string>;
-
-  RC_INVALID_LIQ_BONUS(overrides?: CallOverrides): Promise<string>;
-
-  "RC_INVALID_LIQ_BONUS()"(overrides?: CallOverrides): Promise<string>;
-
-  RC_INVALID_LIQ_THRESHOLD(overrides?: CallOverrides): Promise<string>;
-
-  "RC_INVALID_LIQ_THRESHOLD()"(overrides?: CallOverrides): Promise<string>;
-
-  RC_INVALID_LTV(overrides?: CallOverrides): Promise<string>;
-
-  "RC_INVALID_LTV()"(overrides?: CallOverrides): Promise<string>;
-
-  RC_INVALID_RESERVE_FACTOR(overrides?: CallOverrides): Promise<string>;
-
-  "RC_INVALID_RESERVE_FACTOR()"(overrides?: CallOverrides): Promise<string>;
-
-  RL_ALREADY_INITIALIZED(overrides?: CallOverrides): Promise<string>;
-
-  "RL_ALREADY_INITIALIZED()"(overrides?: CallOverrides): Promise<string>;
-
-  RL_LIQUIDITY_RATE_OVERFLOW(overrides?: CallOverrides): Promise<string>;
-
-  "RL_LIQUIDITY_RATE_OVERFLOW()"(overrides?: CallOverrides): Promise<string>;
-
-  RL_STABLE_BORROW_RATE_OVERFLOW(overrides?: CallOverrides): Promise<string>;
-
-  "RL_STABLE_BORROW_RATE_OVERFLOW()"(
-    overrides?: CallOverrides
-  ): Promise<string>;
-
-  RL_VARIABLE_BORROW_RATE_OVERFLOW(overrides?: CallOverrides): Promise<string>;
-
-  "RL_VARIABLE_BORROW_RATE_OVERFLOW()"(
-    overrides?: CallOverrides
-  ): Promise<string>;
+  "P_PRICE_THRESHOLD_OVERFLOW()"(overrides?: CallOverrides): Promise<string>;
 
   RT_FORBIDDEN_TRANSFER(overrides?: CallOverrides): Promise<string>;
 
@@ -832,47 +684,9 @@ export class Errors extends Contract {
 
     "P_INVALID_LEVERAGE_FACTOR()"(overrides?: CallOverrides): Promise<string>;
 
-    RC_INVALID_DECIMALS(overrides?: CallOverrides): Promise<string>;
+    P_PRICE_THRESHOLD_OVERFLOW(overrides?: CallOverrides): Promise<string>;
 
-    "RC_INVALID_DECIMALS()"(overrides?: CallOverrides): Promise<string>;
-
-    RC_INVALID_LIQ_BONUS(overrides?: CallOverrides): Promise<string>;
-
-    "RC_INVALID_LIQ_BONUS()"(overrides?: CallOverrides): Promise<string>;
-
-    RC_INVALID_LIQ_THRESHOLD(overrides?: CallOverrides): Promise<string>;
-
-    "RC_INVALID_LIQ_THRESHOLD()"(overrides?: CallOverrides): Promise<string>;
-
-    RC_INVALID_LTV(overrides?: CallOverrides): Promise<string>;
-
-    "RC_INVALID_LTV()"(overrides?: CallOverrides): Promise<string>;
-
-    RC_INVALID_RESERVE_FACTOR(overrides?: CallOverrides): Promise<string>;
-
-    "RC_INVALID_RESERVE_FACTOR()"(overrides?: CallOverrides): Promise<string>;
-
-    RL_ALREADY_INITIALIZED(overrides?: CallOverrides): Promise<string>;
-
-    "RL_ALREADY_INITIALIZED()"(overrides?: CallOverrides): Promise<string>;
-
-    RL_LIQUIDITY_RATE_OVERFLOW(overrides?: CallOverrides): Promise<string>;
-
-    "RL_LIQUIDITY_RATE_OVERFLOW()"(overrides?: CallOverrides): Promise<string>;
-
-    RL_STABLE_BORROW_RATE_OVERFLOW(overrides?: CallOverrides): Promise<string>;
-
-    "RL_STABLE_BORROW_RATE_OVERFLOW()"(
-      overrides?: CallOverrides
-    ): Promise<string>;
-
-    RL_VARIABLE_BORROW_RATE_OVERFLOW(
-      overrides?: CallOverrides
-    ): Promise<string>;
-
-    "RL_VARIABLE_BORROW_RATE_OVERFLOW()"(
-      overrides?: CallOverrides
-    ): Promise<string>;
+    "P_PRICE_THRESHOLD_OVERFLOW()"(overrides?: CallOverrides): Promise<string>;
 
     RT_FORBIDDEN_TRANSFER(overrides?: CallOverrides): Promise<string>;
 
@@ -1014,51 +828,9 @@ export class Errors extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    RC_INVALID_DECIMALS(overrides?: CallOverrides): Promise<BigNumber>;
+    P_PRICE_THRESHOLD_OVERFLOW(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "RC_INVALID_DECIMALS()"(overrides?: CallOverrides): Promise<BigNumber>;
-
-    RC_INVALID_LIQ_BONUS(overrides?: CallOverrides): Promise<BigNumber>;
-
-    "RC_INVALID_LIQ_BONUS()"(overrides?: CallOverrides): Promise<BigNumber>;
-
-    RC_INVALID_LIQ_THRESHOLD(overrides?: CallOverrides): Promise<BigNumber>;
-
-    "RC_INVALID_LIQ_THRESHOLD()"(overrides?: CallOverrides): Promise<BigNumber>;
-
-    RC_INVALID_LTV(overrides?: CallOverrides): Promise<BigNumber>;
-
-    "RC_INVALID_LTV()"(overrides?: CallOverrides): Promise<BigNumber>;
-
-    RC_INVALID_RESERVE_FACTOR(overrides?: CallOverrides): Promise<BigNumber>;
-
-    "RC_INVALID_RESERVE_FACTOR()"(
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    RL_ALREADY_INITIALIZED(overrides?: CallOverrides): Promise<BigNumber>;
-
-    "RL_ALREADY_INITIALIZED()"(overrides?: CallOverrides): Promise<BigNumber>;
-
-    RL_LIQUIDITY_RATE_OVERFLOW(overrides?: CallOverrides): Promise<BigNumber>;
-
-    "RL_LIQUIDITY_RATE_OVERFLOW()"(
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    RL_STABLE_BORROW_RATE_OVERFLOW(
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    "RL_STABLE_BORROW_RATE_OVERFLOW()"(
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    RL_VARIABLE_BORROW_RATE_OVERFLOW(
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    "RL_VARIABLE_BORROW_RATE_OVERFLOW()"(
+    "P_PRICE_THRESHOLD_OVERFLOW()"(
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
@@ -1252,73 +1024,11 @@ export class Errors extends Contract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    RC_INVALID_DECIMALS(
+    P_PRICE_THRESHOLD_OVERFLOW(
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    "RC_INVALID_DECIMALS()"(
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    RC_INVALID_LIQ_BONUS(
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    "RC_INVALID_LIQ_BONUS()"(
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    RC_INVALID_LIQ_THRESHOLD(
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    "RC_INVALID_LIQ_THRESHOLD()"(
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    RC_INVALID_LTV(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    "RC_INVALID_LTV()"(
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    RC_INVALID_RESERVE_FACTOR(
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    "RC_INVALID_RESERVE_FACTOR()"(
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    RL_ALREADY_INITIALIZED(
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    "RL_ALREADY_INITIALIZED()"(
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    RL_LIQUIDITY_RATE_OVERFLOW(
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    "RL_LIQUIDITY_RATE_OVERFLOW()"(
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    RL_STABLE_BORROW_RATE_OVERFLOW(
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    "RL_STABLE_BORROW_RATE_OVERFLOW()"(
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    RL_VARIABLE_BORROW_RATE_OVERFLOW(
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    "RL_VARIABLE_BORROW_RATE_OVERFLOW()"(
+    "P_PRICE_THRESHOLD_OVERFLOW()"(
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 

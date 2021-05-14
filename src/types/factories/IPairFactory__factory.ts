@@ -19,6 +19,19 @@ export class IPairFactory__factory {
 const _abi = [
   {
     inputs: [],
+    name: "getAllProxyLendables",
+    outputs: [
+      {
+        internalType: "bytes32[]",
+        name: "",
+        type: "bytes32[]",
+      },
+    ],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [],
     name: "getAllTradables",
     outputs: [
       {
@@ -63,11 +76,69 @@ const _abi = [
       },
       {
         internalType: "address",
+        name: "proxyLendable",
+        type: "address",
+      },
+      {
+        internalType: "address",
+        name: "tradable",
+        type: "address",
+      },
+    ],
+    name: "getOrCreateRoutablePair",
+    outputs: [
+      {
+        internalType: "address",
+        name: "",
+        type: "address",
+      },
+    ],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "lendable",
+        type: "address",
+      },
+      {
+        internalType: "address",
         name: "tradable",
         type: "address",
       },
     ],
     name: "getPair",
+    outputs: [
+      {
+        internalType: "address",
+        name: "",
+        type: "address",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "lendable",
+        type: "address",
+      },
+      {
+        internalType: "address",
+        name: "proxyLendable",
+        type: "address",
+      },
+      {
+        internalType: "address",
+        name: "tradable",
+        type: "address",
+      },
+    ],
+    name: "getRoutablePair",
     outputs: [
       {
         internalType: "address",
@@ -98,16 +169,29 @@ const _abi = [
     type: "function",
   },
   {
-    inputs: [],
-    name: "pairBytecodeHash",
-    outputs: [
+    inputs: [
       {
-        internalType: "bytes32",
-        name: "",
-        type: "bytes32",
+        internalType: "address",
+        name: "token",
+        type: "address",
       },
     ],
-    stateMutability: "view",
+    name: "registerProxyLendable",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address[]",
+        name: "tokens",
+        type: "address[]",
+      },
+    ],
+    name: "registerProxyLendables",
+    outputs: [],
+    stateMutability: "nonpayable",
     type: "function",
   },
   {
@@ -119,13 +203,7 @@ const _abi = [
       },
     ],
     name: "registerTradable",
-    outputs: [
-      {
-        internalType: "bool",
-        name: "",
-        type: "bool",
-      },
-    ],
+    outputs: [],
     stateMutability: "nonpayable",
     type: "function",
   },
@@ -138,13 +216,7 @@ const _abi = [
       },
     ],
     name: "registerTradables",
-    outputs: [
-      {
-        internalType: "bool",
-        name: "",
-        type: "bool",
-      },
-    ],
+    outputs: [],
     stateMutability: "nonpayable",
     type: "function",
   },

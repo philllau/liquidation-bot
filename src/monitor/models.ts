@@ -108,6 +108,8 @@ export class Token extends DatastoreDocument<Token> {
   @BooleanIndex()
   lendable!: boolean;
   @BooleanIndex()
+  proxy!: boolean;
+  @BooleanIndex()
   tradable!: boolean;
   decimals!: number;
 }

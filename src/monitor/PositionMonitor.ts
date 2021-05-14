@@ -182,7 +182,7 @@ export class PositionMonitor extends AbstractMonitor<Position> {
       return position;
     }
 
-    const contract = this.pairContract(position.pair, this.context.signer);
+    const contract = this.context.router;
 
     const lendableToken = await this.context.db
       .getRepository(Token)
@@ -203,7 +203,13 @@ export class PositionMonitor extends AbstractMonitor<Position> {
       updateAt,
     ] = await infRetry(() =>
       this.context
-        .sender!.callWithBlock(contract, "getPosition", position.trader)
+        .sender!.callWithBlock(
+          contract,
+          "getPosition",
+          position.trader,
+          position.lendable,
+          position.tradable
+        )
         .catch((e) => {
           console.log(
             `Error on position state ${lendableToken?.symbol}/${tradableToken?.symbol} ${position.trader} \nissue: ${e}`

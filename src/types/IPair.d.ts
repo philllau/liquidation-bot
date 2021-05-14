@@ -23,28 +23,55 @@ import { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
 
 interface IPairInterface extends ethers.utils.Interface {
   functions: {
-    "calculateBalance(address,uint256)": FunctionFragment;
-    "calculateOpenPosition(uint256,uint256)": FunctionFragment;
+    "calcProfitFee(uint256,uint256)": FunctionFragment;
     "closePosition(address,uint256)": FunctionFragment;
-    "getPosition(address)": FunctionFragment;
+    "getAmountOut(uint256)": FunctionFragment;
+    "getBorrowLimit()": FunctionFragment;
+    "getDeposit(address)": FunctionFragment;
+    "getLiquidationCost(uint256)": FunctionFragment;
+    "getLoan(address)": FunctionFragment;
+    "getRateMultiplier(uint256)": FunctionFragment;
+    "getTotalDeposit()": FunctionFragment;
+    "getTotalLoan()": FunctionFragment;
     "liquidatePosition(address,address)": FunctionFragment;
     "openPosition(address,uint256,uint256)": FunctionFragment;
     "positionCosts(address)": FunctionFragment;
   };
 
   encodeFunctionData(
-    functionFragment: "calculateBalance",
-    values: [string, BigNumberish]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "calculateOpenPosition",
+    functionFragment: "calcProfitFee",
     values: [BigNumberish, BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "closePosition",
     values: [string, BigNumberish]
   ): string;
-  encodeFunctionData(functionFragment: "getPosition", values: [string]): string;
+  encodeFunctionData(
+    functionFragment: "getAmountOut",
+    values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "getBorrowLimit",
+    values?: undefined
+  ): string;
+  encodeFunctionData(functionFragment: "getDeposit", values: [string]): string;
+  encodeFunctionData(
+    functionFragment: "getLiquidationCost",
+    values: [BigNumberish]
+  ): string;
+  encodeFunctionData(functionFragment: "getLoan", values: [string]): string;
+  encodeFunctionData(
+    functionFragment: "getRateMultiplier",
+    values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "getTotalDeposit",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "getTotalLoan",
+    values?: undefined
+  ): string;
   encodeFunctionData(
     functionFragment: "liquidatePosition",
     values: [string, string]
@@ -59,11 +86,7 @@ interface IPairInterface extends ethers.utils.Interface {
   ): string;
 
   decodeFunctionResult(
-    functionFragment: "calculateBalance",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "calculateOpenPosition",
+    functionFragment: "calcProfitFee",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -71,7 +94,29 @@ interface IPairInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "getPosition",
+    functionFragment: "getAmountOut",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "getBorrowLimit",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: "getDeposit", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "getLiquidationCost",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: "getLoan", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "getRateMultiplier",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "getTotalDeposit",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "getTotalLoan",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -140,55 +185,17 @@ export class IPair extends Contract {
   interface: IPairInterface;
 
   functions: {
-    calculateBalance(
-      trader: string,
-      amountIn: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<
-      [BigNumber, BigNumber, BigNumber] & {
-        profit: BigNumber;
-        debtPayable: BigNumber;
-        protocolFee: BigNumber;
-      }
-    >;
-
-    "calculateBalance(address,uint256)"(
-      trader: string,
-      amountIn: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<
-      [BigNumber, BigNumber, BigNumber] & {
-        profit: BigNumber;
-        debtPayable: BigNumber;
-        protocolFee: BigNumber;
-      }
-    >;
-
-    calculateOpenPosition(
+    calcProfitFee(
       amount: BigNumberish,
-      leverageFactor: BigNumberish,
+      deposit: BigNumberish,
       overrides?: CallOverrides
-    ): Promise<
-      [BigNumber, BigNumber, BigNumber, BigNumber] & {
-        maxAmountIn: BigNumber;
-        borrowAmount: BigNumber;
-        borrowRate: BigNumber;
-        liquidationCost: BigNumber;
-      }
-    >;
+    ): Promise<[BigNumber, BigNumber] & { profit: BigNumber; fee: BigNumber }>;
 
-    "calculateOpenPosition(uint256,uint256)"(
+    "calcProfitFee(uint256,uint256)"(
       amount: BigNumberish,
-      leverageFactor: BigNumberish,
+      deposit: BigNumberish,
       overrides?: CallOverrides
-    ): Promise<
-      [BigNumber, BigNumber, BigNumber, BigNumber] & {
-        maxAmountIn: BigNumber;
-        borrowAmount: BigNumber;
-        borrowRate: BigNumber;
-        liquidationCost: BigNumber;
-      }
-    >;
+    ): Promise<[BigNumber, BigNumber] & { profit: BigNumber; fee: BigNumber }>;
 
     closePosition(
       trader: string,
@@ -202,99 +209,61 @@ export class IPair extends Contract {
       overrides?: Overrides
     ): Promise<ContractTransaction>;
 
-    getPosition(
-      trader: string,
+    getAmountOut(
+      amountIn: BigNumberish,
       overrides?: CallOverrides
-    ): Promise<
-      [
-        [
-          BigNumber,
-          BigNumber,
-          BigNumber,
-          BigNumber,
-          BigNumber,
-          BigNumber,
-          BigNumber,
-          BigNumber
-        ] & {
-          amount: BigNumber;
-          value: BigNumber;
-          selfValue: BigNumber;
-          principalDebt: BigNumber;
-          currentDebt: BigNumber;
-          rate: BigNumber;
-          currentCost: BigNumber;
-          liquidationCost: BigNumber;
-        }
-      ] & {
-        position: [
-          BigNumber,
-          BigNumber,
-          BigNumber,
-          BigNumber,
-          BigNumber,
-          BigNumber,
-          BigNumber,
-          BigNumber
-        ] & {
-          amount: BigNumber;
-          value: BigNumber;
-          selfValue: BigNumber;
-          principalDebt: BigNumber;
-          currentDebt: BigNumber;
-          rate: BigNumber;
-          currentCost: BigNumber;
-          liquidationCost: BigNumber;
-        };
-      }
-    >;
+    ): Promise<[BigNumber]>;
 
-    "getPosition(address)"(
+    "getAmountOut(uint256)"(
+      amountIn: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber]>;
+
+    getBorrowLimit(overrides?: CallOverrides): Promise<[BigNumber]>;
+
+    "getBorrowLimit()"(overrides?: CallOverrides): Promise<[BigNumber]>;
+
+    getDeposit(trader: string, overrides?: CallOverrides): Promise<[BigNumber]>;
+
+    "getDeposit(address)"(
       trader: string,
       overrides?: CallOverrides
-    ): Promise<
-      [
-        [
-          BigNumber,
-          BigNumber,
-          BigNumber,
-          BigNumber,
-          BigNumber,
-          BigNumber,
-          BigNumber,
-          BigNumber
-        ] & {
-          amount: BigNumber;
-          value: BigNumber;
-          selfValue: BigNumber;
-          principalDebt: BigNumber;
-          currentDebt: BigNumber;
-          rate: BigNumber;
-          currentCost: BigNumber;
-          liquidationCost: BigNumber;
-        }
-      ] & {
-        position: [
-          BigNumber,
-          BigNumber,
-          BigNumber,
-          BigNumber,
-          BigNumber,
-          BigNumber,
-          BigNumber,
-          BigNumber
-        ] & {
-          amount: BigNumber;
-          value: BigNumber;
-          selfValue: BigNumber;
-          principalDebt: BigNumber;
-          currentDebt: BigNumber;
-          rate: BigNumber;
-          currentCost: BigNumber;
-          liquidationCost: BigNumber;
-        };
-      }
-    >;
+    ): Promise<[BigNumber]>;
+
+    getLiquidationCost(
+      currentDebt: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber]>;
+
+    "getLiquidationCost(uint256)"(
+      currentDebt: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber]>;
+
+    getLoan(trader: string, overrides?: CallOverrides): Promise<[BigNumber]>;
+
+    "getLoan(address)"(
+      trader: string,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber]>;
+
+    getRateMultiplier(
+      leverageFactor: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber]>;
+
+    "getRateMultiplier(uint256)"(
+      leverageFactor: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber]>;
+
+    getTotalDeposit(overrides?: CallOverrides): Promise<[BigNumber]>;
+
+    "getTotalDeposit()"(overrides?: CallOverrides): Promise<[BigNumber]>;
+
+    getTotalLoan(overrides?: CallOverrides): Promise<[BigNumber]>;
+
+    "getTotalLoan()"(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     liquidatePosition(
       trader: string,
@@ -343,55 +312,17 @@ export class IPair extends Contract {
     >;
   };
 
-  calculateBalance(
-    trader: string,
-    amountIn: BigNumberish,
-    overrides?: CallOverrides
-  ): Promise<
-    [BigNumber, BigNumber, BigNumber] & {
-      profit: BigNumber;
-      debtPayable: BigNumber;
-      protocolFee: BigNumber;
-    }
-  >;
-
-  "calculateBalance(address,uint256)"(
-    trader: string,
-    amountIn: BigNumberish,
-    overrides?: CallOverrides
-  ): Promise<
-    [BigNumber, BigNumber, BigNumber] & {
-      profit: BigNumber;
-      debtPayable: BigNumber;
-      protocolFee: BigNumber;
-    }
-  >;
-
-  calculateOpenPosition(
+  calcProfitFee(
     amount: BigNumberish,
-    leverageFactor: BigNumberish,
+    deposit: BigNumberish,
     overrides?: CallOverrides
-  ): Promise<
-    [BigNumber, BigNumber, BigNumber, BigNumber] & {
-      maxAmountIn: BigNumber;
-      borrowAmount: BigNumber;
-      borrowRate: BigNumber;
-      liquidationCost: BigNumber;
-    }
-  >;
+  ): Promise<[BigNumber, BigNumber] & { profit: BigNumber; fee: BigNumber }>;
 
-  "calculateOpenPosition(uint256,uint256)"(
+  "calcProfitFee(uint256,uint256)"(
     amount: BigNumberish,
-    leverageFactor: BigNumberish,
+    deposit: BigNumberish,
     overrides?: CallOverrides
-  ): Promise<
-    [BigNumber, BigNumber, BigNumber, BigNumber] & {
-      maxAmountIn: BigNumber;
-      borrowAmount: BigNumber;
-      borrowRate: BigNumber;
-      liquidationCost: BigNumber;
-    }
-  >;
+  ): Promise<[BigNumber, BigNumber] & { profit: BigNumber; fee: BigNumber }>;
 
   closePosition(
     trader: string,
@@ -405,55 +336,61 @@ export class IPair extends Contract {
     overrides?: Overrides
   ): Promise<ContractTransaction>;
 
-  getPosition(
-    trader: string,
+  getAmountOut(
+    amountIn: BigNumberish,
     overrides?: CallOverrides
-  ): Promise<
-    [
-      BigNumber,
-      BigNumber,
-      BigNumber,
-      BigNumber,
-      BigNumber,
-      BigNumber,
-      BigNumber,
-      BigNumber
-    ] & {
-      amount: BigNumber;
-      value: BigNumber;
-      selfValue: BigNumber;
-      principalDebt: BigNumber;
-      currentDebt: BigNumber;
-      rate: BigNumber;
-      currentCost: BigNumber;
-      liquidationCost: BigNumber;
-    }
-  >;
+  ): Promise<BigNumber>;
 
-  "getPosition(address)"(
+  "getAmountOut(uint256)"(
+    amountIn: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<BigNumber>;
+
+  getBorrowLimit(overrides?: CallOverrides): Promise<BigNumber>;
+
+  "getBorrowLimit()"(overrides?: CallOverrides): Promise<BigNumber>;
+
+  getDeposit(trader: string, overrides?: CallOverrides): Promise<BigNumber>;
+
+  "getDeposit(address)"(
     trader: string,
     overrides?: CallOverrides
-  ): Promise<
-    [
-      BigNumber,
-      BigNumber,
-      BigNumber,
-      BigNumber,
-      BigNumber,
-      BigNumber,
-      BigNumber,
-      BigNumber
-    ] & {
-      amount: BigNumber;
-      value: BigNumber;
-      selfValue: BigNumber;
-      principalDebt: BigNumber;
-      currentDebt: BigNumber;
-      rate: BigNumber;
-      currentCost: BigNumber;
-      liquidationCost: BigNumber;
-    }
-  >;
+  ): Promise<BigNumber>;
+
+  getLiquidationCost(
+    currentDebt: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<BigNumber>;
+
+  "getLiquidationCost(uint256)"(
+    currentDebt: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<BigNumber>;
+
+  getLoan(trader: string, overrides?: CallOverrides): Promise<BigNumber>;
+
+  "getLoan(address)"(
+    trader: string,
+    overrides?: CallOverrides
+  ): Promise<BigNumber>;
+
+  getRateMultiplier(
+    leverageFactor: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<BigNumber>;
+
+  "getRateMultiplier(uint256)"(
+    leverageFactor: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<BigNumber>;
+
+  getTotalDeposit(overrides?: CallOverrides): Promise<BigNumber>;
+
+  "getTotalDeposit()"(overrides?: CallOverrides): Promise<BigNumber>;
+
+  getTotalLoan(overrides?: CallOverrides): Promise<BigNumber>;
+
+  "getTotalLoan()"(overrides?: CallOverrides): Promise<BigNumber>;
 
   liquidatePosition(
     trader: string,
@@ -502,55 +439,17 @@ export class IPair extends Contract {
   >;
 
   callStatic: {
-    calculateBalance(
-      trader: string,
-      amountIn: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<
-      [BigNumber, BigNumber, BigNumber] & {
-        profit: BigNumber;
-        debtPayable: BigNumber;
-        protocolFee: BigNumber;
-      }
-    >;
-
-    "calculateBalance(address,uint256)"(
-      trader: string,
-      amountIn: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<
-      [BigNumber, BigNumber, BigNumber] & {
-        profit: BigNumber;
-        debtPayable: BigNumber;
-        protocolFee: BigNumber;
-      }
-    >;
-
-    calculateOpenPosition(
+    calcProfitFee(
       amount: BigNumberish,
-      leverageFactor: BigNumberish,
+      deposit: BigNumberish,
       overrides?: CallOverrides
-    ): Promise<
-      [BigNumber, BigNumber, BigNumber, BigNumber] & {
-        maxAmountIn: BigNumber;
-        borrowAmount: BigNumber;
-        borrowRate: BigNumber;
-        liquidationCost: BigNumber;
-      }
-    >;
+    ): Promise<[BigNumber, BigNumber] & { profit: BigNumber; fee: BigNumber }>;
 
-    "calculateOpenPosition(uint256,uint256)"(
+    "calcProfitFee(uint256,uint256)"(
       amount: BigNumberish,
-      leverageFactor: BigNumberish,
+      deposit: BigNumberish,
       overrides?: CallOverrides
-    ): Promise<
-      [BigNumber, BigNumber, BigNumber, BigNumber] & {
-        maxAmountIn: BigNumber;
-        borrowAmount: BigNumber;
-        borrowRate: BigNumber;
-        liquidationCost: BigNumber;
-      }
-    >;
+    ): Promise<[BigNumber, BigNumber] & { profit: BigNumber; fee: BigNumber }>;
 
     closePosition(
       trader: string,
@@ -564,55 +463,61 @@ export class IPair extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    getPosition(
-      trader: string,
+    getAmountOut(
+      amountIn: BigNumberish,
       overrides?: CallOverrides
-    ): Promise<
-      [
-        BigNumber,
-        BigNumber,
-        BigNumber,
-        BigNumber,
-        BigNumber,
-        BigNumber,
-        BigNumber,
-        BigNumber
-      ] & {
-        amount: BigNumber;
-        value: BigNumber;
-        selfValue: BigNumber;
-        principalDebt: BigNumber;
-        currentDebt: BigNumber;
-        rate: BigNumber;
-        currentCost: BigNumber;
-        liquidationCost: BigNumber;
-      }
-    >;
+    ): Promise<BigNumber>;
 
-    "getPosition(address)"(
+    "getAmountOut(uint256)"(
+      amountIn: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    getBorrowLimit(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "getBorrowLimit()"(overrides?: CallOverrides): Promise<BigNumber>;
+
+    getDeposit(trader: string, overrides?: CallOverrides): Promise<BigNumber>;
+
+    "getDeposit(address)"(
       trader: string,
       overrides?: CallOverrides
-    ): Promise<
-      [
-        BigNumber,
-        BigNumber,
-        BigNumber,
-        BigNumber,
-        BigNumber,
-        BigNumber,
-        BigNumber,
-        BigNumber
-      ] & {
-        amount: BigNumber;
-        value: BigNumber;
-        selfValue: BigNumber;
-        principalDebt: BigNumber;
-        currentDebt: BigNumber;
-        rate: BigNumber;
-        currentCost: BigNumber;
-        liquidationCost: BigNumber;
-      }
-    >;
+    ): Promise<BigNumber>;
+
+    getLiquidationCost(
+      currentDebt: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "getLiquidationCost(uint256)"(
+      currentDebt: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    getLoan(trader: string, overrides?: CallOverrides): Promise<BigNumber>;
+
+    "getLoan(address)"(
+      trader: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    getRateMultiplier(
+      leverageFactor: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "getRateMultiplier(uint256)"(
+      leverageFactor: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    getTotalDeposit(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "getTotalDeposit()"(overrides?: CallOverrides): Promise<BigNumber>;
+
+    getTotalLoan(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "getTotalLoan()"(overrides?: CallOverrides): Promise<BigNumber>;
 
     liquidatePosition(
       trader: string,
@@ -698,27 +603,15 @@ export class IPair extends Contract {
   };
 
   estimateGas: {
-    calculateBalance(
-      trader: string,
-      amountIn: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    "calculateBalance(address,uint256)"(
-      trader: string,
-      amountIn: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    calculateOpenPosition(
+    calcProfitFee(
       amount: BigNumberish,
-      leverageFactor: BigNumberish,
+      deposit: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    "calculateOpenPosition(uint256,uint256)"(
+    "calcProfitFee(uint256,uint256)"(
       amount: BigNumberish,
-      leverageFactor: BigNumberish,
+      deposit: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
@@ -734,12 +627,61 @@ export class IPair extends Contract {
       overrides?: Overrides
     ): Promise<BigNumber>;
 
-    getPosition(trader: string, overrides?: CallOverrides): Promise<BigNumber>;
+    getAmountOut(
+      amountIn: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
 
-    "getPosition(address)"(
+    "getAmountOut(uint256)"(
+      amountIn: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    getBorrowLimit(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "getBorrowLimit()"(overrides?: CallOverrides): Promise<BigNumber>;
+
+    getDeposit(trader: string, overrides?: CallOverrides): Promise<BigNumber>;
+
+    "getDeposit(address)"(
       trader: string,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
+
+    getLiquidationCost(
+      currentDebt: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "getLiquidationCost(uint256)"(
+      currentDebt: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    getLoan(trader: string, overrides?: CallOverrides): Promise<BigNumber>;
+
+    "getLoan(address)"(
+      trader: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    getRateMultiplier(
+      leverageFactor: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "getRateMultiplier(uint256)"(
+      leverageFactor: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    getTotalDeposit(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "getTotalDeposit()"(overrides?: CallOverrides): Promise<BigNumber>;
+
+    getTotalLoan(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "getTotalLoan()"(overrides?: CallOverrides): Promise<BigNumber>;
 
     liquidatePosition(
       trader: string,
@@ -779,27 +721,15 @@ export class IPair extends Contract {
   };
 
   populateTransaction: {
-    calculateBalance(
-      trader: string,
-      amountIn: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    "calculateBalance(address,uint256)"(
-      trader: string,
-      amountIn: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    calculateOpenPosition(
+    calcProfitFee(
       amount: BigNumberish,
-      leverageFactor: BigNumberish,
+      deposit: BigNumberish,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    "calculateOpenPosition(uint256,uint256)"(
+    "calcProfitFee(uint256,uint256)"(
       amount: BigNumberish,
-      leverageFactor: BigNumberish,
+      deposit: BigNumberish,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
@@ -815,15 +745,71 @@ export class IPair extends Contract {
       overrides?: Overrides
     ): Promise<PopulatedTransaction>;
 
-    getPosition(
+    getAmountOut(
+      amountIn: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    "getAmountOut(uint256)"(
+      amountIn: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    getBorrowLimit(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    "getBorrowLimit()"(
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    getDeposit(
       trader: string,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    "getPosition(address)"(
+    "getDeposit(address)"(
       trader: string,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
+
+    getLiquidationCost(
+      currentDebt: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    "getLiquidationCost(uint256)"(
+      currentDebt: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    getLoan(
+      trader: string,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    "getLoan(address)"(
+      trader: string,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    getRateMultiplier(
+      leverageFactor: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    "getRateMultiplier(uint256)"(
+      leverageFactor: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    getTotalDeposit(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    "getTotalDeposit()"(
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    getTotalLoan(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    "getTotalLoan()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     liquidatePosition(
       trader: string,

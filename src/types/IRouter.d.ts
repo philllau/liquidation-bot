@@ -27,13 +27,20 @@ interface IRouterInterface extends ethers.utils.Interface {
     "WETH()": FunctionFragment;
     "calculateBalance(address,address,address,uint256)": FunctionFragment;
     "calculateOpenPosition(address,address,uint256,uint256)": FunctionFragment;
+    "calculateOpenProxyPosition(address,address,address,uint256,uint256)": FunctionFragment;
+    "calculateProxyBalance(address,address,address,address,uint256)": FunctionFragment;
     "closePosition(uint256,uint256,address,address,address,uint256)": FunctionFragment;
     "closePositionETH(uint256,uint256,address,address,uint256)": FunctionFragment;
+    "closeProxyPosition(uint256,uint256,address,address,address,address,uint256)": FunctionFragment;
     "deposit(address,uint256,address)": FunctionFragment;
     "depositETH(address)": FunctionFragment;
+    "getPosition(address,address,address)": FunctionFragment;
+    "getProxyPosition(address,address,address,address)": FunctionFragment;
     "liquidatePosition(address,address,address)": FunctionFragment;
+    "liquidateProxyPosition(address,address,address,address)": FunctionFragment;
     "openPosition(uint256,uint256,uint256,address,address,address,uint256)": FunctionFragment;
     "openPositionETH(uint256,uint256,address,address,uint256)": FunctionFragment;
+    "openProxyPosition(uint256,uint256,uint256,address,address,address,address,uint256)": FunctionFragment;
     "pairFactory()": FunctionFragment;
     "reserveFactory()": FunctionFragment;
     "swapFactory()": FunctionFragment;
@@ -53,6 +60,14 @@ interface IRouterInterface extends ethers.utils.Interface {
     values: [string, string, BigNumberish, BigNumberish]
   ): string;
   encodeFunctionData(
+    functionFragment: "calculateOpenProxyPosition",
+    values: [string, string, string, BigNumberish, BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "calculateProxyBalance",
+    values: [string, string, string, string, BigNumberish]
+  ): string;
+  encodeFunctionData(
     functionFragment: "closePosition",
     values: [BigNumberish, BigNumberish, string, string, string, BigNumberish]
   ): string;
@@ -61,13 +76,37 @@ interface IRouterInterface extends ethers.utils.Interface {
     values: [BigNumberish, BigNumberish, string, string, BigNumberish]
   ): string;
   encodeFunctionData(
+    functionFragment: "closeProxyPosition",
+    values: [
+      BigNumberish,
+      BigNumberish,
+      string,
+      string,
+      string,
+      string,
+      BigNumberish
+    ]
+  ): string;
+  encodeFunctionData(
     functionFragment: "deposit",
     values: [string, BigNumberish, string]
   ): string;
   encodeFunctionData(functionFragment: "depositETH", values: [string]): string;
   encodeFunctionData(
+    functionFragment: "getPosition",
+    values: [string, string, string]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "getProxyPosition",
+    values: [string, string, string, string]
+  ): string;
+  encodeFunctionData(
     functionFragment: "liquidatePosition",
     values: [string, string, string]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "liquidateProxyPosition",
+    values: [string, string, string, string]
   ): string;
   encodeFunctionData(
     functionFragment: "openPosition",
@@ -84,6 +123,19 @@ interface IRouterInterface extends ethers.utils.Interface {
   encodeFunctionData(
     functionFragment: "openPositionETH",
     values: [BigNumberish, BigNumberish, string, string, BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "openProxyPosition",
+    values: [
+      BigNumberish,
+      BigNumberish,
+      BigNumberish,
+      string,
+      string,
+      string,
+      string,
+      BigNumberish
+    ]
   ): string;
   encodeFunctionData(
     functionFragment: "pairFactory",
@@ -124,6 +176,14 @@ interface IRouterInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
+    functionFragment: "calculateOpenProxyPosition",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "calculateProxyBalance",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "closePosition",
     data: BytesLike
   ): Result;
@@ -131,10 +191,26 @@ interface IRouterInterface extends ethers.utils.Interface {
     functionFragment: "closePositionETH",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(
+    functionFragment: "closeProxyPosition",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "deposit", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "depositETH", data: BytesLike): Result;
   decodeFunctionResult(
+    functionFragment: "getPosition",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "getProxyPosition",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "liquidatePosition",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "liquidateProxyPosition",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -143,6 +219,10 @@ interface IRouterInterface extends ethers.utils.Interface {
   ): Result;
   decodeFunctionResult(
     functionFragment: "openPositionETH",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "openProxyPosition",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -274,6 +354,68 @@ export class IRouter extends Contract {
       }
     >;
 
+    calculateOpenProxyPosition(
+      lendable: string,
+      proxyLendable: string,
+      tradable: string,
+      amount: BigNumberish,
+      leverageFactor: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<
+      [BigNumber, BigNumber, BigNumber, BigNumber] & {
+        maxAmountIn: BigNumber;
+        borrowAmount: BigNumber;
+        borrowRate: BigNumber;
+        liquidationCost: BigNumber;
+      }
+    >;
+
+    "calculateOpenProxyPosition(address,address,address,uint256,uint256)"(
+      lendable: string,
+      proxyLendable: string,
+      tradable: string,
+      amount: BigNumberish,
+      leverageFactor: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<
+      [BigNumber, BigNumber, BigNumber, BigNumber] & {
+        maxAmountIn: BigNumber;
+        borrowAmount: BigNumber;
+        borrowRate: BigNumber;
+        liquidationCost: BigNumber;
+      }
+    >;
+
+    calculateProxyBalance(
+      lendable: string,
+      proxyLendable: string,
+      tradable: string,
+      trader: string,
+      amountIn: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<
+      [BigNumber, BigNumber, BigNumber] & {
+        profit: BigNumber;
+        debtPayable: BigNumber;
+        protocolFee: BigNumber;
+      }
+    >;
+
+    "calculateProxyBalance(address,address,address,address,uint256)"(
+      lendable: string,
+      proxyLendable: string,
+      tradable: string,
+      trader: string,
+      amountIn: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<
+      [BigNumber, BigNumber, BigNumber] & {
+        profit: BigNumber;
+        debtPayable: BigNumber;
+        protocolFee: BigNumber;
+      }
+    >;
+
     closePosition(
       amountIn: BigNumberish,
       amountOutMin: BigNumberish,
@@ -312,6 +454,28 @@ export class IRouter extends Contract {
       overrides?: Overrides
     ): Promise<ContractTransaction>;
 
+    closeProxyPosition(
+      amountIn: BigNumberish,
+      amountOutMin: BigNumberish,
+      lendable: string,
+      proxyLendable: string,
+      tradable: string,
+      trader: string,
+      deadline: BigNumberish,
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
+
+    "closeProxyPosition(uint256,uint256,address,address,address,address,uint256)"(
+      amountIn: BigNumberish,
+      amountOutMin: BigNumberish,
+      lendable: string,
+      proxyLendable: string,
+      tradable: string,
+      trader: string,
+      deadline: BigNumberish,
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
+
     deposit(
       lendable: string,
       amount: BigNumberish,
@@ -336,6 +500,204 @@ export class IRouter extends Contract {
       overrides?: PayableOverrides
     ): Promise<ContractTransaction>;
 
+    getPosition(
+      trader: string,
+      lendable: string,
+      tradable: string,
+      overrides?: CallOverrides
+    ): Promise<
+      [
+        [
+          BigNumber,
+          BigNumber,
+          BigNumber,
+          BigNumber,
+          BigNumber,
+          BigNumber,
+          BigNumber,
+          BigNumber
+        ] & {
+          amount: BigNumber;
+          value: BigNumber;
+          selfValue: BigNumber;
+          principalDebt: BigNumber;
+          currentDebt: BigNumber;
+          rate: BigNumber;
+          currentCost: BigNumber;
+          liquidationCost: BigNumber;
+        }
+      ] & {
+        position: [
+          BigNumber,
+          BigNumber,
+          BigNumber,
+          BigNumber,
+          BigNumber,
+          BigNumber,
+          BigNumber,
+          BigNumber
+        ] & {
+          amount: BigNumber;
+          value: BigNumber;
+          selfValue: BigNumber;
+          principalDebt: BigNumber;
+          currentDebt: BigNumber;
+          rate: BigNumber;
+          currentCost: BigNumber;
+          liquidationCost: BigNumber;
+        };
+      }
+    >;
+
+    "getPosition(address,address,address)"(
+      trader: string,
+      lendable: string,
+      tradable: string,
+      overrides?: CallOverrides
+    ): Promise<
+      [
+        [
+          BigNumber,
+          BigNumber,
+          BigNumber,
+          BigNumber,
+          BigNumber,
+          BigNumber,
+          BigNumber,
+          BigNumber
+        ] & {
+          amount: BigNumber;
+          value: BigNumber;
+          selfValue: BigNumber;
+          principalDebt: BigNumber;
+          currentDebt: BigNumber;
+          rate: BigNumber;
+          currentCost: BigNumber;
+          liquidationCost: BigNumber;
+        }
+      ] & {
+        position: [
+          BigNumber,
+          BigNumber,
+          BigNumber,
+          BigNumber,
+          BigNumber,
+          BigNumber,
+          BigNumber,
+          BigNumber
+        ] & {
+          amount: BigNumber;
+          value: BigNumber;
+          selfValue: BigNumber;
+          principalDebt: BigNumber;
+          currentDebt: BigNumber;
+          rate: BigNumber;
+          currentCost: BigNumber;
+          liquidationCost: BigNumber;
+        };
+      }
+    >;
+
+    getProxyPosition(
+      trader: string,
+      lendable: string,
+      proxyLendable: string,
+      tradable: string,
+      overrides?: CallOverrides
+    ): Promise<
+      [
+        [
+          BigNumber,
+          BigNumber,
+          BigNumber,
+          BigNumber,
+          BigNumber,
+          BigNumber,
+          BigNumber,
+          BigNumber
+        ] & {
+          amount: BigNumber;
+          value: BigNumber;
+          selfValue: BigNumber;
+          principalDebt: BigNumber;
+          currentDebt: BigNumber;
+          rate: BigNumber;
+          currentCost: BigNumber;
+          liquidationCost: BigNumber;
+        }
+      ] & {
+        position: [
+          BigNumber,
+          BigNumber,
+          BigNumber,
+          BigNumber,
+          BigNumber,
+          BigNumber,
+          BigNumber,
+          BigNumber
+        ] & {
+          amount: BigNumber;
+          value: BigNumber;
+          selfValue: BigNumber;
+          principalDebt: BigNumber;
+          currentDebt: BigNumber;
+          rate: BigNumber;
+          currentCost: BigNumber;
+          liquidationCost: BigNumber;
+        };
+      }
+    >;
+
+    "getProxyPosition(address,address,address,address)"(
+      trader: string,
+      lendable: string,
+      proxyLendable: string,
+      tradable: string,
+      overrides?: CallOverrides
+    ): Promise<
+      [
+        [
+          BigNumber,
+          BigNumber,
+          BigNumber,
+          BigNumber,
+          BigNumber,
+          BigNumber,
+          BigNumber,
+          BigNumber
+        ] & {
+          amount: BigNumber;
+          value: BigNumber;
+          selfValue: BigNumber;
+          principalDebt: BigNumber;
+          currentDebt: BigNumber;
+          rate: BigNumber;
+          currentCost: BigNumber;
+          liquidationCost: BigNumber;
+        }
+      ] & {
+        position: [
+          BigNumber,
+          BigNumber,
+          BigNumber,
+          BigNumber,
+          BigNumber,
+          BigNumber,
+          BigNumber,
+          BigNumber
+        ] & {
+          amount: BigNumber;
+          value: BigNumber;
+          selfValue: BigNumber;
+          principalDebt: BigNumber;
+          currentDebt: BigNumber;
+          rate: BigNumber;
+          currentCost: BigNumber;
+          liquidationCost: BigNumber;
+        };
+      }
+    >;
+
     liquidatePosition(
       lendable: string,
       tradable: string,
@@ -345,6 +707,22 @@ export class IRouter extends Contract {
 
     "liquidatePosition(address,address,address)"(
       lendable: string,
+      tradable: string,
+      trader: string,
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
+
+    liquidateProxyPosition(
+      lendable: string,
+      proxyLendable: string,
+      tradable: string,
+      trader: string,
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
+
+    "liquidateProxyPosition(address,address,address,address)"(
+      lendable: string,
+      proxyLendable: string,
       tradable: string,
       trader: string,
       overrides?: Overrides
@@ -388,6 +766,30 @@ export class IRouter extends Contract {
       trader: string,
       deadline: BigNumberish,
       overrides?: PayableOverrides
+    ): Promise<ContractTransaction>;
+
+    openProxyPosition(
+      amountIn: BigNumberish,
+      leverageFactor: BigNumberish,
+      amountOutMin: BigNumberish,
+      lendable: string,
+      proxyLendable: string,
+      tradable: string,
+      trader: string,
+      deadline: BigNumberish,
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
+
+    "openProxyPosition(uint256,uint256,uint256,address,address,address,address,uint256)"(
+      amountIn: BigNumberish,
+      leverageFactor: BigNumberish,
+      amountOutMin: BigNumberish,
+      lendable: string,
+      proxyLendable: string,
+      tradable: string,
+      trader: string,
+      deadline: BigNumberish,
+      overrides?: Overrides
     ): Promise<ContractTransaction>;
 
     pairFactory(overrides?: Overrides): Promise<ContractTransaction>;
@@ -507,6 +909,68 @@ export class IRouter extends Contract {
     }
   >;
 
+  calculateOpenProxyPosition(
+    lendable: string,
+    proxyLendable: string,
+    tradable: string,
+    amount: BigNumberish,
+    leverageFactor: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<
+    [BigNumber, BigNumber, BigNumber, BigNumber] & {
+      maxAmountIn: BigNumber;
+      borrowAmount: BigNumber;
+      borrowRate: BigNumber;
+      liquidationCost: BigNumber;
+    }
+  >;
+
+  "calculateOpenProxyPosition(address,address,address,uint256,uint256)"(
+    lendable: string,
+    proxyLendable: string,
+    tradable: string,
+    amount: BigNumberish,
+    leverageFactor: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<
+    [BigNumber, BigNumber, BigNumber, BigNumber] & {
+      maxAmountIn: BigNumber;
+      borrowAmount: BigNumber;
+      borrowRate: BigNumber;
+      liquidationCost: BigNumber;
+    }
+  >;
+
+  calculateProxyBalance(
+    lendable: string,
+    proxyLendable: string,
+    tradable: string,
+    trader: string,
+    amountIn: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<
+    [BigNumber, BigNumber, BigNumber] & {
+      profit: BigNumber;
+      debtPayable: BigNumber;
+      protocolFee: BigNumber;
+    }
+  >;
+
+  "calculateProxyBalance(address,address,address,address,uint256)"(
+    lendable: string,
+    proxyLendable: string,
+    tradable: string,
+    trader: string,
+    amountIn: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<
+    [BigNumber, BigNumber, BigNumber] & {
+      profit: BigNumber;
+      debtPayable: BigNumber;
+      protocolFee: BigNumber;
+    }
+  >;
+
   closePosition(
     amountIn: BigNumberish,
     amountOutMin: BigNumberish,
@@ -545,6 +1009,28 @@ export class IRouter extends Contract {
     overrides?: Overrides
   ): Promise<ContractTransaction>;
 
+  closeProxyPosition(
+    amountIn: BigNumberish,
+    amountOutMin: BigNumberish,
+    lendable: string,
+    proxyLendable: string,
+    tradable: string,
+    trader: string,
+    deadline: BigNumberish,
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
+
+  "closeProxyPosition(uint256,uint256,address,address,address,address,uint256)"(
+    amountIn: BigNumberish,
+    amountOutMin: BigNumberish,
+    lendable: string,
+    proxyLendable: string,
+    tradable: string,
+    trader: string,
+    deadline: BigNumberish,
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
+
   deposit(
     lendable: string,
     amount: BigNumberish,
@@ -569,6 +1055,116 @@ export class IRouter extends Contract {
     overrides?: PayableOverrides
   ): Promise<ContractTransaction>;
 
+  getPosition(
+    trader: string,
+    lendable: string,
+    tradable: string,
+    overrides?: CallOverrides
+  ): Promise<
+    [
+      BigNumber,
+      BigNumber,
+      BigNumber,
+      BigNumber,
+      BigNumber,
+      BigNumber,
+      BigNumber,
+      BigNumber
+    ] & {
+      amount: BigNumber;
+      value: BigNumber;
+      selfValue: BigNumber;
+      principalDebt: BigNumber;
+      currentDebt: BigNumber;
+      rate: BigNumber;
+      currentCost: BigNumber;
+      liquidationCost: BigNumber;
+    }
+  >;
+
+  "getPosition(address,address,address)"(
+    trader: string,
+    lendable: string,
+    tradable: string,
+    overrides?: CallOverrides
+  ): Promise<
+    [
+      BigNumber,
+      BigNumber,
+      BigNumber,
+      BigNumber,
+      BigNumber,
+      BigNumber,
+      BigNumber,
+      BigNumber
+    ] & {
+      amount: BigNumber;
+      value: BigNumber;
+      selfValue: BigNumber;
+      principalDebt: BigNumber;
+      currentDebt: BigNumber;
+      rate: BigNumber;
+      currentCost: BigNumber;
+      liquidationCost: BigNumber;
+    }
+  >;
+
+  getProxyPosition(
+    trader: string,
+    lendable: string,
+    proxyLendable: string,
+    tradable: string,
+    overrides?: CallOverrides
+  ): Promise<
+    [
+      BigNumber,
+      BigNumber,
+      BigNumber,
+      BigNumber,
+      BigNumber,
+      BigNumber,
+      BigNumber,
+      BigNumber
+    ] & {
+      amount: BigNumber;
+      value: BigNumber;
+      selfValue: BigNumber;
+      principalDebt: BigNumber;
+      currentDebt: BigNumber;
+      rate: BigNumber;
+      currentCost: BigNumber;
+      liquidationCost: BigNumber;
+    }
+  >;
+
+  "getProxyPosition(address,address,address,address)"(
+    trader: string,
+    lendable: string,
+    proxyLendable: string,
+    tradable: string,
+    overrides?: CallOverrides
+  ): Promise<
+    [
+      BigNumber,
+      BigNumber,
+      BigNumber,
+      BigNumber,
+      BigNumber,
+      BigNumber,
+      BigNumber,
+      BigNumber
+    ] & {
+      amount: BigNumber;
+      value: BigNumber;
+      selfValue: BigNumber;
+      principalDebt: BigNumber;
+      currentDebt: BigNumber;
+      rate: BigNumber;
+      currentCost: BigNumber;
+      liquidationCost: BigNumber;
+    }
+  >;
+
   liquidatePosition(
     lendable: string,
     tradable: string,
@@ -578,6 +1174,22 @@ export class IRouter extends Contract {
 
   "liquidatePosition(address,address,address)"(
     lendable: string,
+    tradable: string,
+    trader: string,
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
+
+  liquidateProxyPosition(
+    lendable: string,
+    proxyLendable: string,
+    tradable: string,
+    trader: string,
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
+
+  "liquidateProxyPosition(address,address,address,address)"(
+    lendable: string,
+    proxyLendable: string,
     tradable: string,
     trader: string,
     overrides?: Overrides
@@ -621,6 +1233,30 @@ export class IRouter extends Contract {
     trader: string,
     deadline: BigNumberish,
     overrides?: PayableOverrides
+  ): Promise<ContractTransaction>;
+
+  openProxyPosition(
+    amountIn: BigNumberish,
+    leverageFactor: BigNumberish,
+    amountOutMin: BigNumberish,
+    lendable: string,
+    proxyLendable: string,
+    tradable: string,
+    trader: string,
+    deadline: BigNumberish,
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
+
+  "openProxyPosition(uint256,uint256,uint256,address,address,address,address,uint256)"(
+    amountIn: BigNumberish,
+    leverageFactor: BigNumberish,
+    amountOutMin: BigNumberish,
+    lendable: string,
+    proxyLendable: string,
+    tradable: string,
+    trader: string,
+    deadline: BigNumberish,
+    overrides?: Overrides
   ): Promise<ContractTransaction>;
 
   pairFactory(overrides?: Overrides): Promise<ContractTransaction>;
@@ -740,6 +1376,68 @@ export class IRouter extends Contract {
       }
     >;
 
+    calculateOpenProxyPosition(
+      lendable: string,
+      proxyLendable: string,
+      tradable: string,
+      amount: BigNumberish,
+      leverageFactor: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<
+      [BigNumber, BigNumber, BigNumber, BigNumber] & {
+        maxAmountIn: BigNumber;
+        borrowAmount: BigNumber;
+        borrowRate: BigNumber;
+        liquidationCost: BigNumber;
+      }
+    >;
+
+    "calculateOpenProxyPosition(address,address,address,uint256,uint256)"(
+      lendable: string,
+      proxyLendable: string,
+      tradable: string,
+      amount: BigNumberish,
+      leverageFactor: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<
+      [BigNumber, BigNumber, BigNumber, BigNumber] & {
+        maxAmountIn: BigNumber;
+        borrowAmount: BigNumber;
+        borrowRate: BigNumber;
+        liquidationCost: BigNumber;
+      }
+    >;
+
+    calculateProxyBalance(
+      lendable: string,
+      proxyLendable: string,
+      tradable: string,
+      trader: string,
+      amountIn: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<
+      [BigNumber, BigNumber, BigNumber] & {
+        profit: BigNumber;
+        debtPayable: BigNumber;
+        protocolFee: BigNumber;
+      }
+    >;
+
+    "calculateProxyBalance(address,address,address,address,uint256)"(
+      lendable: string,
+      proxyLendable: string,
+      tradable: string,
+      trader: string,
+      amountIn: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<
+      [BigNumber, BigNumber, BigNumber] & {
+        profit: BigNumber;
+        debtPayable: BigNumber;
+        protocolFee: BigNumber;
+      }
+    >;
+
     closePosition(
       amountIn: BigNumberish,
       amountOutMin: BigNumberish,
@@ -778,6 +1476,28 @@ export class IRouter extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
+    closeProxyPosition(
+      amountIn: BigNumberish,
+      amountOutMin: BigNumberish,
+      lendable: string,
+      proxyLendable: string,
+      tradable: string,
+      trader: string,
+      deadline: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "closeProxyPosition(uint256,uint256,address,address,address,address,uint256)"(
+      amountIn: BigNumberish,
+      amountOutMin: BigNumberish,
+      lendable: string,
+      proxyLendable: string,
+      tradable: string,
+      trader: string,
+      deadline: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
     deposit(
       lendable: string,
       amount: BigNumberish,
@@ -796,6 +1516,116 @@ export class IRouter extends Contract {
 
     "depositETH(address)"(to: string, overrides?: CallOverrides): Promise<void>;
 
+    getPosition(
+      trader: string,
+      lendable: string,
+      tradable: string,
+      overrides?: CallOverrides
+    ): Promise<
+      [
+        BigNumber,
+        BigNumber,
+        BigNumber,
+        BigNumber,
+        BigNumber,
+        BigNumber,
+        BigNumber,
+        BigNumber
+      ] & {
+        amount: BigNumber;
+        value: BigNumber;
+        selfValue: BigNumber;
+        principalDebt: BigNumber;
+        currentDebt: BigNumber;
+        rate: BigNumber;
+        currentCost: BigNumber;
+        liquidationCost: BigNumber;
+      }
+    >;
+
+    "getPosition(address,address,address)"(
+      trader: string,
+      lendable: string,
+      tradable: string,
+      overrides?: CallOverrides
+    ): Promise<
+      [
+        BigNumber,
+        BigNumber,
+        BigNumber,
+        BigNumber,
+        BigNumber,
+        BigNumber,
+        BigNumber,
+        BigNumber
+      ] & {
+        amount: BigNumber;
+        value: BigNumber;
+        selfValue: BigNumber;
+        principalDebt: BigNumber;
+        currentDebt: BigNumber;
+        rate: BigNumber;
+        currentCost: BigNumber;
+        liquidationCost: BigNumber;
+      }
+    >;
+
+    getProxyPosition(
+      trader: string,
+      lendable: string,
+      proxyLendable: string,
+      tradable: string,
+      overrides?: CallOverrides
+    ): Promise<
+      [
+        BigNumber,
+        BigNumber,
+        BigNumber,
+        BigNumber,
+        BigNumber,
+        BigNumber,
+        BigNumber,
+        BigNumber
+      ] & {
+        amount: BigNumber;
+        value: BigNumber;
+        selfValue: BigNumber;
+        principalDebt: BigNumber;
+        currentDebt: BigNumber;
+        rate: BigNumber;
+        currentCost: BigNumber;
+        liquidationCost: BigNumber;
+      }
+    >;
+
+    "getProxyPosition(address,address,address,address)"(
+      trader: string,
+      lendable: string,
+      proxyLendable: string,
+      tradable: string,
+      overrides?: CallOverrides
+    ): Promise<
+      [
+        BigNumber,
+        BigNumber,
+        BigNumber,
+        BigNumber,
+        BigNumber,
+        BigNumber,
+        BigNumber,
+        BigNumber
+      ] & {
+        amount: BigNumber;
+        value: BigNumber;
+        selfValue: BigNumber;
+        principalDebt: BigNumber;
+        currentDebt: BigNumber;
+        rate: BigNumber;
+        currentCost: BigNumber;
+        liquidationCost: BigNumber;
+      }
+    >;
+
     liquidatePosition(
       lendable: string,
       tradable: string,
@@ -805,6 +1635,22 @@ export class IRouter extends Contract {
 
     "liquidatePosition(address,address,address)"(
       lendable: string,
+      tradable: string,
+      trader: string,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    liquidateProxyPosition(
+      lendable: string,
+      proxyLendable: string,
+      tradable: string,
+      trader: string,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    "liquidateProxyPosition(address,address,address,address)"(
+      lendable: string,
+      proxyLendable: string,
       tradable: string,
       trader: string,
       overrides?: CallOverrides
@@ -844,6 +1690,30 @@ export class IRouter extends Contract {
     "openPositionETH(uint256,uint256,address,address,uint256)"(
       leverageFactor: BigNumberish,
       amountOutMin: BigNumberish,
+      tradable: string,
+      trader: string,
+      deadline: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    openProxyPosition(
+      amountIn: BigNumberish,
+      leverageFactor: BigNumberish,
+      amountOutMin: BigNumberish,
+      lendable: string,
+      proxyLendable: string,
+      tradable: string,
+      trader: string,
+      deadline: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "openProxyPosition(uint256,uint256,uint256,address,address,address,address,uint256)"(
+      amountIn: BigNumberish,
+      leverageFactor: BigNumberish,
+      amountOutMin: BigNumberish,
+      lendable: string,
+      proxyLendable: string,
       tradable: string,
       trader: string,
       deadline: BigNumberish,
@@ -944,6 +1814,42 @@ export class IRouter extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
+    calculateOpenProxyPosition(
+      lendable: string,
+      proxyLendable: string,
+      tradable: string,
+      amount: BigNumberish,
+      leverageFactor: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "calculateOpenProxyPosition(address,address,address,uint256,uint256)"(
+      lendable: string,
+      proxyLendable: string,
+      tradable: string,
+      amount: BigNumberish,
+      leverageFactor: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    calculateProxyBalance(
+      lendable: string,
+      proxyLendable: string,
+      tradable: string,
+      trader: string,
+      amountIn: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "calculateProxyBalance(address,address,address,address,uint256)"(
+      lendable: string,
+      proxyLendable: string,
+      tradable: string,
+      trader: string,
+      amountIn: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
     closePosition(
       amountIn: BigNumberish,
       amountOutMin: BigNumberish,
@@ -982,6 +1888,28 @@ export class IRouter extends Contract {
       overrides?: Overrides
     ): Promise<BigNumber>;
 
+    closeProxyPosition(
+      amountIn: BigNumberish,
+      amountOutMin: BigNumberish,
+      lendable: string,
+      proxyLendable: string,
+      tradable: string,
+      trader: string,
+      deadline: BigNumberish,
+      overrides?: Overrides
+    ): Promise<BigNumber>;
+
+    "closeProxyPosition(uint256,uint256,address,address,address,address,uint256)"(
+      amountIn: BigNumberish,
+      amountOutMin: BigNumberish,
+      lendable: string,
+      proxyLendable: string,
+      tradable: string,
+      trader: string,
+      deadline: BigNumberish,
+      overrides?: Overrides
+    ): Promise<BigNumber>;
+
     deposit(
       lendable: string,
       amount: BigNumberish,
@@ -1003,6 +1931,36 @@ export class IRouter extends Contract {
       overrides?: PayableOverrides
     ): Promise<BigNumber>;
 
+    getPosition(
+      trader: string,
+      lendable: string,
+      tradable: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "getPosition(address,address,address)"(
+      trader: string,
+      lendable: string,
+      tradable: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    getProxyPosition(
+      trader: string,
+      lendable: string,
+      proxyLendable: string,
+      tradable: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "getProxyPosition(address,address,address,address)"(
+      trader: string,
+      lendable: string,
+      proxyLendable: string,
+      tradable: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
     liquidatePosition(
       lendable: string,
       tradable: string,
@@ -1012,6 +1970,22 @@ export class IRouter extends Contract {
 
     "liquidatePosition(address,address,address)"(
       lendable: string,
+      tradable: string,
+      trader: string,
+      overrides?: Overrides
+    ): Promise<BigNumber>;
+
+    liquidateProxyPosition(
+      lendable: string,
+      proxyLendable: string,
+      tradable: string,
+      trader: string,
+      overrides?: Overrides
+    ): Promise<BigNumber>;
+
+    "liquidateProxyPosition(address,address,address,address)"(
+      lendable: string,
+      proxyLendable: string,
       tradable: string,
       trader: string,
       overrides?: Overrides
@@ -1055,6 +2029,30 @@ export class IRouter extends Contract {
       trader: string,
       deadline: BigNumberish,
       overrides?: PayableOverrides
+    ): Promise<BigNumber>;
+
+    openProxyPosition(
+      amountIn: BigNumberish,
+      leverageFactor: BigNumberish,
+      amountOutMin: BigNumberish,
+      lendable: string,
+      proxyLendable: string,
+      tradable: string,
+      trader: string,
+      deadline: BigNumberish,
+      overrides?: Overrides
+    ): Promise<BigNumber>;
+
+    "openProxyPosition(uint256,uint256,uint256,address,address,address,address,uint256)"(
+      amountIn: BigNumberish,
+      leverageFactor: BigNumberish,
+      amountOutMin: BigNumberish,
+      lendable: string,
+      proxyLendable: string,
+      tradable: string,
+      trader: string,
+      deadline: BigNumberish,
+      overrides?: Overrides
     ): Promise<BigNumber>;
 
     pairFactory(overrides?: Overrides): Promise<BigNumber>;
@@ -1149,6 +2147,42 @@ export class IRouter extends Contract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
+    calculateOpenProxyPosition(
+      lendable: string,
+      proxyLendable: string,
+      tradable: string,
+      amount: BigNumberish,
+      leverageFactor: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    "calculateOpenProxyPosition(address,address,address,uint256,uint256)"(
+      lendable: string,
+      proxyLendable: string,
+      tradable: string,
+      amount: BigNumberish,
+      leverageFactor: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    calculateProxyBalance(
+      lendable: string,
+      proxyLendable: string,
+      tradable: string,
+      trader: string,
+      amountIn: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    "calculateProxyBalance(address,address,address,address,uint256)"(
+      lendable: string,
+      proxyLendable: string,
+      tradable: string,
+      trader: string,
+      amountIn: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
     closePosition(
       amountIn: BigNumberish,
       amountOutMin: BigNumberish,
@@ -1187,6 +2221,28 @@ export class IRouter extends Contract {
       overrides?: Overrides
     ): Promise<PopulatedTransaction>;
 
+    closeProxyPosition(
+      amountIn: BigNumberish,
+      amountOutMin: BigNumberish,
+      lendable: string,
+      proxyLendable: string,
+      tradable: string,
+      trader: string,
+      deadline: BigNumberish,
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
+
+    "closeProxyPosition(uint256,uint256,address,address,address,address,uint256)"(
+      amountIn: BigNumberish,
+      amountOutMin: BigNumberish,
+      lendable: string,
+      proxyLendable: string,
+      tradable: string,
+      trader: string,
+      deadline: BigNumberish,
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
+
     deposit(
       lendable: string,
       amount: BigNumberish,
@@ -1211,6 +2267,36 @@ export class IRouter extends Contract {
       overrides?: PayableOverrides
     ): Promise<PopulatedTransaction>;
 
+    getPosition(
+      trader: string,
+      lendable: string,
+      tradable: string,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    "getPosition(address,address,address)"(
+      trader: string,
+      lendable: string,
+      tradable: string,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    getProxyPosition(
+      trader: string,
+      lendable: string,
+      proxyLendable: string,
+      tradable: string,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    "getProxyPosition(address,address,address,address)"(
+      trader: string,
+      lendable: string,
+      proxyLendable: string,
+      tradable: string,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
     liquidatePosition(
       lendable: string,
       tradable: string,
@@ -1220,6 +2306,22 @@ export class IRouter extends Contract {
 
     "liquidatePosition(address,address,address)"(
       lendable: string,
+      tradable: string,
+      trader: string,
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
+
+    liquidateProxyPosition(
+      lendable: string,
+      proxyLendable: string,
+      tradable: string,
+      trader: string,
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
+
+    "liquidateProxyPosition(address,address,address,address)"(
+      lendable: string,
+      proxyLendable: string,
       tradable: string,
       trader: string,
       overrides?: Overrides
@@ -1263,6 +2365,30 @@ export class IRouter extends Contract {
       trader: string,
       deadline: BigNumberish,
       overrides?: PayableOverrides
+    ): Promise<PopulatedTransaction>;
+
+    openProxyPosition(
+      amountIn: BigNumberish,
+      leverageFactor: BigNumberish,
+      amountOutMin: BigNumberish,
+      lendable: string,
+      proxyLendable: string,
+      tradable: string,
+      trader: string,
+      deadline: BigNumberish,
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
+
+    "openProxyPosition(uint256,uint256,uint256,address,address,address,address,uint256)"(
+      amountIn: BigNumberish,
+      leverageFactor: BigNumberish,
+      amountOutMin: BigNumberish,
+      lendable: string,
+      proxyLendable: string,
+      tradable: string,
+      trader: string,
+      deadline: BigNumberish,
+      overrides?: Overrides
     ): Promise<PopulatedTransaction>;
 
     pairFactory(overrides?: Overrides): Promise<PopulatedTransaction>;

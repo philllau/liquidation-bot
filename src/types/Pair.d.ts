@@ -23,21 +23,24 @@ import { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
 
 interface PairInterface extends ethers.utils.Interface {
   functions: {
+    "REVISION()": FunctionFragment;
     "allowance(address,address)": FunctionFragment;
     "approve(address,uint256)": FunctionFragment;
     "balanceOf(address)": FunctionFragment;
-    "calculateBalance(address,uint256)": FunctionFragment;
-    "calculateOpenPosition(uint256,uint256)": FunctionFragment;
+    "calcProfitFee(uint256,uint256)": FunctionFragment;
     "closePosition(address,uint256)": FunctionFragment;
     "decimals()": FunctionFragment;
     "decreaseAllowance(address,uint256)": FunctionFragment;
+    "getAmountOut(uint256)": FunctionFragment;
+    "getBorrowLimit()": FunctionFragment;
     "getDeposit(address)": FunctionFragment;
+    "getLiquidationCost(uint256)": FunctionFragment;
     "getLoan(address)": FunctionFragment;
-    "getPosition(address)": FunctionFragment;
+    "getRateMultiplier(uint256)": FunctionFragment;
     "getTotalDeposit()": FunctionFragment;
     "getTotalLoan()": FunctionFragment;
     "increaseAllowance(address,uint256)": FunctionFragment;
-    "initialize(address,address,address,address,address,address,address,address,string,string)": FunctionFragment;
+    "initialize(address,address,address,address,address[],string,string)": FunctionFragment;
     "liquidatePosition(address,address)": FunctionFragment;
     "name()": FunctionFragment;
     "openPosition(address,uint256,uint256)": FunctionFragment;
@@ -48,6 +51,7 @@ interface PairInterface extends ethers.utils.Interface {
     "transferFrom(address,address,uint256)": FunctionFragment;
   };
 
+  encodeFunctionData(functionFragment: "REVISION", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "allowance",
     values: [string, string]
@@ -58,11 +62,7 @@ interface PairInterface extends ethers.utils.Interface {
   ): string;
   encodeFunctionData(functionFragment: "balanceOf", values: [string]): string;
   encodeFunctionData(
-    functionFragment: "calculateBalance",
-    values: [string, BigNumberish]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "calculateOpenPosition",
+    functionFragment: "calcProfitFee",
     values: [BigNumberish, BigNumberish]
   ): string;
   encodeFunctionData(
@@ -74,9 +74,24 @@ interface PairInterface extends ethers.utils.Interface {
     functionFragment: "decreaseAllowance",
     values: [string, BigNumberish]
   ): string;
+  encodeFunctionData(
+    functionFragment: "getAmountOut",
+    values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "getBorrowLimit",
+    values?: undefined
+  ): string;
   encodeFunctionData(functionFragment: "getDeposit", values: [string]): string;
+  encodeFunctionData(
+    functionFragment: "getLiquidationCost",
+    values: [BigNumberish]
+  ): string;
   encodeFunctionData(functionFragment: "getLoan", values: [string]): string;
-  encodeFunctionData(functionFragment: "getPosition", values: [string]): string;
+  encodeFunctionData(
+    functionFragment: "getRateMultiplier",
+    values: [BigNumberish]
+  ): string;
   encodeFunctionData(
     functionFragment: "getTotalDeposit",
     values?: undefined
@@ -91,18 +106,7 @@ interface PairInterface extends ethers.utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "initialize",
-    values: [
-      string,
-      string,
-      string,
-      string,
-      string,
-      string,
-      string,
-      string,
-      string,
-      string
-    ]
+    values: [string, string, string, string, string[], string, string]
   ): string;
   encodeFunctionData(
     functionFragment: "liquidatePosition",
@@ -131,15 +135,12 @@ interface PairInterface extends ethers.utils.Interface {
     values: [string, string, BigNumberish]
   ): string;
 
+  decodeFunctionResult(functionFragment: "REVISION", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "allowance", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "approve", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "balanceOf", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "calculateBalance",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "calculateOpenPosition",
+    functionFragment: "calcProfitFee",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -151,10 +152,22 @@ interface PairInterface extends ethers.utils.Interface {
     functionFragment: "decreaseAllowance",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(
+    functionFragment: "getAmountOut",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "getBorrowLimit",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "getDeposit", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "getLiquidationCost",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "getLoan", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "getPosition",
+    functionFragment: "getRateMultiplier",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -251,6 +264,10 @@ export class Pair extends Contract {
   interface: PairInterface;
 
   functions: {
+    REVISION(overrides?: CallOverrides): Promise<[BigNumber]>;
+
+    "REVISION()"(overrides?: CallOverrides): Promise<[BigNumber]>;
+
     allowance(
       owner: string,
       spender: string,
@@ -282,55 +299,17 @@ export class Pair extends Contract {
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
 
-    calculateBalance(
-      trader: string,
-      amountIn: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<
-      [BigNumber, BigNumber, BigNumber] & {
-        profit: BigNumber;
-        debtPayable: BigNumber;
-        protocolFee: BigNumber;
-      }
-    >;
-
-    "calculateBalance(address,uint256)"(
-      trader: string,
-      amountIn: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<
-      [BigNumber, BigNumber, BigNumber] & {
-        profit: BigNumber;
-        debtPayable: BigNumber;
-        protocolFee: BigNumber;
-      }
-    >;
-
-    calculateOpenPosition(
+    calcProfitFee(
       amount: BigNumberish,
-      leverageFactor: BigNumberish,
+      deposit: BigNumberish,
       overrides?: CallOverrides
-    ): Promise<
-      [BigNumber, BigNumber, BigNumber, BigNumber] & {
-        maxAmountIn: BigNumber;
-        borrowAmount: BigNumber;
-        borrowRate: BigNumber;
-        liquidationCost: BigNumber;
-      }
-    >;
+    ): Promise<[BigNumber, BigNumber] & { profit: BigNumber; fee: BigNumber }>;
 
-    "calculateOpenPosition(uint256,uint256)"(
+    "calcProfitFee(uint256,uint256)"(
       amount: BigNumberish,
-      leverageFactor: BigNumberish,
+      deposit: BigNumberish,
       overrides?: CallOverrides
-    ): Promise<
-      [BigNumber, BigNumber, BigNumber, BigNumber] & {
-        maxAmountIn: BigNumber;
-        borrowAmount: BigNumber;
-        borrowRate: BigNumber;
-        liquidationCost: BigNumber;
-      }
-    >;
+    ): Promise<[BigNumber, BigNumber] & { profit: BigNumber; fee: BigNumber }>;
 
     closePosition(
       trader: string,
@@ -360,10 +339,34 @@ export class Pair extends Contract {
       overrides?: Overrides
     ): Promise<ContractTransaction>;
 
+    getAmountOut(
+      amountIn: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber]>;
+
+    "getAmountOut(uint256)"(
+      amountIn: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber]>;
+
+    getBorrowLimit(overrides?: CallOverrides): Promise<[BigNumber]>;
+
+    "getBorrowLimit()"(overrides?: CallOverrides): Promise<[BigNumber]>;
+
     getDeposit(trader: string, overrides?: CallOverrides): Promise<[BigNumber]>;
 
     "getDeposit(address)"(
       trader: string,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber]>;
+
+    getLiquidationCost(
+      currentDebt: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber]>;
+
+    "getLiquidationCost(uint256)"(
+      currentDebt: BigNumberish,
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
 
@@ -374,99 +377,15 @@ export class Pair extends Contract {
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
 
-    getPosition(
-      trader: string,
+    getRateMultiplier(
+      leverageFactor: BigNumberish,
       overrides?: CallOverrides
-    ): Promise<
-      [
-        [
-          BigNumber,
-          BigNumber,
-          BigNumber,
-          BigNumber,
-          BigNumber,
-          BigNumber,
-          BigNumber,
-          BigNumber
-        ] & {
-          amount: BigNumber;
-          value: BigNumber;
-          selfValue: BigNumber;
-          principalDebt: BigNumber;
-          currentDebt: BigNumber;
-          rate: BigNumber;
-          currentCost: BigNumber;
-          liquidationCost: BigNumber;
-        }
-      ] & {
-        position: [
-          BigNumber,
-          BigNumber,
-          BigNumber,
-          BigNumber,
-          BigNumber,
-          BigNumber,
-          BigNumber,
-          BigNumber
-        ] & {
-          amount: BigNumber;
-          value: BigNumber;
-          selfValue: BigNumber;
-          principalDebt: BigNumber;
-          currentDebt: BigNumber;
-          rate: BigNumber;
-          currentCost: BigNumber;
-          liquidationCost: BigNumber;
-        };
-      }
-    >;
+    ): Promise<[BigNumber]>;
 
-    "getPosition(address)"(
-      trader: string,
+    "getRateMultiplier(uint256)"(
+      leverageFactor: BigNumberish,
       overrides?: CallOverrides
-    ): Promise<
-      [
-        [
-          BigNumber,
-          BigNumber,
-          BigNumber,
-          BigNumber,
-          BigNumber,
-          BigNumber,
-          BigNumber,
-          BigNumber
-        ] & {
-          amount: BigNumber;
-          value: BigNumber;
-          selfValue: BigNumber;
-          principalDebt: BigNumber;
-          currentDebt: BigNumber;
-          rate: BigNumber;
-          currentCost: BigNumber;
-          liquidationCost: BigNumber;
-        }
-      ] & {
-        position: [
-          BigNumber,
-          BigNumber,
-          BigNumber,
-          BigNumber,
-          BigNumber,
-          BigNumber,
-          BigNumber,
-          BigNumber
-        ] & {
-          amount: BigNumber;
-          value: BigNumber;
-          selfValue: BigNumber;
-          principalDebt: BigNumber;
-          currentDebt: BigNumber;
-          rate: BigNumber;
-          currentCost: BigNumber;
-          liquidationCost: BigNumber;
-        };
-      }
-    >;
+    ): Promise<[BigNumber]>;
 
     getTotalDeposit(overrides?: CallOverrides): Promise<[BigNumber]>;
 
@@ -490,27 +409,21 @@ export class Pair extends Contract {
 
     initialize(
       reserve: string,
-      pancakePair: string,
-      pancakeRouter: string,
       paramProvider: string,
       treasurer: string,
-      lendable: string,
-      tradable: string,
       wow: string,
+      path: string[],
       name: string,
       symbol: string,
       overrides?: Overrides
     ): Promise<ContractTransaction>;
 
-    "initialize(address,address,address,address,address,address,address,address,string,string)"(
+    "initialize(address,address,address,address,address[],string,string)"(
       reserve: string,
-      pancakePair: string,
-      pancakeRouter: string,
       paramProvider: string,
       treasurer: string,
-      lendable: string,
-      tradable: string,
       wow: string,
+      path: string[],
       name: string,
       symbol: string,
       overrides?: Overrides
@@ -601,6 +514,10 @@ export class Pair extends Contract {
     ): Promise<ContractTransaction>;
   };
 
+  REVISION(overrides?: CallOverrides): Promise<BigNumber>;
+
+  "REVISION()"(overrides?: CallOverrides): Promise<BigNumber>;
+
   allowance(
     owner: string,
     spender: string,
@@ -632,55 +549,17 @@ export class Pair extends Contract {
     overrides?: CallOverrides
   ): Promise<BigNumber>;
 
-  calculateBalance(
-    trader: string,
-    amountIn: BigNumberish,
-    overrides?: CallOverrides
-  ): Promise<
-    [BigNumber, BigNumber, BigNumber] & {
-      profit: BigNumber;
-      debtPayable: BigNumber;
-      protocolFee: BigNumber;
-    }
-  >;
-
-  "calculateBalance(address,uint256)"(
-    trader: string,
-    amountIn: BigNumberish,
-    overrides?: CallOverrides
-  ): Promise<
-    [BigNumber, BigNumber, BigNumber] & {
-      profit: BigNumber;
-      debtPayable: BigNumber;
-      protocolFee: BigNumber;
-    }
-  >;
-
-  calculateOpenPosition(
+  calcProfitFee(
     amount: BigNumberish,
-    leverageFactor: BigNumberish,
+    deposit: BigNumberish,
     overrides?: CallOverrides
-  ): Promise<
-    [BigNumber, BigNumber, BigNumber, BigNumber] & {
-      maxAmountIn: BigNumber;
-      borrowAmount: BigNumber;
-      borrowRate: BigNumber;
-      liquidationCost: BigNumber;
-    }
-  >;
+  ): Promise<[BigNumber, BigNumber] & { profit: BigNumber; fee: BigNumber }>;
 
-  "calculateOpenPosition(uint256,uint256)"(
+  "calcProfitFee(uint256,uint256)"(
     amount: BigNumberish,
-    leverageFactor: BigNumberish,
+    deposit: BigNumberish,
     overrides?: CallOverrides
-  ): Promise<
-    [BigNumber, BigNumber, BigNumber, BigNumber] & {
-      maxAmountIn: BigNumber;
-      borrowAmount: BigNumber;
-      borrowRate: BigNumber;
-      liquidationCost: BigNumber;
-    }
-  >;
+  ): Promise<[BigNumber, BigNumber] & { profit: BigNumber; fee: BigNumber }>;
 
   closePosition(
     trader: string,
@@ -710,10 +589,34 @@ export class Pair extends Contract {
     overrides?: Overrides
   ): Promise<ContractTransaction>;
 
+  getAmountOut(
+    amountIn: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<BigNumber>;
+
+  "getAmountOut(uint256)"(
+    amountIn: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<BigNumber>;
+
+  getBorrowLimit(overrides?: CallOverrides): Promise<BigNumber>;
+
+  "getBorrowLimit()"(overrides?: CallOverrides): Promise<BigNumber>;
+
   getDeposit(trader: string, overrides?: CallOverrides): Promise<BigNumber>;
 
   "getDeposit(address)"(
     trader: string,
+    overrides?: CallOverrides
+  ): Promise<BigNumber>;
+
+  getLiquidationCost(
+    currentDebt: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<BigNumber>;
+
+  "getLiquidationCost(uint256)"(
+    currentDebt: BigNumberish,
     overrides?: CallOverrides
   ): Promise<BigNumber>;
 
@@ -724,55 +627,15 @@ export class Pair extends Contract {
     overrides?: CallOverrides
   ): Promise<BigNumber>;
 
-  getPosition(
-    trader: string,
+  getRateMultiplier(
+    leverageFactor: BigNumberish,
     overrides?: CallOverrides
-  ): Promise<
-    [
-      BigNumber,
-      BigNumber,
-      BigNumber,
-      BigNumber,
-      BigNumber,
-      BigNumber,
-      BigNumber,
-      BigNumber
-    ] & {
-      amount: BigNumber;
-      value: BigNumber;
-      selfValue: BigNumber;
-      principalDebt: BigNumber;
-      currentDebt: BigNumber;
-      rate: BigNumber;
-      currentCost: BigNumber;
-      liquidationCost: BigNumber;
-    }
-  >;
+  ): Promise<BigNumber>;
 
-  "getPosition(address)"(
-    trader: string,
+  "getRateMultiplier(uint256)"(
+    leverageFactor: BigNumberish,
     overrides?: CallOverrides
-  ): Promise<
-    [
-      BigNumber,
-      BigNumber,
-      BigNumber,
-      BigNumber,
-      BigNumber,
-      BigNumber,
-      BigNumber,
-      BigNumber
-    ] & {
-      amount: BigNumber;
-      value: BigNumber;
-      selfValue: BigNumber;
-      principalDebt: BigNumber;
-      currentDebt: BigNumber;
-      rate: BigNumber;
-      currentCost: BigNumber;
-      liquidationCost: BigNumber;
-    }
-  >;
+  ): Promise<BigNumber>;
 
   getTotalDeposit(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -796,27 +659,21 @@ export class Pair extends Contract {
 
   initialize(
     reserve: string,
-    pancakePair: string,
-    pancakeRouter: string,
     paramProvider: string,
     treasurer: string,
-    lendable: string,
-    tradable: string,
     wow: string,
+    path: string[],
     name: string,
     symbol: string,
     overrides?: Overrides
   ): Promise<ContractTransaction>;
 
-  "initialize(address,address,address,address,address,address,address,address,string,string)"(
+  "initialize(address,address,address,address,address[],string,string)"(
     reserve: string,
-    pancakePair: string,
-    pancakeRouter: string,
     paramProvider: string,
     treasurer: string,
-    lendable: string,
-    tradable: string,
     wow: string,
+    path: string[],
     name: string,
     symbol: string,
     overrides?: Overrides
@@ -907,6 +764,10 @@ export class Pair extends Contract {
   ): Promise<ContractTransaction>;
 
   callStatic: {
+    REVISION(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "REVISION()"(overrides?: CallOverrides): Promise<BigNumber>;
+
     allowance(
       owner: string,
       spender: string,
@@ -938,55 +799,17 @@ export class Pair extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    calculateBalance(
-      trader: string,
-      amountIn: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<
-      [BigNumber, BigNumber, BigNumber] & {
-        profit: BigNumber;
-        debtPayable: BigNumber;
-        protocolFee: BigNumber;
-      }
-    >;
-
-    "calculateBalance(address,uint256)"(
-      trader: string,
-      amountIn: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<
-      [BigNumber, BigNumber, BigNumber] & {
-        profit: BigNumber;
-        debtPayable: BigNumber;
-        protocolFee: BigNumber;
-      }
-    >;
-
-    calculateOpenPosition(
+    calcProfitFee(
       amount: BigNumberish,
-      leverageFactor: BigNumberish,
+      deposit: BigNumberish,
       overrides?: CallOverrides
-    ): Promise<
-      [BigNumber, BigNumber, BigNumber, BigNumber] & {
-        maxAmountIn: BigNumber;
-        borrowAmount: BigNumber;
-        borrowRate: BigNumber;
-        liquidationCost: BigNumber;
-      }
-    >;
+    ): Promise<[BigNumber, BigNumber] & { profit: BigNumber; fee: BigNumber }>;
 
-    "calculateOpenPosition(uint256,uint256)"(
+    "calcProfitFee(uint256,uint256)"(
       amount: BigNumberish,
-      leverageFactor: BigNumberish,
+      deposit: BigNumberish,
       overrides?: CallOverrides
-    ): Promise<
-      [BigNumber, BigNumber, BigNumber, BigNumber] & {
-        maxAmountIn: BigNumber;
-        borrowAmount: BigNumber;
-        borrowRate: BigNumber;
-        liquidationCost: BigNumber;
-      }
-    >;
+    ): Promise<[BigNumber, BigNumber] & { profit: BigNumber; fee: BigNumber }>;
 
     closePosition(
       trader: string,
@@ -1016,10 +839,34 @@ export class Pair extends Contract {
       overrides?: CallOverrides
     ): Promise<boolean>;
 
+    getAmountOut(
+      amountIn: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "getAmountOut(uint256)"(
+      amountIn: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    getBorrowLimit(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "getBorrowLimit()"(overrides?: CallOverrides): Promise<BigNumber>;
+
     getDeposit(trader: string, overrides?: CallOverrides): Promise<BigNumber>;
 
     "getDeposit(address)"(
       trader: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    getLiquidationCost(
+      currentDebt: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "getLiquidationCost(uint256)"(
+      currentDebt: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
@@ -1030,55 +877,15 @@ export class Pair extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    getPosition(
-      trader: string,
+    getRateMultiplier(
+      leverageFactor: BigNumberish,
       overrides?: CallOverrides
-    ): Promise<
-      [
-        BigNumber,
-        BigNumber,
-        BigNumber,
-        BigNumber,
-        BigNumber,
-        BigNumber,
-        BigNumber,
-        BigNumber
-      ] & {
-        amount: BigNumber;
-        value: BigNumber;
-        selfValue: BigNumber;
-        principalDebt: BigNumber;
-        currentDebt: BigNumber;
-        rate: BigNumber;
-        currentCost: BigNumber;
-        liquidationCost: BigNumber;
-      }
-    >;
+    ): Promise<BigNumber>;
 
-    "getPosition(address)"(
-      trader: string,
+    "getRateMultiplier(uint256)"(
+      leverageFactor: BigNumberish,
       overrides?: CallOverrides
-    ): Promise<
-      [
-        BigNumber,
-        BigNumber,
-        BigNumber,
-        BigNumber,
-        BigNumber,
-        BigNumber,
-        BigNumber,
-        BigNumber
-      ] & {
-        amount: BigNumber;
-        value: BigNumber;
-        selfValue: BigNumber;
-        principalDebt: BigNumber;
-        currentDebt: BigNumber;
-        rate: BigNumber;
-        currentCost: BigNumber;
-        liquidationCost: BigNumber;
-      }
-    >;
+    ): Promise<BigNumber>;
 
     getTotalDeposit(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -1102,27 +909,21 @@ export class Pair extends Contract {
 
     initialize(
       reserve: string,
-      pancakePair: string,
-      pancakeRouter: string,
       paramProvider: string,
       treasurer: string,
-      lendable: string,
-      tradable: string,
       wow: string,
+      path: string[],
       name: string,
       symbol: string,
       overrides?: CallOverrides
     ): Promise<void>;
 
-    "initialize(address,address,address,address,address,address,address,address,string,string)"(
+    "initialize(address,address,address,address,address[],string,string)"(
       reserve: string,
-      pancakePair: string,
-      pancakeRouter: string,
       paramProvider: string,
       treasurer: string,
-      lendable: string,
-      tradable: string,
       wow: string,
+      path: string[],
       name: string,
       symbol: string,
       overrides?: CallOverrides
@@ -1268,6 +1069,10 @@ export class Pair extends Contract {
   };
 
   estimateGas: {
+    REVISION(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "REVISION()"(overrides?: CallOverrides): Promise<BigNumber>;
+
     allowance(
       owner: string,
       spender: string,
@@ -1299,27 +1104,15 @@ export class Pair extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    calculateBalance(
-      trader: string,
-      amountIn: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    "calculateBalance(address,uint256)"(
-      trader: string,
-      amountIn: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    calculateOpenPosition(
+    calcProfitFee(
       amount: BigNumberish,
-      leverageFactor: BigNumberish,
+      deposit: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    "calculateOpenPosition(uint256,uint256)"(
+    "calcProfitFee(uint256,uint256)"(
       amount: BigNumberish,
-      leverageFactor: BigNumberish,
+      deposit: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
@@ -1351,10 +1144,34 @@ export class Pair extends Contract {
       overrides?: Overrides
     ): Promise<BigNumber>;
 
+    getAmountOut(
+      amountIn: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "getAmountOut(uint256)"(
+      amountIn: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    getBorrowLimit(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "getBorrowLimit()"(overrides?: CallOverrides): Promise<BigNumber>;
+
     getDeposit(trader: string, overrides?: CallOverrides): Promise<BigNumber>;
 
     "getDeposit(address)"(
       trader: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    getLiquidationCost(
+      currentDebt: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "getLiquidationCost(uint256)"(
+      currentDebt: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
@@ -1365,10 +1182,13 @@ export class Pair extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    getPosition(trader: string, overrides?: CallOverrides): Promise<BigNumber>;
+    getRateMultiplier(
+      leverageFactor: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
 
-    "getPosition(address)"(
-      trader: string,
+    "getRateMultiplier(uint256)"(
+      leverageFactor: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
@@ -1394,27 +1214,21 @@ export class Pair extends Contract {
 
     initialize(
       reserve: string,
-      pancakePair: string,
-      pancakeRouter: string,
       paramProvider: string,
       treasurer: string,
-      lendable: string,
-      tradable: string,
       wow: string,
+      path: string[],
       name: string,
       symbol: string,
       overrides?: Overrides
     ): Promise<BigNumber>;
 
-    "initialize(address,address,address,address,address,address,address,address,string,string)"(
+    "initialize(address,address,address,address,address[],string,string)"(
       reserve: string,
-      pancakePair: string,
-      pancakeRouter: string,
       paramProvider: string,
       treasurer: string,
-      lendable: string,
-      tradable: string,
       wow: string,
+      path: string[],
       name: string,
       symbol: string,
       overrides?: Overrides
@@ -1496,6 +1310,10 @@ export class Pair extends Contract {
   };
 
   populateTransaction: {
+    REVISION(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    "REVISION()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
     allowance(
       owner: string,
       spender: string,
@@ -1530,27 +1348,15 @@ export class Pair extends Contract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    calculateBalance(
-      trader: string,
-      amountIn: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    "calculateBalance(address,uint256)"(
-      trader: string,
-      amountIn: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    calculateOpenPosition(
+    calcProfitFee(
       amount: BigNumberish,
-      leverageFactor: BigNumberish,
+      deposit: BigNumberish,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    "calculateOpenPosition(uint256,uint256)"(
+    "calcProfitFee(uint256,uint256)"(
       amount: BigNumberish,
-      leverageFactor: BigNumberish,
+      deposit: BigNumberish,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
@@ -1582,6 +1388,22 @@ export class Pair extends Contract {
       overrides?: Overrides
     ): Promise<PopulatedTransaction>;
 
+    getAmountOut(
+      amountIn: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    "getAmountOut(uint256)"(
+      amountIn: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    getBorrowLimit(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    "getBorrowLimit()"(
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
     getDeposit(
       trader: string,
       overrides?: CallOverrides
@@ -1589,6 +1411,16 @@ export class Pair extends Contract {
 
     "getDeposit(address)"(
       trader: string,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    getLiquidationCost(
+      currentDebt: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    "getLiquidationCost(uint256)"(
+      currentDebt: BigNumberish,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
@@ -1602,13 +1434,13 @@ export class Pair extends Contract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    getPosition(
-      trader: string,
+    getRateMultiplier(
+      leverageFactor: BigNumberish,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    "getPosition(address)"(
-      trader: string,
+    "getRateMultiplier(uint256)"(
+      leverageFactor: BigNumberish,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
@@ -1636,27 +1468,21 @@ export class Pair extends Contract {
 
     initialize(
       reserve: string,
-      pancakePair: string,
-      pancakeRouter: string,
       paramProvider: string,
       treasurer: string,
-      lendable: string,
-      tradable: string,
       wow: string,
+      path: string[],
       name: string,
       symbol: string,
       overrides?: Overrides
     ): Promise<PopulatedTransaction>;
 
-    "initialize(address,address,address,address,address,address,address,address,string,string)"(
+    "initialize(address,address,address,address,address[],string,string)"(
       reserve: string,
-      pancakePair: string,
-      pancakeRouter: string,
       paramProvider: string,
       treasurer: string,
-      lendable: string,
-      tradable: string,
       wow: string,
+      path: string[],
       name: string,
       symbol: string,
       overrides?: Overrides

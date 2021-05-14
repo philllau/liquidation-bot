@@ -24,14 +24,9 @@ const _abi = [
   {
     inputs: [
       {
-        internalType: "address",
-        name: "lendable",
-        type: "address",
-      },
-      {
-        internalType: "address",
-        name: "tradable",
-        type: "address",
+        internalType: "address[]",
+        name: "path",
+        type: "address[]",
       },
     ],
     name: "createPairParamProvider",
@@ -105,6 +100,74 @@ const _abi = [
       },
     ],
     stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "lendable",
+        type: "address",
+      },
+      {
+        internalType: "address",
+        name: "proxyLendable",
+        type: "address",
+      },
+      {
+        internalType: "address",
+        name: "tradable",
+        type: "address",
+      },
+    ],
+    name: "getRoutablePairParamProvider",
+    outputs: [
+      {
+        internalType: "address",
+        name: "",
+        type: "address",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "swapRouter",
+        type: "address",
+      },
+    ],
+    name: "setSwapRouter",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address[]",
+        name: "path",
+        type: "address[]",
+      },
+    ],
+    name: "upgradePairParamProvider",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "lendable",
+        type: "address",
+      },
+    ],
+    name: "upgradeReserveParamProvider",
+    outputs: [],
+    stateMutability: "nonpayable",
     type: "function",
   },
 ];

@@ -24,20 +24,29 @@ import { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
 interface PairFactoryInterface extends ethers.utils.Interface {
   functions: {
     "REVISION()": FunctionFragment;
+    "getAllProxyLendables()": FunctionFragment;
     "getAllTradables()": FunctionFragment;
     "getOrCreatePair(address,address)": FunctionFragment;
+    "getOrCreateRoutablePair(address,address,address)": FunctionFragment;
     "getPair(address,address)": FunctionFragment;
-    "initialize(address,address,address,address,address,address)": FunctionFragment;
+    "getRoutablePair(address,address,address)": FunctionFragment;
+    "initialize(address,address,address,address)": FunctionFragment;
     "isPair(address)": FunctionFragment;
     "owner()": FunctionFragment;
-    "pairBytecodeHash()": FunctionFragment;
+    "registerProxyLendable(address)": FunctionFragment;
+    "registerProxyLendables(address[])": FunctionFragment;
     "registerTradable(address)": FunctionFragment;
     "registerTradables(address[])": FunctionFragment;
     "renounceOwnership()": FunctionFragment;
     "transferOwnership(address)": FunctionFragment;
+    "upgrade()": FunctionFragment;
   };
 
   encodeFunctionData(functionFragment: "REVISION", values?: undefined): string;
+  encodeFunctionData(
+    functionFragment: "getAllProxyLendables",
+    values?: undefined
+  ): string;
   encodeFunctionData(
     functionFragment: "getAllTradables",
     values?: undefined
@@ -47,18 +56,30 @@ interface PairFactoryInterface extends ethers.utils.Interface {
     values: [string, string]
   ): string;
   encodeFunctionData(
+    functionFragment: "getOrCreateRoutablePair",
+    values: [string, string, string]
+  ): string;
+  encodeFunctionData(
     functionFragment: "getPair",
     values: [string, string]
   ): string;
   encodeFunctionData(
+    functionFragment: "getRoutablePair",
+    values: [string, string, string]
+  ): string;
+  encodeFunctionData(
     functionFragment: "initialize",
-    values: [string, string, string, string, string, string]
+    values: [string, string, string, string]
   ): string;
   encodeFunctionData(functionFragment: "isPair", values: [string]): string;
   encodeFunctionData(functionFragment: "owner", values?: undefined): string;
   encodeFunctionData(
-    functionFragment: "pairBytecodeHash",
-    values?: undefined
+    functionFragment: "registerProxyLendable",
+    values: [string]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "registerProxyLendables",
+    values: [string[]]
   ): string;
   encodeFunctionData(
     functionFragment: "registerTradable",
@@ -76,8 +97,13 @@ interface PairFactoryInterface extends ethers.utils.Interface {
     functionFragment: "transferOwnership",
     values: [string]
   ): string;
+  encodeFunctionData(functionFragment: "upgrade", values?: undefined): string;
 
   decodeFunctionResult(functionFragment: "REVISION", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "getAllProxyLendables",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(
     functionFragment: "getAllTradables",
     data: BytesLike
@@ -86,12 +112,24 @@ interface PairFactoryInterface extends ethers.utils.Interface {
     functionFragment: "getOrCreatePair",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(
+    functionFragment: "getOrCreateRoutablePair",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "getPair", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "getRoutablePair",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "initialize", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "isPair", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "owner", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "pairBytecodeHash",
+    functionFragment: "registerProxyLendable",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "registerProxyLendables",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -110,6 +148,7 @@ interface PairFactoryInterface extends ethers.utils.Interface {
     functionFragment: "transferOwnership",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "upgrade", data: BytesLike): Result;
 
   events: {
     "OwnershipTransferred(address,address)": EventFragment;
@@ -166,6 +205,10 @@ export class PairFactory extends Contract {
 
     "REVISION()"(overrides?: CallOverrides): Promise<[BigNumber]>;
 
+    getAllProxyLendables(overrides?: CallOverrides): Promise<[string[]]>;
+
+    "getAllProxyLendables()"(overrides?: CallOverrides): Promise<[string[]]>;
+
     getAllTradables(overrides?: CallOverrides): Promise<[string[]]>;
 
     "getAllTradables()"(overrides?: CallOverrides): Promise<[string[]]>;
@@ -182,6 +225,20 @@ export class PairFactory extends Contract {
       overrides?: Overrides
     ): Promise<ContractTransaction>;
 
+    getOrCreateRoutablePair(
+      lendable: string,
+      proxyLendable: string,
+      tradable: string,
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
+
+    "getOrCreateRoutablePair(address,address,address)"(
+      lendable: string,
+      proxyLendable: string,
+      tradable: string,
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
+
     getPair(
       lendable: string,
       tradable: string,
@@ -194,21 +251,31 @@ export class PairFactory extends Contract {
       overrides?: CallOverrides
     ): Promise<[string]>;
 
+    getRoutablePair(
+      lendable: string,
+      proxyLendable: string,
+      tradable: string,
+      overrides?: CallOverrides
+    ): Promise<[string]>;
+
+    "getRoutablePair(address,address,address)"(
+      lendable: string,
+      proxyLendable: string,
+      tradable: string,
+      overrides?: CallOverrides
+    ): Promise<[string]>;
+
     initialize(
       reserveFactory: string,
       paramProviderFactory: string,
-      pancakeFactory: string,
-      pancakeRouter: string,
       treasurer: string,
       wow: string,
       overrides?: Overrides
     ): Promise<ContractTransaction>;
 
-    "initialize(address,address,address,address,address,address)"(
+    "initialize(address,address,address,address)"(
       reserveFactory: string,
       paramProviderFactory: string,
-      pancakeFactory: string,
-      pancakeRouter: string,
       treasurer: string,
       wow: string,
       overrides?: Overrides
@@ -225,9 +292,25 @@ export class PairFactory extends Contract {
 
     "owner()"(overrides?: CallOverrides): Promise<[string]>;
 
-    pairBytecodeHash(overrides?: CallOverrides): Promise<[string]>;
+    registerProxyLendable(
+      token: string,
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
 
-    "pairBytecodeHash()"(overrides?: CallOverrides): Promise<[string]>;
+    "registerProxyLendable(address)"(
+      token: string,
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
+
+    registerProxyLendables(
+      tokens: string[],
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
+
+    "registerProxyLendables(address[])"(
+      tokens: string[],
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
 
     registerTradable(
       token: string,
@@ -262,11 +345,19 @@ export class PairFactory extends Contract {
       newOwner: string,
       overrides?: Overrides
     ): Promise<ContractTransaction>;
+
+    upgrade(overrides?: Overrides): Promise<ContractTransaction>;
+
+    "upgrade()"(overrides?: Overrides): Promise<ContractTransaction>;
   };
 
   REVISION(overrides?: CallOverrides): Promise<BigNumber>;
 
   "REVISION()"(overrides?: CallOverrides): Promise<BigNumber>;
+
+  getAllProxyLendables(overrides?: CallOverrides): Promise<string[]>;
+
+  "getAllProxyLendables()"(overrides?: CallOverrides): Promise<string[]>;
 
   getAllTradables(overrides?: CallOverrides): Promise<string[]>;
 
@@ -284,6 +375,20 @@ export class PairFactory extends Contract {
     overrides?: Overrides
   ): Promise<ContractTransaction>;
 
+  getOrCreateRoutablePair(
+    lendable: string,
+    proxyLendable: string,
+    tradable: string,
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
+
+  "getOrCreateRoutablePair(address,address,address)"(
+    lendable: string,
+    proxyLendable: string,
+    tradable: string,
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
+
   getPair(
     lendable: string,
     tradable: string,
@@ -296,21 +401,31 @@ export class PairFactory extends Contract {
     overrides?: CallOverrides
   ): Promise<string>;
 
+  getRoutablePair(
+    lendable: string,
+    proxyLendable: string,
+    tradable: string,
+    overrides?: CallOverrides
+  ): Promise<string>;
+
+  "getRoutablePair(address,address,address)"(
+    lendable: string,
+    proxyLendable: string,
+    tradable: string,
+    overrides?: CallOverrides
+  ): Promise<string>;
+
   initialize(
     reserveFactory: string,
     paramProviderFactory: string,
-    pancakeFactory: string,
-    pancakeRouter: string,
     treasurer: string,
     wow: string,
     overrides?: Overrides
   ): Promise<ContractTransaction>;
 
-  "initialize(address,address,address,address,address,address)"(
+  "initialize(address,address,address,address)"(
     reserveFactory: string,
     paramProviderFactory: string,
-    pancakeFactory: string,
-    pancakeRouter: string,
     treasurer: string,
     wow: string,
     overrides?: Overrides
@@ -324,9 +439,25 @@ export class PairFactory extends Contract {
 
   "owner()"(overrides?: CallOverrides): Promise<string>;
 
-  pairBytecodeHash(overrides?: CallOverrides): Promise<string>;
+  registerProxyLendable(
+    token: string,
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
 
-  "pairBytecodeHash()"(overrides?: CallOverrides): Promise<string>;
+  "registerProxyLendable(address)"(
+    token: string,
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
+
+  registerProxyLendables(
+    tokens: string[],
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
+
+  "registerProxyLendables(address[])"(
+    tokens: string[],
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
 
   registerTradable(
     token: string,
@@ -362,10 +493,18 @@ export class PairFactory extends Contract {
     overrides?: Overrides
   ): Promise<ContractTransaction>;
 
+  upgrade(overrides?: Overrides): Promise<ContractTransaction>;
+
+  "upgrade()"(overrides?: Overrides): Promise<ContractTransaction>;
+
   callStatic: {
     REVISION(overrides?: CallOverrides): Promise<BigNumber>;
 
     "REVISION()"(overrides?: CallOverrides): Promise<BigNumber>;
+
+    getAllProxyLendables(overrides?: CallOverrides): Promise<string[]>;
+
+    "getAllProxyLendables()"(overrides?: CallOverrides): Promise<string[]>;
 
     getAllTradables(overrides?: CallOverrides): Promise<string[]>;
 
@@ -383,6 +522,20 @@ export class PairFactory extends Contract {
       overrides?: CallOverrides
     ): Promise<string>;
 
+    getOrCreateRoutablePair(
+      lendable: string,
+      proxyLendable: string,
+      tradable: string,
+      overrides?: CallOverrides
+    ): Promise<string>;
+
+    "getOrCreateRoutablePair(address,address,address)"(
+      lendable: string,
+      proxyLendable: string,
+      tradable: string,
+      overrides?: CallOverrides
+    ): Promise<string>;
+
     getPair(
       lendable: string,
       tradable: string,
@@ -395,21 +548,31 @@ export class PairFactory extends Contract {
       overrides?: CallOverrides
     ): Promise<string>;
 
+    getRoutablePair(
+      lendable: string,
+      proxyLendable: string,
+      tradable: string,
+      overrides?: CallOverrides
+    ): Promise<string>;
+
+    "getRoutablePair(address,address,address)"(
+      lendable: string,
+      proxyLendable: string,
+      tradable: string,
+      overrides?: CallOverrides
+    ): Promise<string>;
+
     initialize(
       reserveFactory: string,
       paramProviderFactory: string,
-      pancakeFactory: string,
-      pancakeRouter: string,
       treasurer: string,
       wow: string,
       overrides?: CallOverrides
     ): Promise<void>;
 
-    "initialize(address,address,address,address,address,address)"(
+    "initialize(address,address,address,address)"(
       reserveFactory: string,
       paramProviderFactory: string,
-      pancakeFactory: string,
-      pancakeRouter: string,
       treasurer: string,
       wow: string,
       overrides?: CallOverrides
@@ -426,29 +589,42 @@ export class PairFactory extends Contract {
 
     "owner()"(overrides?: CallOverrides): Promise<string>;
 
-    pairBytecodeHash(overrides?: CallOverrides): Promise<string>;
-
-    "pairBytecodeHash()"(overrides?: CallOverrides): Promise<string>;
-
-    registerTradable(
+    registerProxyLendable(
       token: string,
       overrides?: CallOverrides
-    ): Promise<boolean>;
+    ): Promise<void>;
+
+    "registerProxyLendable(address)"(
+      token: string,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    registerProxyLendables(
+      tokens: string[],
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    "registerProxyLendables(address[])"(
+      tokens: string[],
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    registerTradable(token: string, overrides?: CallOverrides): Promise<void>;
 
     "registerTradable(address)"(
       token: string,
       overrides?: CallOverrides
-    ): Promise<boolean>;
+    ): Promise<void>;
 
     registerTradables(
       tokens: string[],
       overrides?: CallOverrides
-    ): Promise<boolean>;
+    ): Promise<void>;
 
     "registerTradables(address[])"(
       tokens: string[],
       overrides?: CallOverrides
-    ): Promise<boolean>;
+    ): Promise<void>;
 
     renounceOwnership(overrides?: CallOverrides): Promise<void>;
 
@@ -463,6 +639,10 @@ export class PairFactory extends Contract {
       newOwner: string,
       overrides?: CallOverrides
     ): Promise<void>;
+
+    upgrade(overrides?: CallOverrides): Promise<void>;
+
+    "upgrade()"(overrides?: CallOverrides): Promise<void>;
   };
 
   filters: {
@@ -480,6 +660,10 @@ export class PairFactory extends Contract {
 
     "REVISION()"(overrides?: CallOverrides): Promise<BigNumber>;
 
+    getAllProxyLendables(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "getAllProxyLendables()"(overrides?: CallOverrides): Promise<BigNumber>;
+
     getAllTradables(overrides?: CallOverrides): Promise<BigNumber>;
 
     "getAllTradables()"(overrides?: CallOverrides): Promise<BigNumber>;
@@ -496,6 +680,20 @@ export class PairFactory extends Contract {
       overrides?: Overrides
     ): Promise<BigNumber>;
 
+    getOrCreateRoutablePair(
+      lendable: string,
+      proxyLendable: string,
+      tradable: string,
+      overrides?: Overrides
+    ): Promise<BigNumber>;
+
+    "getOrCreateRoutablePair(address,address,address)"(
+      lendable: string,
+      proxyLendable: string,
+      tradable: string,
+      overrides?: Overrides
+    ): Promise<BigNumber>;
+
     getPair(
       lendable: string,
       tradable: string,
@@ -508,21 +706,31 @@ export class PairFactory extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
+    getRoutablePair(
+      lendable: string,
+      proxyLendable: string,
+      tradable: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "getRoutablePair(address,address,address)"(
+      lendable: string,
+      proxyLendable: string,
+      tradable: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
     initialize(
       reserveFactory: string,
       paramProviderFactory: string,
-      pancakeFactory: string,
-      pancakeRouter: string,
       treasurer: string,
       wow: string,
       overrides?: Overrides
     ): Promise<BigNumber>;
 
-    "initialize(address,address,address,address,address,address)"(
+    "initialize(address,address,address,address)"(
       reserveFactory: string,
       paramProviderFactory: string,
-      pancakeFactory: string,
-      pancakeRouter: string,
       treasurer: string,
       wow: string,
       overrides?: Overrides
@@ -539,9 +747,25 @@ export class PairFactory extends Contract {
 
     "owner()"(overrides?: CallOverrides): Promise<BigNumber>;
 
-    pairBytecodeHash(overrides?: CallOverrides): Promise<BigNumber>;
+    registerProxyLendable(
+      token: string,
+      overrides?: Overrides
+    ): Promise<BigNumber>;
 
-    "pairBytecodeHash()"(overrides?: CallOverrides): Promise<BigNumber>;
+    "registerProxyLendable(address)"(
+      token: string,
+      overrides?: Overrides
+    ): Promise<BigNumber>;
+
+    registerProxyLendables(
+      tokens: string[],
+      overrides?: Overrides
+    ): Promise<BigNumber>;
+
+    "registerProxyLendables(address[])"(
+      tokens: string[],
+      overrides?: Overrides
+    ): Promise<BigNumber>;
 
     registerTradable(token: string, overrides?: Overrides): Promise<BigNumber>;
 
@@ -573,12 +797,24 @@ export class PairFactory extends Contract {
       newOwner: string,
       overrides?: Overrides
     ): Promise<BigNumber>;
+
+    upgrade(overrides?: Overrides): Promise<BigNumber>;
+
+    "upgrade()"(overrides?: Overrides): Promise<BigNumber>;
   };
 
   populateTransaction: {
     REVISION(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     "REVISION()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    getAllProxyLendables(
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    "getAllProxyLendables()"(
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
 
     getAllTradables(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
@@ -598,6 +834,20 @@ export class PairFactory extends Contract {
       overrides?: Overrides
     ): Promise<PopulatedTransaction>;
 
+    getOrCreateRoutablePair(
+      lendable: string,
+      proxyLendable: string,
+      tradable: string,
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
+
+    "getOrCreateRoutablePair(address,address,address)"(
+      lendable: string,
+      proxyLendable: string,
+      tradable: string,
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
+
     getPair(
       lendable: string,
       tradable: string,
@@ -610,21 +860,31 @@ export class PairFactory extends Contract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
+    getRoutablePair(
+      lendable: string,
+      proxyLendable: string,
+      tradable: string,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    "getRoutablePair(address,address,address)"(
+      lendable: string,
+      proxyLendable: string,
+      tradable: string,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
     initialize(
       reserveFactory: string,
       paramProviderFactory: string,
-      pancakeFactory: string,
-      pancakeRouter: string,
       treasurer: string,
       wow: string,
       overrides?: Overrides
     ): Promise<PopulatedTransaction>;
 
-    "initialize(address,address,address,address,address,address)"(
+    "initialize(address,address,address,address)"(
       reserveFactory: string,
       paramProviderFactory: string,
-      pancakeFactory: string,
-      pancakeRouter: string,
       treasurer: string,
       wow: string,
       overrides?: Overrides
@@ -644,10 +904,24 @@ export class PairFactory extends Contract {
 
     "owner()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    pairBytecodeHash(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    registerProxyLendable(
+      token: string,
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
 
-    "pairBytecodeHash()"(
-      overrides?: CallOverrides
+    "registerProxyLendable(address)"(
+      token: string,
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
+
+    registerProxyLendables(
+      tokens: string[],
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
+
+    "registerProxyLendables(address[])"(
+      tokens: string[],
+      overrides?: Overrides
     ): Promise<PopulatedTransaction>;
 
     registerTradable(
@@ -683,5 +957,9 @@ export class PairFactory extends Contract {
       newOwner: string,
       overrides?: Overrides
     ): Promise<PopulatedTransaction>;
+
+    upgrade(overrides?: Overrides): Promise<PopulatedTransaction>;
+
+    "upgrade()"(overrides?: Overrides): Promise<PopulatedTransaction>;
   };
 }
