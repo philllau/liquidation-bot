@@ -63,16 +63,17 @@ const AddressKey = () => HexKey(20);
 const HexIndex = (size: number) =>
   Index({
     size,
-    getter: (address: string) => {
+    getter: (hex?: string) => {
       const buf = Buffer.alloc(size, 0);
-      address = address.startsWith("0x") ? address.substr(2) : address;
+      if (hex) {
+        hex = hex.startsWith("0x") ? hex.substr(2) : hex;
 
-      if (size < buf.length) {
-        throw new Error("HexIndex is not long enough");
+        if (size < buf.length) {
+          throw new Error("HexIndex is not long enough");
+        }
+
+        Buffer.from(hex, "hex").copy(buf, size - buf.length);
       }
-
-      Buffer.from(address, "hex").copy(buf, size - buf.length);
-
       return buf;
     },
   });
@@ -121,6 +122,8 @@ export class Pair extends DatastoreDocument<Pair> {
   lendable!: string;
   @AddressIndex()
   tradable!: string;
+  @AddressIndex()
+  proxy?: string;
 
   @Index()
   updateAt!: number;
@@ -138,6 +141,8 @@ export class Position extends DatastoreDocument<Position> {
   lendable!: string;
   @AddressIndex()
   tradable!: string;
+  @AddressIndex()
+  proxy?: string;
   @AddressIndex()
   trader!: string;
   @AddressIndex()

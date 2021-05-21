@@ -2,6 +2,7 @@ import { classToPlain } from "class-transformer";
 import { ethers } from "ethers";
 import { Observable } from "observable-fns";
 import { DatastoreRepository } from "../db/repository";
+import { defined } from "../utils";
 import { AbstractMonitor } from "./AbstractMonitor";
 import { HeightMonitor } from "./HeightMonitor";
 import { Pair, Token } from "./models";
@@ -21,6 +22,7 @@ export class PairMonitor extends AbstractMonitor<Pair> {
 
   async run(): Promise<Observable<Pair>> {
     this.repository = this.context.db.getRepository(Pair);
+    
 
     (await this.context.getChannel(TokenMonitor)).subscribe(
       (token) => {
@@ -45,11 +47,7 @@ export class PairMonitor extends AbstractMonitor<Pair> {
     this.tradables.push(tradable);
     this.lendables
       .filter((lendable) => tradable.address !== lendable.address)
-      .forEach((lendable) => this.unfoundPairs.push({ lendable, tradable }));
-
-    this.lendables
-      .filter((lendable) => lendable.address !== tradable.address)
-      .forEach((lendable) =>
+      .forEach((lendable) => {
         this.proxies
           .filter(
             (proxy) =>
@@ -58,8 +56,9 @@ export class PairMonitor extends AbstractMonitor<Pair> {
           )
           .forEach((proxy) =>
             this.unfoundPairs.push({ lendable, proxy, tradable })
-          )
-      );
+          );
+        this.unfoundPairs.push({ lendable, tradable });
+      });
 
     this.update();
   }
@@ -120,15 +119,22 @@ export class PairMonitor extends AbstractMonitor<Pair> {
     const unfoundPairs = this.unfoundPairs.splice(0, this.unfoundPairs.length);
 
     const possiblePairParams = await Promise.all(
-      unfoundPairs.map(({ lendable, tradable }) =>
-        this.context.sender
-          .call(
-            this.context.pairFactory,
-            "getPair",
-            lendable.address,
-            tradable.address
-          )
-          .then((address) => ({ lendable, tradable, address }))
+      unfoundPairs.map(({ lendable, tradable, proxy }) =>
+        (proxy
+          ? this.context.sender.call(
+              this.context.pairFactory,
+              "getRoutablePair",
+              lendable.address,
+              proxy.address,
+              tradable.address
+            )
+          : this.context.sender.call(
+              this.context.pairFactory,
+              "getPair",
+              lendable.address,
+              tradable.address
+            )
+        ).then((address) => ({ lendable, tradable, proxy, address }))
       )
     );
 
@@ -142,17 +148,21 @@ export class PairMonitor extends AbstractMonitor<Pair> {
     const pairs = await Promise.all(
       possiblePairParams
         .filter(({ address }) => address !== ethers.constants.AddressZero)
-        .map(async ({ lendable, tradable, address }) => {
+        .map(async ({ lendable, tradable, proxy, address }) => {
           let instance = await this.repository.get(address);
 
-          if (!instance) {
-            console.log(
-              `Create new pair pair ${address} ${tradable.symbol}/${lendable.symbol}`
-            );
+          const path = [lendable, tradable, proxy]
+            .map((t) => t?.address)
+            .filter(defined)
+            .join("/");
+
+          if (!instance || proxy?.address !== instance.proxy) {
+            console.log(`Create new pair pair ${address} ${path}}`);
             instance = new Pair();
             instance.address = address;
             instance.lendable = lendable.address;
             instance.tradable = tradable.address;
+            instance.proxy = proxy?.address;
             instance.updateAt = this.context.startBlock;
 
             await this.repository.put(instance);
@@ -160,6 +170,7 @@ export class PairMonitor extends AbstractMonitor<Pair> {
           return instance;
         })
     );
+
 
     pairs.forEach(this.channel.next.bind(this.channel));
 

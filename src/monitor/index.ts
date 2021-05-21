@@ -1,6 +1,8 @@
-import { Observable } from "observable-fns";
 import { JsonRpcProvider } from "@ethersproject/providers";
 import { Signer, Wallet } from "ethers";
+import { Observable } from "observable-fns";
+import { DatastoreConnection } from "../db/connection";
+import { connect } from "../db/datastore";
 import {
   PairFactory,
   PairFactory__factory,
@@ -12,20 +14,20 @@ import {
   ReserveFactory__factory,
   Router,
 } from "../types";
-import { DatastoreConnection } from "../db/connection";
-import { Multisender } from "./multisender";
-import { TokenMonitor } from "./TokenMonitor";
-import { connect } from "../db/datastore";
-import { HeightMonitor } from "./HeightMonitor";
+import { infRetry, logError } from "../utils";
 import { AbstractMonitor } from "./AbstractMonitor";
+import { HeightMonitor } from "./HeightMonitor";
+import { Multisender } from "./multisender";
 import { PairMonitor } from "./PairMonitor";
 import { PositionMonitor } from "./PositionMonitor";
+import { TokenMonitor } from "./TokenMonitor";
 
 export type Ctor<T> = new (context: ExecutionContext) => T;
 
 export type InitializeParams = Readonly<{
   dispatchId: number;
   dispatchSize: number;
+  covalentAPI: string;
   provider: JsonRpcProvider;
   providerUrl: string;
   signer: Signer;
@@ -49,6 +51,9 @@ type ChannelType<T> = T extends Ctor<AbstractMonitor<infer TChannel>>
   : never;
 
 export class ExecutionContext implements InitializeParams {
+  get covalentAPI() {
+    return this.params.covalentAPI;
+  }
   get dispatchId() {
     return this.params.dispatchId;
   }
@@ -93,29 +98,47 @@ export class ExecutionContext implements InitializeParams {
   swapFactory!: PancakeFactory;
   swapRouter!: PancakeRouter01;
   sender!: Multisender;
+  chainId!: number;
 
   constructor(private params: InitializeParams) {}
 
   async run() {
-    this.db = connect(`.snapshot/instance-${this.dispatchId}`);
+    this.chainId = await this.provider.getNetwork().then(n => n.chainId)
+    
+    this.db = connect(`.snapshot/instance-${this.chainId}`);
+
 
     this.pairFactory = PairFactory__factory.connect(
-      await this.router.pairFactory(),
+      await infRetry(() =>
+        this.router
+          .pairFactory()
+          .catch(logError(`Failed request pairFactory()`))
+      ),
       this.provider
     ).connect(this.signer);
 
     this.reserveFactory = ReserveFactory__factory.connect(
-      await this.router.reserveFactory(),
+      await infRetry(() =>
+        this.router
+          .reserveFactory()
+          .catch(logError(`Failed request reserveFactory()`))
+      ),
       this.provider
     ).connect(this.signer);
 
     this.swapFactory = PancakeFactory__factory.connect(
-      await this.router.swapFactory(),
+      await infRetry(() =>
+        this.router
+          .swapFactory()
+          .catch(logError(`Failed request swapFactory()`))
+      ),
       this.provider
     ).connect(this.signer);
 
     this.swapRouter = PancakeRouter01__factory.connect(
-      await this.router.swapRouter(),
+      await infRetry(() =>
+        this.router.swapRouter().catch(logError(`Failed request swapRouter()`))
+      ),
       this.provider
     ).connect(this.signer);
 

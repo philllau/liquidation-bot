@@ -1,20 +1,19 @@
-import { BigNumber, ethers, Signer } from "ethers";
+import axios from "axios";
 import { Observable } from "observable-fns";
 import { DatastoreRepository } from "../db/repository";
 import { amount, bn, oneEther, oneRay, toBN } from "../math";
-import { Pair as PairContract, Pair__factory } from "../types";
-import { infRetry, sleep } from "../utils";
+import { defined, infRetry, sleep } from "../utils";
 import { AbstractMonitor } from "./AbstractMonitor";
 import { HeightMonitor } from "./HeightMonitor";
 import { Pair, Position, Token } from "./models";
 
-const BATCH_SIZE = 500;
+// const BATCH_SIZE = 500;
 
 export class PositionMonitor extends AbstractMonitor<Position> {
   private repository!: DatastoreRepository<Position>;
   private pairRepository!: DatastoreRepository<Pair>;
 
-  private connections: Record<string, Signer> = {};
+  // private connections: Record<string, Signer> = {};
   private lastHeight = 0;
 
   async run(): Promise<Observable<Position>> {
@@ -23,12 +22,13 @@ export class PositionMonitor extends AbstractMonitor<Position> {
 
     (await this.context.getChannel(HeightMonitor)).subscribe((height) => {
       this.lastHeight = height;
-      this.liquidateUnhealty();
     });
 
-    this.onChainUpdate();
+    this.updateHolders();
+    this.updatePositions();
     return this.channel;
   }
+
   private async liquidateUnhealty() {
     let unhealty = await this.repository.find("health", { $eq: amount(0) });
     unhealty = unhealty.filter((p) => p.amount.gt(amount(0)));
@@ -45,46 +45,120 @@ export class PositionMonitor extends AbstractMonitor<Position> {
           const tradableToken = await this.context.db
             .getRepository(Token)
             .get(p.tradable);
+          const proxyToken = p.proxy
+            ? await this.context.db.getRepository(Token).get(p.proxy)
+            : undefined;
+
+          const path = [lendableToken, proxyToken, tradableToken]
+            .map((t) => t?.symbol)
+            .filter(defined)
+            .join("/");
+
+          let amount = p.amount
+            .decimalPlaces(tradableToken?.decimals!)
+            .dividedBy(bn(10).pow(tradableToken!.decimals));
 
           console.log(
-            `Liquidate position: ${lendableToken?.symbol}/${
-              tradableToken?.symbol
-            } ${p.trader} - ${p.amount
-              .decimalPlaces(tradableToken?.decimals!)
-              .dividedBy(bn(10).pow(tradableToken!.decimals))} ${
+            `Liquidate position: ${path} ${p.trader} - ${amount.toString()} ${
               tradableToken?.symbol
             }`
           );
-          return this.context.router
-            .liquidatePosition(p.lendable, p.tradable, p.trader)
-            .then((tx) => tx.wait(3));
+          return (
+            p.proxy
+              ? this.context.router.liquidateProxyPosition(
+                  p.lendable,
+                  p.proxy,
+                  p.tradable,
+                  p.trader
+                )
+              : this.context.router.liquidatePosition(
+                  p.lendable,
+                  p.tradable,
+                  p.trader
+                )
+          )
+            .then((tx) => tx.wait())
+            .catch((e) => {
+              console.error(`Failed liquidate position of ${path} ${p.trader}`);
+            });
         })
     );
   }
 
-  private onTransfer(
-    height: number,
-    pair: Pair,
-    transfer: {
-      args: { from: string; to: string; value: BigNumber };
+  private async updatePositions() {
+    const height = this.lastHeight;
+    console.log("update positions at height", height);
+
+    const positionToUpdate = await this.repository.find("updateAt", {
+      $lt: height,
+    });
+    await Promise.all(
+      positionToUpdate.map((position) => this.updatePosition(position))
+    );
+
+    await this.liquidateUnhealty();
+
+    while (height === this.lastHeight) {
+      await sleep(this.context.sleep);
     }
-  ) {
-    return Promise.all(
-      [transfer.args.from, transfer.args.to].map(async (address) => {
-        if (
-          address === pair.address ||
-          address === ethers.constants.AddressZero
-        )
-          return;
 
-        let position = await this.repository.get(
-          Position.toId(pair.address, address)
-        );
-        if (!position) {
-          position = new Position();
+    this.updatePositions();
+  }
 
+  private async updateHolders() {
+    const height = this.lastHeight;
+    console.log("update holders at height", height);
+
+    const pairs = await this.pairRepository.find("updateAt", { $lt: height });
+    for (let pair of pairs) {
+      const lendableToken = await this.context.db
+        .getRepository(Token)
+        .get(pair.lendable);
+      const tradableToken = await this.context.db
+        .getRepository(Token)
+        .get(pair.tradable);
+      const proxyToken = pair.proxy
+        ? await this.context.db.getRepository(Token).get(pair.proxy)
+        : undefined;
+
+      const path = [lendableToken, proxyToken, tradableToken]
+        .map((t) => t?.symbol)
+        .filter(defined)
+        .join("/");
+      console.log(`Getting holders of ${path}`);
+
+      const holders = await infRetry(() =>
+        axios
+          .get<{
+            data: { items: Array<{ address: string; balance: string }> };
+          }>(
+            `https://api.covalenthq.com/v1/${this.context.chainId}/tokens/${pair.address}/token_holders/`,
+            {
+              params: {
+                key: this.context.covalentAPI,
+              },
+            }
+          )
+          .then((r) => r.data.data.items)
+          .catch((e) => {
+            console.error(`Failed get holders for ${path}: \n${e}`);
+            throw e;
+          })
+      );
+
+      await sleep(this.context.sleep);
+
+      const known = await this.repository.find("pair", pair.address);
+      const unknown = holders.filter(
+        (h) => !known.some((k) => k.trader === h.address)
+      );
+
+      await Promise.all(
+        unknown.map(({ address }) => {
+          const position = new Position();
           position.lendable = pair.lendable;
           position.tradable = pair.tradable;
+          position.proxy = pair.proxy;
           position.pair = pair.address;
           position.trader = address;
           position.amount = bn(0);
@@ -96,84 +170,17 @@ export class PositionMonitor extends AbstractMonitor<Position> {
           position.currentCost = bn(0);
           position.liquidationCost = bn(0);
           position.updateAt = 0;
+          position.appearAt = height;
 
-          const lendableToken = await this.context.db
-            .getRepository(Token)
-            .get(pair.lendable);
-          const tradableToken = await this.context.db
-            .getRepository(Token)
-            .get(pair.tradable);
+          return this.repository.put(position);
+        })
+      );
+    }
 
-          console.log(
-            `New position in ${lendableToken?.symbol}/${tradableToken?.symbol} for ${address} (at block ${height})`
-          );
-        }
-
-        position.appearAt = height;
-        this.repository.put(position);
-      })
-    );
-  }
-
-  private async onChainUpdate() {
-    const height = this.lastHeight;
-    console.log("update at height", height);
-
-    const positionToUpdate = await this.repository.find("updateAt", {
-      $lt: height,
-    });
-    await Promise.all(
-      positionToUpdate.map((position) => this.updatePosition(position))
-    );
-
-    const pairs = await this.pairRepository.find("updateAt", { $lt: height });
-
-    await Promise.all(
-      pairs.map(async (pair) => {
-        // for (let pair of pairs) {
-        if (!this.connections[pair.address]) {
-          this.connections[pair.address] = this.context.getNewConnection();
-        }
-
-        const from = pair.updateAt;
-        const to = Math.min(height, from + BATCH_SIZE);
-        const contract = this.pairContract(
-          pair.address,
-          this.connections[pair.address]
-        );
-        const transfers = contract.filters.Transfer(null, null, null);
-
-        const lendableToken = await this.context.db
-          .getRepository(Token)
-          .get(pair.lendable);
-        const tradableToken = await this.context.db
-          .getRepository(Token)
-          .get(pair.tradable);
-        try {
-          const transferEvents = await contract.queryFilter(
-            transfers,
-            from,
-            to
-          );
-
-          transferEvents.forEach((ev) =>
-            this.onTransfer(ev.blockNumber, pair, ev)
-          );
-
-          pair.updateAt = to;
-          await this.pairRepository.put(pair);
-          console.log(
-            `Fetched pair ${lendableToken?.symbol}/${tradableToken?.symbol} from ${from} to ${to}`
-          );
-        } catch (e) {
-          console.log(
-            `Failed pair ${lendableToken?.symbol}/${tradableToken?.symbol} from ${from} to ${to} (${e.body})`
-          );
-        }
-      })
-    );
-    if (pairs.length === 0) await sleep(this.context.sleep);
-    this.onChainUpdate();
+    while (height === this.lastHeight) {
+      await sleep(this.context.sleep);
+    }
+    this.updateHolders();
   }
 
   async updatePosition(position: Position) {
@@ -190,6 +197,24 @@ export class PositionMonitor extends AbstractMonitor<Position> {
     const tradableToken = await this.context.db
       .getRepository(Token)
       .get(position.tradable);
+    const proxyToken = position.proxy
+      ? await this.context.db.getRepository(Token).get(position.proxy)
+      : undefined;
+
+    const path = [lendableToken, proxyToken, tradableToken]
+      .map((t) => t?.symbol)
+      .filter(defined)
+      .join("/");
+
+    const inputs = [position.trader, position.lendable];
+
+    if (position.proxy) {
+      inputs.push(position.proxy);
+    }
+
+    inputs.push(position.tradable);
+
+    const method = position.proxy ? "getProxyPosition" : "getPosition";
 
     const [
       amount,
@@ -203,21 +228,15 @@ export class PositionMonitor extends AbstractMonitor<Position> {
       updateAt,
     ] = await infRetry(() =>
       this.context
-        .sender!.callWithBlock(
-          contract,
-          "getPosition",
-          position.trader,
-          position.lendable,
-          position.tradable
-        )
+        .sender!.callWithBlock(contract, method, ...(inputs as any))
+        .then(({ result, blockHeight }) => {
+          return [...result.map(toBN), toBN(blockHeight)];
+        })
         .catch((e) => {
           console.log(
-            `Error on position state ${lendableToken?.symbol}/${tradableToken?.symbol} ${position.trader} \nissue: ${e}`
+            `Error on position state ${path} ${position.trader} \nissue: ${e}`
           );
           throw e;
-        })
-        .then(({ result, blockHeight }) => {
-          return [...result.map(toBN), blockHeight.toNumber()];
         })
     );
 
@@ -229,25 +248,26 @@ export class PositionMonitor extends AbstractMonitor<Position> {
     position.rate = rate;
     position.currentCost = currentCost;
     position.liquidationCost = liquidationCost;
-    position.updateAt = updateAt;
+    position.updateAt = updateAt.toNumber();
 
     console.log(
-      `Update position:  ${lendableToken?.symbol}/${tradableToken?.symbol} ${
-        position.trader
-      } (heath: ${position.health
+      `Update position:  ${path} ${position.trader} (heath: ${position.health
         .decimalPlaces(27)
         .dividedBy(oneRay)}, value: ${position.value
         .decimalPlaces(18)
-        .dividedBy(oneEther)})\n`
+        .dividedBy(oneEther)})`
     );
 
-    await this.repository.put(position);
+    await this.repository.put(position).catch((e) => {
+      console.error(position);
+      throw e;
+    });
 
     return position;
   }
 
-  private pairContract(address: string, signer: Signer): PairContract {
-    // TODO: Should it be cached?
-    return new Pair__factory(signer).attach(address);
-  }
+  // private pairContract(address: string, signer: Signer): PairContract {
+  //   // TODO: Should it be cached?
+  //   return new Pair__factory(signer).attach(address);
+  // }
 }

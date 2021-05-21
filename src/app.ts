@@ -10,19 +10,9 @@ const { PRIVATE_KEY, pm_id, instances } = process.env;
 const dispatchSize = instances ? parseInt(instances) : 1;
 const dispatchId = pm_id ? parseInt(pm_id) : 0;
 
-console.log({
-  providerUrl,
-  routerAddress,
-  sleepMs,
-  PRIVATE_KEY,
-  dispatchId,
-  dispatchSize,
-});
-
 const provider = new JsonRpcProvider(providerUrl);
 const signer = new Wallet(PRIVATE_KEY!, provider);
 
-console.log({ signer: signer.address });
 const router = new Router__factory()
   .attach(routerAddress)
   .connect(provider)
@@ -31,6 +21,7 @@ const router = new Router__factory()
 run({
   provider,
   providerUrl,
+  covalentAPI: "ckey_44edb98eba8941749fba9b9b9eb",
   signer,
   router,
   multicall,

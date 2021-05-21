@@ -37,7 +37,7 @@ export class TokenMonitor extends AbstractMonitor<Token> {
           const difference = diff(this.lendables, values);
           if (difference) {
             this.lendables = values;
-            this.parseDifference(difference as any, true);
+            this.parseDifference(difference as any);
           }
         })
     );
@@ -54,7 +54,7 @@ export class TokenMonitor extends AbstractMonitor<Token> {
           const difference = diff(this.tradables, values);
           if (difference) {
             this.tradables = values;
-            this.parseDifference(difference as any, false);
+            this.parseDifference(difference as any);
           }
         })
     );
@@ -72,7 +72,7 @@ export class TokenMonitor extends AbstractMonitor<Token> {
           const difference = diff(this.proxies, values);
           if (difference) {
             this.proxies = values;
-            this.parseDifference(difference as any, false);
+            this.parseDifference(difference as any);
           }
         })
     );
@@ -80,10 +80,9 @@ export class TokenMonitor extends AbstractMonitor<Token> {
     return this.channel;
   }
 
-  private parseDifference(
-    difference: Diff<string[], string>[],
-    isLendable: boolean
-  ) {
+  private parseDifference(difference: Diff<string[], string>[]) {
+    const repository = this.context.db.getRepository(Token);
+
     const newTokens: string[] = difference
       .filter((dif): dif is DiffArray<string[], string> => dif.kind === "A")
       .map((difs) => difs.item)
@@ -92,12 +91,21 @@ export class TokenMonitor extends AbstractMonitor<Token> {
 
     Promise.all(
       newTokens.map(async (address) => {
-        const repository = this.context.db.getRepository(Token);
+        const lendable = this.lendables.includes(address);
+        const proxy = this.proxies.includes(address);
+        const tradable = this.tradables.includes(address);
 
         let instance = await repository.get(address);
-        if (!instance) {
+        if (
+          !instance ||
+          instance.lendable !== lendable ||
+          instance.tradable !== tradable ||
+          instance.proxy !== proxy
+        ) {
           instance = new Token();
-          instance.lendable = isLendable;
+          instance.lendable = this.lendables.includes(address);
+          instance.proxy = this.proxies.includes(address);
+          instance.tradable = this.tradables.includes(address);
           instance.address = address;
 
           const contract = IERC20Detailed__factory.connect(
@@ -105,15 +113,12 @@ export class TokenMonitor extends AbstractMonitor<Token> {
             this.context.provider
           );
 
-          [
-            instance.name,
-            instance.symbol,
-            instance.decimals,
-          ] = await Promise.all([
-            this.context.sender!.call(contract, "name"),
-            this.context.sender!.call(contract, "symbol"),
-            this.context.sender!.call(contract, "decimals"),
-          ]);
+          [instance.name, instance.symbol, instance.decimals] =
+            await Promise.all([
+              this.context.sender!.call(contract, "name"),
+              this.context.sender!.call(contract, "symbol"),
+              this.context.sender!.call(contract, "decimals"),
+            ]);
 
           await this.context.db.getRepository(Token).put(instance);
         }

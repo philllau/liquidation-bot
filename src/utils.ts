@@ -3,15 +3,25 @@ import { getAddress } from "@ethersproject/address";
 export const sleep = (ms: number) =>
   new Promise((resolve) => setTimeout(resolve, ms));
 
-export const mapAll = <TIn, TOut>(func: (el: TIn) => TOut) => (
-  collection: TIn[]
-) => collection.map(func);
+export const mapAll =
+  <TIn, TOut>(func: (el: TIn) => TOut) =>
+  (collection: TIn[]) =>
+    collection.map(func);
 
 export const byteToAddress = (bytes: string) =>
   getAddress("0x" + bytes.slice(26));
 
+export const defined = <T>(something: T | undefined): something is T =>
+  typeof something !== "undefined";
+
 export const flatten = <TElement>(collection: Array<Array<TElement>>) =>
   collection.reduce((accumulator, value) => accumulator.concat(value), []);
+
+
+export const logError = (msg: string) => <TError>(e: TError) => {
+  console.error(msg, "\n", e)
+  throw e
+}
 
 function wait(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
