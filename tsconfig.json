@@ -6,6 +6,7 @@
     "declaration": true,
     "declarationMap": true,
     "outDir": "lib",
+    "rootDir": "src",
     "removeComments": true,
     "strict": true,
     "noUnusedLocals": true,
