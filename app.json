@@ -14,15 +14,15 @@
       "value": ""
     },
     "NODE_ENDPOINT": {
-      "description": "Node endpoint.\n Binance Smart Chain: https://bsc-dataseed2.binance.org\n Matic: https://matic-mainnet.chainstacklabs.com",
+      "description": "Node endpoint.<br/> Binance Smart Chain: https://bsc-dataseed2.binance.org<br/> Matic: https://matic-mainnet.chainstacklabs.com",
       "value": "https://bsc-dataseed2.binance.org"
     },
     "MULTICALL_ADDRESS": {
-      "description": "Multicall address. \n BSC: 0x8BB95a1E0D9556997Ab9B56Fc3DE62B7110a95E8\n Matic: 0xeCd953FCC60D9bE066863643591Bb73d115F2cC6",
+      "description": "Multicall address. <br/> BSC: 0x8BB95a1E0D9556997Ab9B56Fc3DE62B7110a95E8<br/> Matic: 0xeCd953FCC60D9bE066863643591Bb73d115F2cC6",
       "value": "0x8BB95a1E0D9556997Ab9B56Fc3DE62B7110a95E8"
     },
     "ROUTER_ADDRESS": {
-      "description": "Router address. \n BSC: 0x168Ea9Cf517F29045098961423397dBC742cf264\n Matic: 0x5f5fD73CF951a3f03F885Fa742A26903C02AdAb1",
+      "description": "Router address. <br/> BSC: 0x168Ea9Cf517F29045098961423397dBC742cf264<br/> Matic: 0x5f5fD73CF951a3f03F885Fa742A26903C02AdAb1",
       "value": "0x168Ea9Cf517F29045098961423397dBC742cf264"
     },
     "SLEEP_TIME": {
