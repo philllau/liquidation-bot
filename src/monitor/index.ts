@@ -21,6 +21,7 @@ import { Multisender } from "./multisender";
 import { PairMonitor } from "./PairMonitor";
 import { PositionMonitor } from "./PositionMonitor";
 import { TokenMonitor } from "./TokenMonitor";
+import { TotalValueMonitor } from "./ValueMonitor";
 
 export type Ctor<T> = new (context: ExecutionContext) => T;
 
@@ -42,6 +43,7 @@ const monitors = [
   TokenMonitor,
   PairMonitor,
   PositionMonitor,
+  TotalValueMonitor
 ] as const;
 
 type InstanceType<T> = T extends Ctor<infer TInstance> ? TInstance : never;
@@ -147,6 +149,7 @@ export class ExecutionContext implements InitializeParams {
     this.runMonitor(TokenMonitor);
     this.runMonitor(PairMonitor);
     this.runMonitor(PositionMonitor);
+    this.runMonitor(TotalValueMonitor);
   }
 
   async runMonitor<T extends typeof monitors[number]>(ctor: T) {

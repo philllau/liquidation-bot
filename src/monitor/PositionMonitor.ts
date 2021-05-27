@@ -29,11 +29,15 @@ export class PositionMonitor extends AbstractMonitor<Position> {
     return this.channel;
   }
 
-  private async liquidateUnhealty() {
+  async liquidateUnhealty() {
     let unhealty = await this.repository.find("health", { $eq: amount(0) });
     unhealty = unhealty.filter((p) => p.amount.gt(amount(0)));
 
     unhealty = await Promise.all(unhealty.map((p) => this.updatePosition(p)));
+
+    let nonce = await this.context.provider.getTransactionCount(
+      this.context.signer.getAddress()
+    );
 
     await Promise.all(
       unhealty
@@ -69,17 +73,20 @@ export class PositionMonitor extends AbstractMonitor<Position> {
                   p.lendable,
                   p.proxy,
                   p.tradable,
-                  p.trader
+                  p.trader,
+                  { nonce: nonce++ }
                 )
               : this.context.router.liquidatePosition(
                   p.lendable,
                   p.tradable,
-                  p.trader
+                  p.trader,
+                  { nonce: nonce++ }
                 )
           )
             .then((tx) => tx.wait())
             .catch((e) => {
               console.error(`Failed liquidate position of ${path} ${p.trader}`);
+              // console.error(e);
             });
         })
     );
