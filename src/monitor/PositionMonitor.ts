@@ -101,9 +101,9 @@ export class PositionMonitor extends AbstractMonitor<Position> {
     });
     await Promise.all(
       positionToUpdate.map((position) => this.updatePosition(position))
-    );
+    ).catch(() => console.error(`Failed update position run`));
 
-    await this.liquidateUnhealty();
+    await this.liquidateUnhealty().catch(() => console.error(`Failed liquidation run`));
 
     while (height === this.lastHeight) {
       await sleep(this.context.sleep);
@@ -272,9 +272,4 @@ export class PositionMonitor extends AbstractMonitor<Position> {
 
     return position;
   }
-
-  // private pairContract(address: string, signer: Signer): PairContract {
-  //   // TODO: Should it be cached?
-  //   return new Pair__factory(signer).attach(address);
-  // }
 }
