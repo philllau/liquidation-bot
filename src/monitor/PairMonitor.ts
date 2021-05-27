@@ -1,4 +1,3 @@
-import { classToPlain } from "class-transformer";
 import { ethers } from "ethers";
 import { Observable } from "observable-fns";
 import { DatastoreRepository } from "../db/repository";
@@ -22,7 +21,6 @@ export class PairMonitor extends AbstractMonitor<Pair> {
 
   async run(): Promise<Observable<Pair>> {
     this.repository = this.context.db.getRepository(Pair);
-    
 
     (await this.context.getChannel(TokenMonitor)).subscribe(
       (token) => {
@@ -30,7 +28,6 @@ export class PairMonitor extends AbstractMonitor<Pair> {
         if (token.proxy) this.onNewProxy(token);
         this.onNewTradable(token);
       }
-      // token.lendable ? this.onNewLendable(token) : this.onNewTradable(token)
     );
 
     (await this.context.getChannel(HeightMonitor)).subscribe(
@@ -42,7 +39,7 @@ export class PairMonitor extends AbstractMonitor<Pair> {
 
   async onNewTradable(tradable: Token) {
     if (this.tradables.some((known) => known.address === tradable.address)) {
-      return console.error("Already known tradable?", classToPlain(tradable));
+      return;
     }
     this.tradables.push(tradable);
     this.lendables
@@ -65,7 +62,7 @@ export class PairMonitor extends AbstractMonitor<Pair> {
 
   onNewLendable(lendable: Token): void {
     if (this.lendables.some((known) => known.address === lendable.address)) {
-      return console.error("Already known lendable?", classToPlain(lendable));
+      return;
     }
     this.lendables.push(lendable);
     this.tradables
@@ -91,7 +88,7 @@ export class PairMonitor extends AbstractMonitor<Pair> {
 
   onNewProxy(proxy: Token): void {
     if (this.proxies.some((known) => known.address === proxy.address)) {
-      return console.error("Already known proxy?", classToPlain(proxy));
+      return;
     }
     this.proxies.push(proxy);
     this.lendables
@@ -170,7 +167,6 @@ export class PairMonitor extends AbstractMonitor<Pair> {
           return instance;
         })
     );
-
 
     pairs.forEach(this.channel.next.bind(this.channel));
 

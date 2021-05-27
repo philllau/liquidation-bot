@@ -23,6 +23,9 @@ import { PositionMonitor } from "./PositionMonitor";
 import { TokenMonitor } from "./TokenMonitor";
 import { TotalValueMonitor } from "./ValueMonitor";
 
+import http from "http";
+import express from "express";
+
 export type Ctor<T> = new (context: ExecutionContext) => T;
 
 export type InitializeParams = Readonly<{
@@ -43,7 +46,7 @@ const monitors = [
   TokenMonitor,
   PairMonitor,
   PositionMonitor,
-  TotalValueMonitor
+  TotalValueMonitor,
 ] as const;
 
 type InstanceType<T> = T extends Ctor<infer TInstance> ? TInstance : never;
@@ -105,10 +108,9 @@ export class ExecutionContext implements InitializeParams {
   constructor(private params: InitializeParams) {}
 
   async run() {
-    this.chainId = await this.provider.getNetwork().then(n => n.chainId)
-    
-    this.db = connect(`.snapshot/instance-${this.chainId}`);
+    this.chainId = await this.provider.getNetwork().then((n) => n.chainId);
 
+    this.db = connect(`.snapshot/instance-${this.chainId}`);
 
     this.pairFactory = PairFactory__factory.connect(
       await infRetry(() =>
@@ -150,6 +152,20 @@ export class ExecutionContext implements InitializeParams {
     this.runMonitor(PairMonitor);
     this.runMonitor(PositionMonitor);
     this.runMonitor(TotalValueMonitor);
+
+    this.api();
+  }
+
+  async api() {
+    const app = express();
+    const server = http.createServer(app);
+    app.get("/", async (req, res, next) => {
+      res.json({ result: "Hello" })
+      next()
+    });
+    server.listen(process.env.PORT, async () => {
+      console.log("Server started");
+    });
   }
 
   async runMonitor<T extends typeof monitors[number]>(ctor: T) {
@@ -200,5 +216,6 @@ export class ExecutionContext implements InitializeParams {
 
 export async function run(params: InitializeParams) {
   const context = new ExecutionContext(params);
+
   await context.run();
 }

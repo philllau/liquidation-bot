@@ -1,12 +1,13 @@
-import { Observable } from "observable-fns";
-import { AbstractMonitor } from "./AbstractMonitor";
 import BigNumber from "bignumber.js";
-import { TokenMonitor } from "./TokenMonitor";
+import { Signer } from "ethers";
+import { Observable } from "observable-fns";
+import { Pair as PairContract, Pair__factory } from "../types";
+import { defined } from "../utils";
+import { AbstractMonitor } from "./AbstractMonitor";
+import { HeightMonitor } from "./HeightMonitor";
 import { Pair, Token } from "./models";
 import { PairMonitor } from "./PairMonitor";
-import { HeightMonitor } from "./HeightMonitor";
-import { Pair__factory, Pair as PairContract } from "../types";
-import { Signer } from "ethers";
+import { TokenMonitor } from "./TokenMonitor";
 
 export enum LockType {
   Staked,
@@ -62,7 +63,28 @@ export class TotalValueMonitor extends AbstractMonitor<TotalValue> {
       }))
     );
 
-    pairsWithSupply.forEach((s) => console.log(s));
+    
+    await Promise.all(
+      pairsWithSupply.map(async (pair) => {
+
+      const lendableToken = await this.context.db
+      .getRepository(Token)
+      .get(pair.lendable);
+    const tradableToken = await this.context.db
+      .getRepository(Token)
+      .get(pair.tradable);
+    const proxyToken = pair.proxy
+      ? await this.context.db.getRepository(Token).get(pair.proxy)
+      : undefined;
+
+      const path = [lendableToken, proxyToken, tradableToken]
+        .map((t) => t?.symbol)
+        .filter(defined)
+        .join("/");
+        
+        console.log(`Supply of ${path}: ${pair.supply} ${tradableToken?.symbol}`)
+      }
+    ))
     // console.log("update value monitor at", height)
   }
 
