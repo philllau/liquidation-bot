@@ -8,7 +8,7 @@
   "env": {
     "NODE_ENV": "production",
     "NPM_CONFIG_PRODUCTION": "false",
-    "YARN_PRODUCTION": "true",
+    "YARN_PRODUCTION": "false",
     "PRIVATE_KEY": {
       "description": "Enter your private key of liquidator wallet.\n Wallet should have native currency to pay transaction fees",
       "value": ""
