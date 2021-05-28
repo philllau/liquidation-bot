@@ -1,7 +1,7 @@
 {
   "name": "WOWSwap Liqidation bot",
   "description": "NodeJS implementation of Liquidation software",
-  "repository": "https://github.com/wowswap-io/liquidation-bot/tree/master",
+  "repository": "https://github.com/wowswap-io/liquidation-bot/tree/matic",
   "logo": "https://cdn.rawgit.com/heroku/node-js-getting-started/main/public/node.svg",
   "keywords": ["node", "typescript", "heroku"],
   "image": "heroku/nodejs",
