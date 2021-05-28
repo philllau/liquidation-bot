@@ -14,16 +14,16 @@
       "value": ""
     },
     "NODE_ENDPOINT": {
-      "description": "Binance Smart Chain: https://bsc-dataseed2.binance.org, Matic: https://matic-mainnet.chainstacklabs.com",
-      "value": "https://bsc-dataseed2.binance.org"
+      "description": "JSON RPC node",
+      "value": "https://matic-mainnet.chainstacklabs.com"
     },
     "MULTICALL_ADDRESS": {
-      "description": "BSC: 0x8BB95a1E0D9556997Ab9B56Fc3DE62B7110a95E8, Matic: 0xeCd953FCC60D9bE066863643591Bb73d115F2cC6",
-      "value": "0x8BB95a1E0D9556997Ab9B56Fc3DE62B7110a95E8"
+      "description": "Address of the multicall sender",
+      "value": "0xeCd953FCC60D9bE066863643591Bb73d115F2cC6"
     },
     "ROUTER_ADDRESS": {
-      "description": "BSC: 0x168Ea9Cf517F29045098961423397dBC742cf264, Matic: 0x5f5fD73CF951a3f03F885Fa742A26903C02AdAb1",
-      "value": "0x168Ea9Cf517F29045098961423397dBC742cf264"
+      "description": "Address of the router",
+      "value": "0x5f5fD73CF951a3f03F885Fa742A26903C02AdAb1"
     },
     "SLEEP_TIME": {
       "value": "250"
