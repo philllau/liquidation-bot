@@ -77,7 +77,7 @@ export class PositionMonitor extends AbstractMonitor<Position> {
             .then((tx) => tx.wait())
             .catch((e) => {
               console.error(`Failed liquidate position of ${path} ${p.trader}`);
-              // console.error(e);
+              console.error(e.message);
             });
         })
     );
