@@ -61,7 +61,7 @@ export class PositionMonitor extends AbstractMonitor<Position> {
         }`
       );
 
-      return new Pair__factory(this.context.signer)
+      await new Pair__factory(this.context.signer)
         .attach(p.pair)
         .liquidatePosition(p.trader, this.context.signer.address)
         .then((tx) => tx.wait())
