@@ -53,6 +53,7 @@ export class TotalValueMonitor extends AbstractMonitor<TotalValue> {
   }
 
   async update(height: number) {
+    return 
     const pairsWithSupply = await Promise.all(
       this.pairs.map(async (p) => ({
         ...p,
