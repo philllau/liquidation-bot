@@ -32,6 +32,7 @@ export class TotalValueMonitor extends AbstractMonitor<TotalValue> {
   private pairs: Pair[] = [];
 
   async run(): Promise<Observable<TotalValue>> {
+    return this.channel;
     this.context.getChannel(TokenMonitor).then((channel) =>
       channel.subscribe((token) => {
         if (this.lendables.some((t) => t.address === token.address)) return;
