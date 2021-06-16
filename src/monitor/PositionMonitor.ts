@@ -33,54 +33,43 @@ export class PositionMonitor extends AbstractMonitor<Position> {
   async liquidateUnhealty() {
     let unhealty = await this.repository.find("health", { $eq: amount(0) });
     unhealty = unhealty.filter((p) => p.amount.gt(amount(0)));
-
     unhealty = await Promise.all(unhealty.map((p) => this.updatePosition(p)));
 
-    let nonce = await this.context.provider.getTransactionCount(
-      this.context.signer.getAddress()
-    );
+    for (let p of unhealty.filter((p) => p.amount.gt(amount(0)))) {
+      const lendableToken = await this.context.db
+        .getRepository(Token)
+        .get(p.lendable);
+      const tradableToken = await this.context.db
+        .getRepository(Token)
+        .get(p.tradable);
+      const proxyToken = p.proxy
+        ? await this.context.db.getRepository(Token).get(p.proxy)
+        : undefined;
 
-    await Promise.all(
-      unhealty
-        .filter((p) => p.amount.gt(amount(0)))
-        .map(async (p) => {
-          const lendableToken = await this.context.db
-            .getRepository(Token)
-            .get(p.lendable);
-          const tradableToken = await this.context.db
-            .getRepository(Token)
-            .get(p.tradable);
-          const proxyToken = p.proxy
-            ? await this.context.db.getRepository(Token).get(p.proxy)
-            : undefined;
+      const path = [lendableToken, proxyToken, tradableToken]
+        .map((t) => t?.symbol)
+        .filter(defined)
+        .join("/");
 
-          const path = [lendableToken, proxyToken, tradableToken]
-            .map((t) => t?.symbol)
-            .filter(defined)
-            .join("/");
+      let amount = p.amount
+        .decimalPlaces(tradableToken?.decimals!)
+        .dividedBy(bn(10).pow(tradableToken!.decimals));
 
-          let amount = p.amount
-            .decimalPlaces(tradableToken?.decimals!)
-            .dividedBy(bn(10).pow(tradableToken!.decimals));
+      console.log(
+        `Liquidate position: ${path} ${p.trader} - ${amount.toString()} ${
+          tradableToken?.symbol
+        }`
+      );
 
-          console.log(
-            `Liquidate position: ${path} ${p.trader} - ${amount.toString()} ${
-              tradableToken?.symbol
-            }`
-          );
-          
-          return new Pair__factory(this.context.signer)
-            .attach(p.pair)
-            .liquidatePosition(p.trader, this.context.signer.address, {
-              nonce: nonce++,
-            })
-            .then((tx) => tx.wait())
-            .catch((e) => {
-              console.error(`Failed liquidate position of ${path} ${p.trader}`);
-              console.error(e.message);
-            });
-        })
-    );
+      return new Pair__factory(this.context.signer)
+        .attach(p.pair)
+        .liquidatePosition(p.trader, this.context.signer.address)
+        .then((tx) => tx.wait())
+        .catch((e) => {
+          console.error(`Failed liquidate position of ${path} ${p.trader}`);
+          console.error(e.message);
+        });
+    }
   }
 
   private async updatePositions() {
@@ -94,7 +83,9 @@ export class PositionMonitor extends AbstractMonitor<Position> {
       positionToUpdate.map((position) => this.updatePosition(position))
     ).catch(() => console.error(`Failed update position run`));
 
-    await this.liquidateUnhealty().catch(() => console.error(`Failed liquidation run`));
+    await this.liquidateUnhealty().catch(() =>
+      console.error(`Failed liquidation run`)
+    );
 
     while (height === this.lastHeight) {
       await sleep(this.context.sleep);
