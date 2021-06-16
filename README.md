@@ -20,6 +20,7 @@ Select a bot for Binance Smart Chain or Polygon Network:
 
 * **[Binance Smart Chain](https://heroku.com/deploy?template=https://github.com/wowswap-io/liquidation-bot/tree/binance-smart-chain)**
 * [**Polygon** (formerly Matic)](https://heroku.com/deploy?template=https://github.com/wowswap-io/liquidation-bot/tree/matic)
+* **[Heco](https://heroku.com/deploy?template=https://github.com/wowswap-io/liquidation-bot/tree/heco)**
 
 
 In the field "App name" provide a name for your bot and paste the Private Key obrained at the previous step - the bot requires Private Key from your liquidation wallet because it will be submitting transactions on your behalf and pay for gas from this wallet. Don't change other parameters. Click "Deploy app".
