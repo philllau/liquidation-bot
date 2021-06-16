@@ -2,6 +2,7 @@ import axios from "axios";
 import { Observable } from "observable-fns";
 import { DatastoreRepository } from "../db/repository";
 import { amount, bn, oneEther, oneRay, toBN } from "../math";
+import { Pair__factory } from "../types";
 import { defined, infRetry, sleep } from "../utils";
 import { AbstractMonitor } from "./AbstractMonitor";
 import { HeightMonitor } from "./HeightMonitor";
@@ -67,26 +68,16 @@ export class PositionMonitor extends AbstractMonitor<Position> {
               tradableToken?.symbol
             }`
           );
-          return (
-            p.proxy
-              ? this.context.router.liquidateProxyPosition(
-                  p.lendable,
-                  p.proxy,
-                  p.tradable,
-                  p.trader,
-                  { nonce: nonce++ }
-                )
-              : this.context.router.liquidatePosition(
-                  p.lendable,
-                  p.tradable,
-                  p.trader,
-                  { nonce: nonce++ }
-                )
-          )
+          
+          return new Pair__factory(this.context.signer)
+            .attach(p.pair)
+            .liquidatePosition(p.trader, this.context.signer.address, {
+              nonce: nonce++,
+            })
             .then((tx) => tx.wait())
             .catch((e) => {
               console.error(`Failed liquidate position of ${path} ${p.trader}`);
-              // console.error(e);
+              console.error(e.message);
             });
         })
     );

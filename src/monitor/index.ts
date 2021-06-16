@@ -1,5 +1,7 @@
 import { JsonRpcProvider } from "@ethersproject/providers";
-import { Signer, Wallet } from "ethers";
+import { Wallet } from "ethers";
+import express from "express";
+import http from "http";
 import { Observable } from "observable-fns";
 import { DatastoreConnection } from "../db/connection";
 import { connect } from "../db/datastore";
@@ -12,7 +14,7 @@ import {
   PancakeRouter01__factory,
   ReserveFactory,
   ReserveFactory__factory,
-  Router,
+  Router
 } from "../types";
 import { infRetry, logError } from "../utils";
 import { AbstractMonitor } from "./AbstractMonitor";
@@ -23,8 +25,6 @@ import { PositionMonitor } from "./PositionMonitor";
 import { TokenMonitor } from "./TokenMonitor";
 import { TotalValueMonitor } from "./ValueMonitor";
 
-import http from "http";
-import express from "express";
 
 export type Ctor<T> = new (context: ExecutionContext) => T;
 
@@ -34,7 +34,7 @@ export type InitializeParams = Readonly<{
   covalentAPI: string;
   provider: JsonRpcProvider;
   providerUrl: string;
-  signer: Signer;
+  signer: Wallet;
   multicall: string;
   router: Router;
   sleep: number;
