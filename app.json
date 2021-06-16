@@ -1,7 +1,7 @@
 {
   "name": "WOWSwap Liqidation bot",
   "description": "NodeJS implementation of Liquidation software",
-  "repository": "https://github.com/wowswap-io/liquidation-bot/tree/binance-smart-chain",
+  "repository": "https://github.com/wowswap-io/liquidation-bot/tree/heco",
   "logo": "https://cdn.rawgit.com/heroku/node-js-getting-started/main/public/node.svg",
   "keywords": ["node", "typescript", "heroku"],
   "image": "heroku/nodejs",
@@ -15,21 +15,21 @@
     },
     "NODE_ENDPOINT": {
       "description": "JSON RPC node",
-      "value": "https://bsc-dataseed2.binance.org"
+      "value": "https://http-mainnet-node.huobichain.com"
     },
     "MULTICALL_ADDRESS": {
       "description": "Address of the multicall sender",
-      "value": "0x8BB95a1E0D9556997Ab9B56Fc3DE62B7110a95E8"
+      "value": "0x72279055bA0f09FC4efA69Ac5A1A3511bD0e4d03"
     },
     "ROUTER_ADDRESS": {
       "description": "Address of the router",
-      "value": "0x168Ea9Cf517F29045098961423397dBC742cf264"
+      "value": "0xB9FeD121a12c84E7717Ecc6EEd85eF1D9965Ed37"
     },
     "SLEEP_TIME": {
       "value": "250"
     },
     "START_BLOCK": {
-      "value": "1"
+      "value": "4693500"
     }
   }
 }
