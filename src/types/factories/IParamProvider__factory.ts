@@ -19,6 +19,19 @@ export class IParamProvider__factory {
 const _abi = [
   {
     inputs: [],
+    name: "WOW",
+    outputs: [
+      {
+        internalType: "address",
+        name: "",
+        type: "address",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
     name: "baseBorrowRate",
     outputs: [
       {
@@ -38,6 +51,19 @@ const _abi = [
         internalType: "uint256",
         name: "",
         type: "uint256",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "feeToken",
+    outputs: [
+      {
+        internalType: "address",
+        name: "",
+        type: "address",
       },
     ],
     stateMutability: "view",
@@ -206,299 +232,55 @@ const _abi = [
     type: "function",
   },
   {
-    inputs: [
+    inputs: [],
+    name: "referralFirstBonus",
+    outputs: [
       {
         internalType: "uint256",
-        name: "value",
+        name: "",
         type: "uint256",
       },
     ],
-    name: "setBaseBorrowRate",
-    outputs: [],
-    stateMutability: "nonpayable",
+    stateMutability: "view",
     type: "function",
   },
   {
-    inputs: [
-      {
-        internalType: "uint256",
-        name: "value",
-        type: "uint256",
-      },
-    ],
-    name: "setExcessSlope",
-    outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    inputs: [
-      {
-        internalType: "uint256",
-        name: "value",
-        type: "uint256",
-      },
-    ],
-    name: "setLiquidationMargin",
-    outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    inputs: [
-      {
-        internalType: "uint256",
-        name: "value",
-        type: "uint256",
-      },
-    ],
-    name: "setLiquidationReward",
-    outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    inputs: [
-      {
-        internalType: "uint256",
-        name: "value",
-        type: "uint256",
-      },
-    ],
-    name: "setMaxLeverageFactor",
-    outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    inputs: [
-      {
-        internalType: "uint256",
-        name: "value",
-        type: "uint256",
-      },
-    ],
-    name: "setMaxLiquidationReward",
-    outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    inputs: [
-      {
-        internalType: "uint256",
-        name: "value",
-        type: "uint256",
-      },
-    ],
-    name: "setMaxPriceThreshold",
-    outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    inputs: [
-      {
-        internalType: "uint256",
-        name: "value",
-        type: "uint256",
-      },
-    ],
-    name: "setMaxRateMultiplier",
-    outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    inputs: [
-      {
-        internalType: "uint256",
-        name: "value",
-        type: "uint256",
-      },
-    ],
-    name: "setMinPositionDeposit",
-    outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    inputs: [
-      {
-        internalType: "uint256",
-        name: "leverageFactor",
-        type: "uint256",
-      },
-      {
-        internalType: "uint256",
-        name: "value",
-        type: "uint256",
-      },
-    ],
-    name: "setMinWOWBalance",
-    outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    inputs: [
-      {
-        internalType: "uint256",
-        name: "value",
-        type: "uint256",
-      },
-    ],
-    name: "setOptimalSlope",
-    outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    inputs: [
-      {
-        internalType: "uint256",
-        name: "value",
-        type: "uint256",
-      },
-    ],
-    name: "setOptimalUtilization",
-    outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    inputs: [
-      {
-        components: [
-          {
-            internalType: "uint256",
-            name: "baseBorrowRate",
-            type: "uint256",
-          },
-          {
-            internalType: "uint256",
-            name: "optimalSlope",
-            type: "uint256",
-          },
-          {
-            internalType: "uint256",
-            name: "excessSlope",
-            type: "uint256",
-          },
-          {
-            internalType: "uint256",
-            name: "optimalUtilization",
-            type: "uint256",
-          },
-          {
-            internalType: "uint256",
-            name: "treasureFactor",
-            type: "uint256",
-          },
-          {
-            internalType: "uint256",
-            name: "poolUtilizationAllowance",
-            type: "uint256",
-          },
-          {
-            internalType: "uint256",
-            name: "traderProfitFee",
-            type: "uint256",
-          },
-          {
-            internalType: "uint256",
-            name: "liquidationMargin",
-            type: "uint256",
-          },
-          {
-            internalType: "uint256",
-            name: "liquidationReward",
-            type: "uint256",
-          },
-          {
-            internalType: "uint256",
-            name: "maxLeverageFactor",
-            type: "uint256",
-          },
-          {
-            internalType: "uint256",
-            name: "maxRateMultiplier",
-            type: "uint256",
-          },
-        ],
-        internalType: "struct ProtocolParameters",
-        name: "parameters",
-        type: "tuple",
-      },
-    ],
-    name: "setParameters",
-    outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    inputs: [
-      {
-        internalType: "uint256",
-        name: "value",
-        type: "uint256",
-      },
-    ],
-    name: "setPoolUtilizationAllowance",
-    outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    inputs: [
+    inputs: [],
+    name: "referralProgram",
+    outputs: [
       {
         internalType: "address",
-        name: "priceGuard",
+        name: "",
         type: "address",
       },
     ],
-    name: "setPriceGuard",
-    outputs: [],
-    stateMutability: "nonpayable",
+    stateMutability: "view",
     type: "function",
   },
   {
-    inputs: [
-      {
-        internalType: "address",
-        name: "swapRouter",
-        type: "address",
-      },
-    ],
-    name: "setSwapRouter",
-    outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    inputs: [
+    inputs: [],
+    name: "referralSecondBonus",
+    outputs: [
       {
         internalType: "uint256",
-        name: "value",
+        name: "",
         type: "uint256",
       },
     ],
-    name: "setTraderProfitFee",
-    outputs: [],
-    stateMutability: "nonpayable",
+    stateMutability: "view",
     type: "function",
   },
   {
-    inputs: [
+    inputs: [],
+    name: "referralThirdBonus",
+    outputs: [
       {
         internalType: "uint256",
-        name: "value",
+        name: "",
         type: "uint256",
       },
     ],
-    name: "setTreasureFactor",
-    outputs: [],
-    stateMutability: "nonpayable",
+    stateMutability: "view",
     type: "function",
   },
   {
@@ -535,6 +317,32 @@ const _abi = [
         internalType: "uint256",
         name: "",
         type: "uint256",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "treasurer",
+    outputs: [
+      {
+        internalType: "address",
+        name: "",
+        type: "address",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "xWOW",
+    outputs: [
+      {
+        internalType: "address",
+        name: "",
+        type: "address",
       },
     ],
     stateMutability: "view",

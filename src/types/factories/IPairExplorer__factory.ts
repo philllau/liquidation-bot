@@ -44,6 +44,11 @@ const _abi = [
     outputs: [
       {
         internalType: "uint256",
+        name: "amountOut",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
         name: "profit",
         type: "uint256",
       },
@@ -178,6 +183,109 @@ const _abi = [
       },
       {
         internalType: "address",
+        name: "shortable",
+        type: "address",
+      },
+      {
+        internalType: "uint256",
+        name: "amount",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "leverageFactor",
+        type: "uint256",
+      },
+    ],
+    name: "calculateOpenProxyShortPosition",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "maxAmountIn",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "borrowAmount",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "borrowRate",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "liquidationCost",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "lendable",
+        type: "address",
+      },
+      {
+        internalType: "address",
+        name: "shortable",
+        type: "address",
+      },
+      {
+        internalType: "uint256",
+        name: "amount",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "leverageFactor",
+        type: "uint256",
+      },
+    ],
+    name: "calculateOpenShortPosition",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "maxAmountIn",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "borrowAmount",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "borrowRate",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "liquidationCost",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "lendable",
+        type: "address",
+      },
+      {
+        internalType: "address",
+        name: "proxyLendable",
+        type: "address",
+      },
+      {
+        internalType: "address",
         name: "tradable",
         type: "address",
       },
@@ -194,6 +302,114 @@ const _abi = [
     ],
     name: "calculateProxyBalance",
     outputs: [
+      {
+        internalType: "uint256",
+        name: "amountOut",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "profit",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "debtPayable",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "protocolFee",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "lendable",
+        type: "address",
+      },
+      {
+        internalType: "address",
+        name: "proxyLendable",
+        type: "address",
+      },
+      {
+        internalType: "address",
+        name: "shortable",
+        type: "address",
+      },
+      {
+        internalType: "address",
+        name: "trader",
+        type: "address",
+      },
+      {
+        internalType: "uint256",
+        name: "amountIn",
+        type: "uint256",
+      },
+    ],
+    name: "calculateProxyShortBalance",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "amountOut",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "profit",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "debtPayable",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "protocolFee",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "lendable",
+        type: "address",
+      },
+      {
+        internalType: "address",
+        name: "shortable",
+        type: "address",
+      },
+      {
+        internalType: "address",
+        name: "trader",
+        type: "address",
+      },
+      {
+        internalType: "uint256",
+        name: "amountIn",
+        type: "uint256",
+      },
+    ],
+    name: "calculateShortBalance",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "amountOut",
+        type: "uint256",
+      },
       {
         internalType: "uint256",
         name: "profit",
@@ -308,6 +524,153 @@ const _abi = [
       },
     ],
     name: "getProxyPosition",
+    outputs: [
+      {
+        components: [
+          {
+            internalType: "uint256",
+            name: "amount",
+            type: "uint256",
+          },
+          {
+            internalType: "uint256",
+            name: "value",
+            type: "uint256",
+          },
+          {
+            internalType: "uint256",
+            name: "selfValue",
+            type: "uint256",
+          },
+          {
+            internalType: "uint256",
+            name: "principalDebt",
+            type: "uint256",
+          },
+          {
+            internalType: "uint256",
+            name: "currentDebt",
+            type: "uint256",
+          },
+          {
+            internalType: "uint256",
+            name: "rate",
+            type: "uint256",
+          },
+          {
+            internalType: "uint256",
+            name: "currentCost",
+            type: "uint256",
+          },
+          {
+            internalType: "uint256",
+            name: "liquidationCost",
+            type: "uint256",
+          },
+        ],
+        internalType: "struct Position",
+        name: "position",
+        type: "tuple",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "trader",
+        type: "address",
+      },
+      {
+        internalType: "address",
+        name: "lendable",
+        type: "address",
+      },
+      {
+        internalType: "address",
+        name: "proxyLendable",
+        type: "address",
+      },
+      {
+        internalType: "address",
+        name: "shortable",
+        type: "address",
+      },
+    ],
+    name: "getProxyShortPosition",
+    outputs: [
+      {
+        components: [
+          {
+            internalType: "uint256",
+            name: "amount",
+            type: "uint256",
+          },
+          {
+            internalType: "uint256",
+            name: "value",
+            type: "uint256",
+          },
+          {
+            internalType: "uint256",
+            name: "selfValue",
+            type: "uint256",
+          },
+          {
+            internalType: "uint256",
+            name: "principalDebt",
+            type: "uint256",
+          },
+          {
+            internalType: "uint256",
+            name: "currentDebt",
+            type: "uint256",
+          },
+          {
+            internalType: "uint256",
+            name: "rate",
+            type: "uint256",
+          },
+          {
+            internalType: "uint256",
+            name: "currentCost",
+            type: "uint256",
+          },
+          {
+            internalType: "uint256",
+            name: "liquidationCost",
+            type: "uint256",
+          },
+        ],
+        internalType: "struct Position",
+        name: "position",
+        type: "tuple",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "trader",
+        type: "address",
+      },
+      {
+        internalType: "address",
+        name: "lendable",
+        type: "address",
+      },
+      {
+        internalType: "address",
+        name: "shortable",
+        type: "address",
+      },
+    ],
+    name: "getShortPosition",
     outputs: [
       {
         components: [

@@ -37,6 +37,7 @@ interface ReserveStorageInterface extends ethers.utils.Interface {
     "transfer(address,uint256)": FunctionFragment;
     "transferFrom(address,address,uint256)": FunctionFragment;
     "transferOwnership(address)": FunctionFragment;
+    "treasurerUpdate()": FunctionFragment;
   };
 
   encodeFunctionData(
@@ -80,6 +81,10 @@ interface ReserveStorageInterface extends ethers.utils.Interface {
     functionFragment: "transferOwnership",
     values: [string]
   ): string;
+  encodeFunctionData(
+    functionFragment: "treasurerUpdate",
+    values?: undefined
+  ): string;
 
   decodeFunctionResult(functionFragment: "allowance", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "approve", data: BytesLike): Result;
@@ -111,6 +116,10 @@ interface ReserveStorageInterface extends ethers.utils.Interface {
   ): Result;
   decodeFunctionResult(
     functionFragment: "transferOwnership",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "treasurerUpdate",
     data: BytesLike
   ): Result;
 
@@ -283,6 +292,10 @@ export class ReserveStorage extends Contract {
       newOwner: string,
       overrides?: Overrides
     ): Promise<ContractTransaction>;
+
+    treasurerUpdate(overrides?: CallOverrides): Promise<[BigNumber]>;
+
+    "treasurerUpdate()"(overrides?: CallOverrides): Promise<[BigNumber]>;
   };
 
   allowance(
@@ -400,6 +413,10 @@ export class ReserveStorage extends Contract {
     overrides?: Overrides
   ): Promise<ContractTransaction>;
 
+  treasurerUpdate(overrides?: CallOverrides): Promise<BigNumber>;
+
+  "treasurerUpdate()"(overrides?: CallOverrides): Promise<BigNumber>;
+
   callStatic: {
     allowance(
       owner: string,
@@ -515,6 +532,10 @@ export class ReserveStorage extends Contract {
       newOwner: string,
       overrides?: CallOverrides
     ): Promise<void>;
+
+    treasurerUpdate(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "treasurerUpdate()"(overrides?: CallOverrides): Promise<BigNumber>;
   };
 
   filters: {
@@ -660,6 +681,10 @@ export class ReserveStorage extends Contract {
       newOwner: string,
       overrides?: Overrides
     ): Promise<BigNumber>;
+
+    treasurerUpdate(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "treasurerUpdate()"(overrides?: CallOverrides): Promise<BigNumber>;
   };
 
   populateTransaction: {
@@ -779,6 +804,12 @@ export class ReserveStorage extends Contract {
     "transferOwnership(address)"(
       newOwner: string,
       overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
+
+    treasurerUpdate(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    "treasurerUpdate()"(
+      overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
   };
 }

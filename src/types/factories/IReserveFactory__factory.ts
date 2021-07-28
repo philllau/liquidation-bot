@@ -53,6 +53,25 @@ const _abi = [
     inputs: [
       {
         internalType: "address",
+        name: "shortable",
+        type: "address",
+      },
+    ],
+    name: "getOrCreateShortingReserve",
+    outputs: [
+      {
+        internalType: "address",
+        name: "",
+        type: "address",
+      },
+    ],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
         name: "lendable",
         type: "address",
       },
@@ -63,6 +82,25 @@ const _abi = [
         internalType: "address",
         name: "",
         type: "address",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "token",
+        type: "address",
+      },
+    ],
+    name: "isRegisteredLendable",
+    outputs: [
+      {
+        internalType: "bool",
+        name: "",
+        type: "bool",
       },
     ],
     stateMutability: "view",
@@ -117,24 +155,6 @@ const _abi = [
       },
     ],
     stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [
-      {
-        internalType: "address",
-        name: "lendable",
-        type: "address",
-      },
-      {
-        internalType: "address",
-        name: "to",
-        type: "address",
-      },
-    ],
-    name: "sweepFee",
-    outputs: [],
-    stateMutability: "nonpayable",
     type: "function",
   },
 ];

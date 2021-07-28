@@ -26,17 +26,22 @@ interface ParamProviderFactoryInterface extends ethers.utils.Interface {
     "REVISION()": FunctionFragment;
     "createPairParamProvider(address[])": FunctionFragment;
     "createReserveParamProvider(address)": FunctionFragment;
+    "createShortingPairParamProvider(address[])": FunctionFragment;
     "getPairParamProvider(address,address)": FunctionFragment;
     "getReserveParamProvider(address)": FunctionFragment;
     "getRoutablePairParamProvider(address,address,address)": FunctionFragment;
-    "initialize(address,address,tuple,address[],tuple[],tuple[])": FunctionFragment;
+    "getRoutableShortingPairParamProvider(address,address,address)": FunctionFragment;
+    "getShortingPairParamProvider(address,address)": FunctionFragment;
+    "initialize(address,address,address[],tuple[])": FunctionFragment;
     "owner()": FunctionFragment;
     "renounceOwnership()": FunctionFragment;
+    "setParamGovernance(address)": FunctionFragment;
     "setSwapRouter(address)": FunctionFragment;
     "transferOwnership(address)": FunctionFragment;
     "upgrade()": FunctionFragment;
     "upgradePairParamProvider(address[])": FunctionFragment;
     "upgradeReserveParamProvider(address)": FunctionFragment;
+    "upgradeShortingPairParamProvider(address[])": FunctionFragment;
   };
 
   encodeFunctionData(functionFragment: "REVISION", values?: undefined): string;
@@ -47,6 +52,10 @@ interface ParamProviderFactoryInterface extends ethers.utils.Interface {
   encodeFunctionData(
     functionFragment: "createReserveParamProvider",
     values: [string]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "createShortingPairParamProvider",
+    values: [string[]]
   ): string;
   encodeFunctionData(
     functionFragment: "getPairParamProvider",
@@ -61,35 +70,30 @@ interface ParamProviderFactoryInterface extends ethers.utils.Interface {
     values: [string, string, string]
   ): string;
   encodeFunctionData(
+    functionFragment: "getRoutableShortingPairParamProvider",
+    values: [string, string, string]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "getShortingPairParamProvider",
+    values: [string, string]
+  ): string;
+  encodeFunctionData(
     functionFragment: "initialize",
     values: [
       string,
       string,
-      {
-        baseBorrowRate: BigNumberish;
-        optimalSlope: BigNumberish;
-        excessSlope: BigNumberish;
-        optimalUtilization: BigNumberish;
-        treasureFactor: BigNumberish;
-        poolUtilizationAllowance: BigNumberish;
-        traderProfitFee: BigNumberish;
-        liquidationMargin: BigNumberish;
-        liquidationReward: BigNumberish;
-        maxLeverageFactor: BigNumberish;
-        maxRateMultiplier: BigNumberish;
-      },
       string[],
-      {
-        maxLiquidationReward: BigNumberish;
-        minPositionDeposit: BigNumberish;
-      }[],
-      { leverageFactor: BigNumberish; minWOWBalance: BigNumberish }[]
+      { maxLiquidationReward: BigNumberish; minPositionDeposit: BigNumberish }[]
     ]
   ): string;
   encodeFunctionData(functionFragment: "owner", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "renounceOwnership",
     values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "setParamGovernance",
+    values: [string]
   ): string;
   encodeFunctionData(
     functionFragment: "setSwapRouter",
@@ -108,6 +112,10 @@ interface ParamProviderFactoryInterface extends ethers.utils.Interface {
     functionFragment: "upgradeReserveParamProvider",
     values: [string]
   ): string;
+  encodeFunctionData(
+    functionFragment: "upgradeShortingPairParamProvider",
+    values: [string[]]
+  ): string;
 
   decodeFunctionResult(functionFragment: "REVISION", data: BytesLike): Result;
   decodeFunctionResult(
@@ -116,6 +124,10 @@ interface ParamProviderFactoryInterface extends ethers.utils.Interface {
   ): Result;
   decodeFunctionResult(
     functionFragment: "createReserveParamProvider",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "createShortingPairParamProvider",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -130,10 +142,22 @@ interface ParamProviderFactoryInterface extends ethers.utils.Interface {
     functionFragment: "getRoutablePairParamProvider",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(
+    functionFragment: "getRoutableShortingPairParamProvider",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "getShortingPairParamProvider",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "initialize", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "owner", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "renounceOwnership",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "setParamGovernance",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -151,6 +175,10 @@ interface ParamProviderFactoryInterface extends ethers.utils.Interface {
   ): Result;
   decodeFunctionResult(
     functionFragment: "upgradeReserveParamProvider",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "upgradeShortingPairParamProvider",
     data: BytesLike
   ): Result;
 
@@ -229,6 +257,16 @@ export class ParamProviderFactory extends Contract {
       overrides?: Overrides
     ): Promise<ContractTransaction>;
 
+    createShortingPairParamProvider(
+      path: string[],
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
+
+    "createShortingPairParamProvider(address[])"(
+      path: string[],
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
+
     getPairParamProvider(
       lendable: string,
       tradable: string,
@@ -265,58 +303,50 @@ export class ParamProviderFactory extends Contract {
       overrides?: CallOverrides
     ): Promise<[string]>;
 
+    getRoutableShortingPairParamProvider(
+      lendable: string,
+      proxyLendable: string,
+      tradable: string,
+      overrides?: CallOverrides
+    ): Promise<[string]>;
+
+    "getRoutableShortingPairParamProvider(address,address,address)"(
+      lendable: string,
+      proxyLendable: string,
+      tradable: string,
+      overrides?: CallOverrides
+    ): Promise<[string]>;
+
+    getShortingPairParamProvider(
+      lendable: string,
+      tradable: string,
+      overrides?: CallOverrides
+    ): Promise<[string]>;
+
+    "getShortingPairParamProvider(address,address)"(
+      lendable: string,
+      tradable: string,
+      overrides?: CallOverrides
+    ): Promise<[string]>;
+
     initialize(
       reserveFactory: string,
       pairFactory: string,
-      defaultParameters: {
-        baseBorrowRate: BigNumberish;
-        optimalSlope: BigNumberish;
-        excessSlope: BigNumberish;
-        optimalUtilization: BigNumberish;
-        treasureFactor: BigNumberish;
-        poolUtilizationAllowance: BigNumberish;
-        traderProfitFee: BigNumberish;
-        liquidationMargin: BigNumberish;
-        liquidationReward: BigNumberish;
-        maxLeverageFactor: BigNumberish;
-        maxRateMultiplier: BigNumberish;
-      },
       lendables: string[],
       lendableParameters: {
         maxLiquidationReward: BigNumberish;
         minPositionDeposit: BigNumberish;
-      }[],
-      minWOWBalances: {
-        leverageFactor: BigNumberish;
-        minWOWBalance: BigNumberish;
       }[],
       overrides?: Overrides
     ): Promise<ContractTransaction>;
 
-    "initialize(address,address,(uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256),address[],tuple[],tuple[])"(
+    "initialize(address,address,address[],tuple[])"(
       reserveFactory: string,
       pairFactory: string,
-      defaultParameters: {
-        baseBorrowRate: BigNumberish;
-        optimalSlope: BigNumberish;
-        excessSlope: BigNumberish;
-        optimalUtilization: BigNumberish;
-        treasureFactor: BigNumberish;
-        poolUtilizationAllowance: BigNumberish;
-        traderProfitFee: BigNumberish;
-        liquidationMargin: BigNumberish;
-        liquidationReward: BigNumberish;
-        maxLeverageFactor: BigNumberish;
-        maxRateMultiplier: BigNumberish;
-      },
       lendables: string[],
       lendableParameters: {
         maxLiquidationReward: BigNumberish;
         minPositionDeposit: BigNumberish;
-      }[],
-      minWOWBalances: {
-        leverageFactor: BigNumberish;
-        minWOWBalance: BigNumberish;
       }[],
       overrides?: Overrides
     ): Promise<ContractTransaction>;
@@ -328,6 +358,16 @@ export class ParamProviderFactory extends Contract {
     renounceOwnership(overrides?: Overrides): Promise<ContractTransaction>;
 
     "renounceOwnership()"(overrides?: Overrides): Promise<ContractTransaction>;
+
+    setParamGovernance(
+      paramGovernance: string,
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
+
+    "setParamGovernance(address)"(
+      paramGovernance: string,
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
 
     setSwapRouter(
       swapRouter: string,
@@ -372,6 +412,16 @@ export class ParamProviderFactory extends Contract {
       lendable: string,
       overrides?: Overrides
     ): Promise<ContractTransaction>;
+
+    upgradeShortingPairParamProvider(
+      path: string[],
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
+
+    "upgradeShortingPairParamProvider(address[])"(
+      path: string[],
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
   };
 
   REVISION(overrides?: CallOverrides): Promise<BigNumber>;
@@ -395,6 +445,16 @@ export class ParamProviderFactory extends Contract {
 
   "createReserveParamProvider(address)"(
     lendable: string,
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
+
+  createShortingPairParamProvider(
+    path: string[],
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
+
+  "createShortingPairParamProvider(address[])"(
+    path: string[],
     overrides?: Overrides
   ): Promise<ContractTransaction>;
 
@@ -434,58 +494,50 @@ export class ParamProviderFactory extends Contract {
     overrides?: CallOverrides
   ): Promise<string>;
 
+  getRoutableShortingPairParamProvider(
+    lendable: string,
+    proxyLendable: string,
+    tradable: string,
+    overrides?: CallOverrides
+  ): Promise<string>;
+
+  "getRoutableShortingPairParamProvider(address,address,address)"(
+    lendable: string,
+    proxyLendable: string,
+    tradable: string,
+    overrides?: CallOverrides
+  ): Promise<string>;
+
+  getShortingPairParamProvider(
+    lendable: string,
+    tradable: string,
+    overrides?: CallOverrides
+  ): Promise<string>;
+
+  "getShortingPairParamProvider(address,address)"(
+    lendable: string,
+    tradable: string,
+    overrides?: CallOverrides
+  ): Promise<string>;
+
   initialize(
     reserveFactory: string,
     pairFactory: string,
-    defaultParameters: {
-      baseBorrowRate: BigNumberish;
-      optimalSlope: BigNumberish;
-      excessSlope: BigNumberish;
-      optimalUtilization: BigNumberish;
-      treasureFactor: BigNumberish;
-      poolUtilizationAllowance: BigNumberish;
-      traderProfitFee: BigNumberish;
-      liquidationMargin: BigNumberish;
-      liquidationReward: BigNumberish;
-      maxLeverageFactor: BigNumberish;
-      maxRateMultiplier: BigNumberish;
-    },
     lendables: string[],
     lendableParameters: {
       maxLiquidationReward: BigNumberish;
       minPositionDeposit: BigNumberish;
-    }[],
-    minWOWBalances: {
-      leverageFactor: BigNumberish;
-      minWOWBalance: BigNumberish;
     }[],
     overrides?: Overrides
   ): Promise<ContractTransaction>;
 
-  "initialize(address,address,(uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256),address[],tuple[],tuple[])"(
+  "initialize(address,address,address[],tuple[])"(
     reserveFactory: string,
     pairFactory: string,
-    defaultParameters: {
-      baseBorrowRate: BigNumberish;
-      optimalSlope: BigNumberish;
-      excessSlope: BigNumberish;
-      optimalUtilization: BigNumberish;
-      treasureFactor: BigNumberish;
-      poolUtilizationAllowance: BigNumberish;
-      traderProfitFee: BigNumberish;
-      liquidationMargin: BigNumberish;
-      liquidationReward: BigNumberish;
-      maxLeverageFactor: BigNumberish;
-      maxRateMultiplier: BigNumberish;
-    },
     lendables: string[],
     lendableParameters: {
       maxLiquidationReward: BigNumberish;
       minPositionDeposit: BigNumberish;
-    }[],
-    minWOWBalances: {
-      leverageFactor: BigNumberish;
-      minWOWBalance: BigNumberish;
     }[],
     overrides?: Overrides
   ): Promise<ContractTransaction>;
@@ -497,6 +549,16 @@ export class ParamProviderFactory extends Contract {
   renounceOwnership(overrides?: Overrides): Promise<ContractTransaction>;
 
   "renounceOwnership()"(overrides?: Overrides): Promise<ContractTransaction>;
+
+  setParamGovernance(
+    paramGovernance: string,
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
+
+  "setParamGovernance(address)"(
+    paramGovernance: string,
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
 
   setSwapRouter(
     swapRouter: string,
@@ -542,6 +604,16 @@ export class ParamProviderFactory extends Contract {
     overrides?: Overrides
   ): Promise<ContractTransaction>;
 
+  upgradeShortingPairParamProvider(
+    path: string[],
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
+
+  "upgradeShortingPairParamProvider(address[])"(
+    path: string[],
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
+
   callStatic: {
     REVISION(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -564,6 +636,16 @@ export class ParamProviderFactory extends Contract {
 
     "createReserveParamProvider(address)"(
       lendable: string,
+      overrides?: CallOverrides
+    ): Promise<string>;
+
+    createShortingPairParamProvider(
+      path: string[],
+      overrides?: CallOverrides
+    ): Promise<string>;
+
+    "createShortingPairParamProvider(address[])"(
+      path: string[],
       overrides?: CallOverrides
     ): Promise<string>;
 
@@ -603,58 +685,50 @@ export class ParamProviderFactory extends Contract {
       overrides?: CallOverrides
     ): Promise<string>;
 
+    getRoutableShortingPairParamProvider(
+      lendable: string,
+      proxyLendable: string,
+      tradable: string,
+      overrides?: CallOverrides
+    ): Promise<string>;
+
+    "getRoutableShortingPairParamProvider(address,address,address)"(
+      lendable: string,
+      proxyLendable: string,
+      tradable: string,
+      overrides?: CallOverrides
+    ): Promise<string>;
+
+    getShortingPairParamProvider(
+      lendable: string,
+      tradable: string,
+      overrides?: CallOverrides
+    ): Promise<string>;
+
+    "getShortingPairParamProvider(address,address)"(
+      lendable: string,
+      tradable: string,
+      overrides?: CallOverrides
+    ): Promise<string>;
+
     initialize(
       reserveFactory: string,
       pairFactory: string,
-      defaultParameters: {
-        baseBorrowRate: BigNumberish;
-        optimalSlope: BigNumberish;
-        excessSlope: BigNumberish;
-        optimalUtilization: BigNumberish;
-        treasureFactor: BigNumberish;
-        poolUtilizationAllowance: BigNumberish;
-        traderProfitFee: BigNumberish;
-        liquidationMargin: BigNumberish;
-        liquidationReward: BigNumberish;
-        maxLeverageFactor: BigNumberish;
-        maxRateMultiplier: BigNumberish;
-      },
       lendables: string[],
       lendableParameters: {
         maxLiquidationReward: BigNumberish;
         minPositionDeposit: BigNumberish;
-      }[],
-      minWOWBalances: {
-        leverageFactor: BigNumberish;
-        minWOWBalance: BigNumberish;
       }[],
       overrides?: CallOverrides
     ): Promise<void>;
 
-    "initialize(address,address,(uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256),address[],tuple[],tuple[])"(
+    "initialize(address,address,address[],tuple[])"(
       reserveFactory: string,
       pairFactory: string,
-      defaultParameters: {
-        baseBorrowRate: BigNumberish;
-        optimalSlope: BigNumberish;
-        excessSlope: BigNumberish;
-        optimalUtilization: BigNumberish;
-        treasureFactor: BigNumberish;
-        poolUtilizationAllowance: BigNumberish;
-        traderProfitFee: BigNumberish;
-        liquidationMargin: BigNumberish;
-        liquidationReward: BigNumberish;
-        maxLeverageFactor: BigNumberish;
-        maxRateMultiplier: BigNumberish;
-      },
       lendables: string[],
       lendableParameters: {
         maxLiquidationReward: BigNumberish;
         minPositionDeposit: BigNumberish;
-      }[],
-      minWOWBalances: {
-        leverageFactor: BigNumberish;
-        minWOWBalance: BigNumberish;
       }[],
       overrides?: CallOverrides
     ): Promise<void>;
@@ -666,6 +740,16 @@ export class ParamProviderFactory extends Contract {
     renounceOwnership(overrides?: CallOverrides): Promise<void>;
 
     "renounceOwnership()"(overrides?: CallOverrides): Promise<void>;
+
+    setParamGovernance(
+      paramGovernance: string,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    "setParamGovernance(address)"(
+      paramGovernance: string,
+      overrides?: CallOverrides
+    ): Promise<void>;
 
     setSwapRouter(swapRouter: string, overrides?: CallOverrides): Promise<void>;
 
@@ -707,6 +791,16 @@ export class ParamProviderFactory extends Contract {
       lendable: string,
       overrides?: CallOverrides
     ): Promise<void>;
+
+    upgradeShortingPairParamProvider(
+      path: string[],
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    "upgradeShortingPairParamProvider(address[])"(
+      path: string[],
+      overrides?: CallOverrides
+    ): Promise<void>;
   };
 
   filters: {
@@ -741,6 +835,16 @@ export class ParamProviderFactory extends Contract {
 
     "createReserveParamProvider(address)"(
       lendable: string,
+      overrides?: Overrides
+    ): Promise<BigNumber>;
+
+    createShortingPairParamProvider(
+      path: string[],
+      overrides?: Overrides
+    ): Promise<BigNumber>;
+
+    "createShortingPairParamProvider(address[])"(
+      path: string[],
       overrides?: Overrides
     ): Promise<BigNumber>;
 
@@ -780,58 +884,50 @@ export class ParamProviderFactory extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
+    getRoutableShortingPairParamProvider(
+      lendable: string,
+      proxyLendable: string,
+      tradable: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "getRoutableShortingPairParamProvider(address,address,address)"(
+      lendable: string,
+      proxyLendable: string,
+      tradable: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    getShortingPairParamProvider(
+      lendable: string,
+      tradable: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "getShortingPairParamProvider(address,address)"(
+      lendable: string,
+      tradable: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
     initialize(
       reserveFactory: string,
       pairFactory: string,
-      defaultParameters: {
-        baseBorrowRate: BigNumberish;
-        optimalSlope: BigNumberish;
-        excessSlope: BigNumberish;
-        optimalUtilization: BigNumberish;
-        treasureFactor: BigNumberish;
-        poolUtilizationAllowance: BigNumberish;
-        traderProfitFee: BigNumberish;
-        liquidationMargin: BigNumberish;
-        liquidationReward: BigNumberish;
-        maxLeverageFactor: BigNumberish;
-        maxRateMultiplier: BigNumberish;
-      },
       lendables: string[],
       lendableParameters: {
         maxLiquidationReward: BigNumberish;
         minPositionDeposit: BigNumberish;
-      }[],
-      minWOWBalances: {
-        leverageFactor: BigNumberish;
-        minWOWBalance: BigNumberish;
       }[],
       overrides?: Overrides
     ): Promise<BigNumber>;
 
-    "initialize(address,address,(uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256),address[],tuple[],tuple[])"(
+    "initialize(address,address,address[],tuple[])"(
       reserveFactory: string,
       pairFactory: string,
-      defaultParameters: {
-        baseBorrowRate: BigNumberish;
-        optimalSlope: BigNumberish;
-        excessSlope: BigNumberish;
-        optimalUtilization: BigNumberish;
-        treasureFactor: BigNumberish;
-        poolUtilizationAllowance: BigNumberish;
-        traderProfitFee: BigNumberish;
-        liquidationMargin: BigNumberish;
-        liquidationReward: BigNumberish;
-        maxLeverageFactor: BigNumberish;
-        maxRateMultiplier: BigNumberish;
-      },
       lendables: string[],
       lendableParameters: {
         maxLiquidationReward: BigNumberish;
         minPositionDeposit: BigNumberish;
-      }[],
-      minWOWBalances: {
-        leverageFactor: BigNumberish;
-        minWOWBalance: BigNumberish;
       }[],
       overrides?: Overrides
     ): Promise<BigNumber>;
@@ -843,6 +939,16 @@ export class ParamProviderFactory extends Contract {
     renounceOwnership(overrides?: Overrides): Promise<BigNumber>;
 
     "renounceOwnership()"(overrides?: Overrides): Promise<BigNumber>;
+
+    setParamGovernance(
+      paramGovernance: string,
+      overrides?: Overrides
+    ): Promise<BigNumber>;
+
+    "setParamGovernance(address)"(
+      paramGovernance: string,
+      overrides?: Overrides
+    ): Promise<BigNumber>;
 
     setSwapRouter(
       swapRouter: string,
@@ -887,6 +993,16 @@ export class ParamProviderFactory extends Contract {
       lendable: string,
       overrides?: Overrides
     ): Promise<BigNumber>;
+
+    upgradeShortingPairParamProvider(
+      path: string[],
+      overrides?: Overrides
+    ): Promise<BigNumber>;
+
+    "upgradeShortingPairParamProvider(address[])"(
+      path: string[],
+      overrides?: Overrides
+    ): Promise<BigNumber>;
   };
 
   populateTransaction: {
@@ -911,6 +1027,16 @@ export class ParamProviderFactory extends Contract {
 
     "createReserveParamProvider(address)"(
       lendable: string,
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
+
+    createShortingPairParamProvider(
+      path: string[],
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
+
+    "createShortingPairParamProvider(address[])"(
+      path: string[],
       overrides?: Overrides
     ): Promise<PopulatedTransaction>;
 
@@ -950,58 +1076,50 @@ export class ParamProviderFactory extends Contract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
+    getRoutableShortingPairParamProvider(
+      lendable: string,
+      proxyLendable: string,
+      tradable: string,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    "getRoutableShortingPairParamProvider(address,address,address)"(
+      lendable: string,
+      proxyLendable: string,
+      tradable: string,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    getShortingPairParamProvider(
+      lendable: string,
+      tradable: string,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    "getShortingPairParamProvider(address,address)"(
+      lendable: string,
+      tradable: string,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
     initialize(
       reserveFactory: string,
       pairFactory: string,
-      defaultParameters: {
-        baseBorrowRate: BigNumberish;
-        optimalSlope: BigNumberish;
-        excessSlope: BigNumberish;
-        optimalUtilization: BigNumberish;
-        treasureFactor: BigNumberish;
-        poolUtilizationAllowance: BigNumberish;
-        traderProfitFee: BigNumberish;
-        liquidationMargin: BigNumberish;
-        liquidationReward: BigNumberish;
-        maxLeverageFactor: BigNumberish;
-        maxRateMultiplier: BigNumberish;
-      },
       lendables: string[],
       lendableParameters: {
         maxLiquidationReward: BigNumberish;
         minPositionDeposit: BigNumberish;
-      }[],
-      minWOWBalances: {
-        leverageFactor: BigNumberish;
-        minWOWBalance: BigNumberish;
       }[],
       overrides?: Overrides
     ): Promise<PopulatedTransaction>;
 
-    "initialize(address,address,(uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256),address[],tuple[],tuple[])"(
+    "initialize(address,address,address[],tuple[])"(
       reserveFactory: string,
       pairFactory: string,
-      defaultParameters: {
-        baseBorrowRate: BigNumberish;
-        optimalSlope: BigNumberish;
-        excessSlope: BigNumberish;
-        optimalUtilization: BigNumberish;
-        treasureFactor: BigNumberish;
-        poolUtilizationAllowance: BigNumberish;
-        traderProfitFee: BigNumberish;
-        liquidationMargin: BigNumberish;
-        liquidationReward: BigNumberish;
-        maxLeverageFactor: BigNumberish;
-        maxRateMultiplier: BigNumberish;
-      },
       lendables: string[],
       lendableParameters: {
         maxLiquidationReward: BigNumberish;
         minPositionDeposit: BigNumberish;
-      }[],
-      minWOWBalances: {
-        leverageFactor: BigNumberish;
-        minWOWBalance: BigNumberish;
       }[],
       overrides?: Overrides
     ): Promise<PopulatedTransaction>;
@@ -1013,6 +1131,16 @@ export class ParamProviderFactory extends Contract {
     renounceOwnership(overrides?: Overrides): Promise<PopulatedTransaction>;
 
     "renounceOwnership()"(overrides?: Overrides): Promise<PopulatedTransaction>;
+
+    setParamGovernance(
+      paramGovernance: string,
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
+
+    "setParamGovernance(address)"(
+      paramGovernance: string,
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
 
     setSwapRouter(
       swapRouter: string,
@@ -1055,6 +1183,16 @@ export class ParamProviderFactory extends Contract {
 
     "upgradeReserveParamProvider(address)"(
       lendable: string,
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
+
+    upgradeShortingPairParamProvider(
+      path: string[],
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
+
+    "upgradeShortingPairParamProvider(address[])"(
+      path: string[],
       overrides?: Overrides
     ): Promise<PopulatedTransaction>;
   };

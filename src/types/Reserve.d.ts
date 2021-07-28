@@ -29,7 +29,7 @@ interface ReserveInterface extends ethers.utils.Interface {
     "balanceOf(address)": FunctionFragment;
     "borrow(address,uint256,uint256)": FunctionFragment;
     "calculateBorrow(uint256,uint256)": FunctionFragment;
-    "calculateDeposit(uint256,address)": FunctionFragment;
+    "calculateDeposit(uint256)": FunctionFragment;
     "calculateWithdraw(uint256,address)": FunctionFragment;
     "decimals()": FunctionFragment;
     "decreaseAllowance(address,uint256)": FunctionFragment;
@@ -51,18 +51,20 @@ interface ReserveInterface extends ethers.utils.Interface {
     "initialize(address,address,string,string,address)": FunctionFragment;
     "liquidate(address)": FunctionFragment;
     "liquidityOf(address)": FunctionFragment;
+    "migrate()": FunctionFragment;
     "name()": FunctionFragment;
     "owner()": FunctionFragment;
     "renounceOwnership()": FunctionFragment;
     "repay(address,address)": FunctionFragment;
     "shareOf(address)": FunctionFragment;
-    "sweepFee(address)": FunctionFragment;
+    "sweepFee()": FunctionFragment;
     "symbol()": FunctionFragment;
     "totalSupply()": FunctionFragment;
     "transfer(address,uint256)": FunctionFragment;
     "transferDebt(address,address,uint256)": FunctionFragment;
     "transferFrom(address,address,uint256)": FunctionFragment;
     "transferOwnership(address)": FunctionFragment;
+    "treasurerUpdate()": FunctionFragment;
     "withdraw(address,address)": FunctionFragment;
   };
 
@@ -86,7 +88,7 @@ interface ReserveInterface extends ethers.utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "calculateDeposit",
-    values: [BigNumberish, string]
+    values: [BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "calculateWithdraw",
@@ -151,6 +153,7 @@ interface ReserveInterface extends ethers.utils.Interface {
   ): string;
   encodeFunctionData(functionFragment: "liquidate", values: [string]): string;
   encodeFunctionData(functionFragment: "liquidityOf", values: [string]): string;
+  encodeFunctionData(functionFragment: "migrate", values?: undefined): string;
   encodeFunctionData(functionFragment: "name", values?: undefined): string;
   encodeFunctionData(functionFragment: "owner", values?: undefined): string;
   encodeFunctionData(
@@ -162,7 +165,7 @@ interface ReserveInterface extends ethers.utils.Interface {
     values: [string, string]
   ): string;
   encodeFunctionData(functionFragment: "shareOf", values: [string]): string;
-  encodeFunctionData(functionFragment: "sweepFee", values: [string]): string;
+  encodeFunctionData(functionFragment: "sweepFee", values?: undefined): string;
   encodeFunctionData(functionFragment: "symbol", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "totalSupply",
@@ -183,6 +186,10 @@ interface ReserveInterface extends ethers.utils.Interface {
   encodeFunctionData(
     functionFragment: "transferOwnership",
     values: [string]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "treasurerUpdate",
+    values?: undefined
   ): string;
   encodeFunctionData(
     functionFragment: "withdraw",
@@ -262,6 +269,7 @@ interface ReserveInterface extends ethers.utils.Interface {
     functionFragment: "liquidityOf",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "migrate", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "name", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "owner", data: BytesLike): Result;
   decodeFunctionResult(
@@ -287,6 +295,10 @@ interface ReserveInterface extends ethers.utils.Interface {
   ): Result;
   decodeFunctionResult(
     functionFragment: "transferOwnership",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "treasurerUpdate",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "withdraw", data: BytesLike): Result;
@@ -421,13 +433,11 @@ export class Reserve extends Contract {
 
     calculateDeposit(
       amount: BigNumberish,
-      investor: string,
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
 
-    "calculateDeposit(uint256,address)"(
+    "calculateDeposit(uint256)"(
       amount: BigNumberish,
-      investor: string,
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
 
@@ -687,6 +697,10 @@ export class Reserve extends Contract {
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
 
+    migrate(overrides?: Overrides): Promise<ContractTransaction>;
+
+    "migrate()"(overrides?: Overrides): Promise<ContractTransaction>;
+
     name(overrides?: CallOverrides): Promise<[string]>;
 
     "name()"(overrides?: CallOverrides): Promise<[string]>;
@@ -718,12 +732,9 @@ export class Reserve extends Contract {
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
 
-    sweepFee(to: string, overrides?: Overrides): Promise<ContractTransaction>;
+    sweepFee(overrides?: Overrides): Promise<ContractTransaction>;
 
-    "sweepFee(address)"(
-      to: string,
-      overrides?: Overrides
-    ): Promise<ContractTransaction>;
+    "sweepFee()"(overrides?: Overrides): Promise<ContractTransaction>;
 
     symbol(overrides?: CallOverrides): Promise<[string]>;
 
@@ -782,6 +793,10 @@ export class Reserve extends Contract {
       newOwner: string,
       overrides?: Overrides
     ): Promise<ContractTransaction>;
+
+    treasurerUpdate(overrides?: CallOverrides): Promise<[BigNumber]>;
+
+    "treasurerUpdate()"(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     withdraw(
       from: string,
@@ -859,13 +874,11 @@ export class Reserve extends Contract {
 
   calculateDeposit(
     amount: BigNumberish,
-    investor: string,
     overrides?: CallOverrides
   ): Promise<BigNumber>;
 
-  "calculateDeposit(uint256,address)"(
+  "calculateDeposit(uint256)"(
     amount: BigNumberish,
-    investor: string,
     overrides?: CallOverrides
   ): Promise<BigNumber>;
 
@@ -1098,6 +1111,10 @@ export class Reserve extends Contract {
     overrides?: CallOverrides
   ): Promise<BigNumber>;
 
+  migrate(overrides?: Overrides): Promise<ContractTransaction>;
+
+  "migrate()"(overrides?: Overrides): Promise<ContractTransaction>;
+
   name(overrides?: CallOverrides): Promise<string>;
 
   "name()"(overrides?: CallOverrides): Promise<string>;
@@ -1129,12 +1146,9 @@ export class Reserve extends Contract {
     overrides?: CallOverrides
   ): Promise<BigNumber>;
 
-  sweepFee(to: string, overrides?: Overrides): Promise<ContractTransaction>;
+  sweepFee(overrides?: Overrides): Promise<ContractTransaction>;
 
-  "sweepFee(address)"(
-    to: string,
-    overrides?: Overrides
-  ): Promise<ContractTransaction>;
+  "sweepFee()"(overrides?: Overrides): Promise<ContractTransaction>;
 
   symbol(overrides?: CallOverrides): Promise<string>;
 
@@ -1193,6 +1207,10 @@ export class Reserve extends Contract {
     newOwner: string,
     overrides?: Overrides
   ): Promise<ContractTransaction>;
+
+  treasurerUpdate(overrides?: CallOverrides): Promise<BigNumber>;
+
+  "treasurerUpdate()"(overrides?: CallOverrides): Promise<BigNumber>;
 
   withdraw(
     from: string,
@@ -1270,13 +1288,11 @@ export class Reserve extends Contract {
 
     calculateDeposit(
       amount: BigNumberish,
-      investor: string,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    "calculateDeposit(uint256,address)"(
+    "calculateDeposit(uint256)"(
       amount: BigNumberish,
-      investor: string,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
@@ -1506,6 +1522,10 @@ export class Reserve extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
+    migrate(overrides?: CallOverrides): Promise<boolean>;
+
+    "migrate()"(overrides?: CallOverrides): Promise<boolean>;
+
     name(overrides?: CallOverrides): Promise<string>;
 
     "name()"(overrides?: CallOverrides): Promise<string>;
@@ -1537,9 +1557,9 @@ export class Reserve extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    sweepFee(to: string, overrides?: CallOverrides): Promise<void>;
+    sweepFee(overrides?: CallOverrides): Promise<void>;
 
-    "sweepFee(address)"(to: string, overrides?: CallOverrides): Promise<void>;
+    "sweepFee()"(overrides?: CallOverrides): Promise<void>;
 
     symbol(overrides?: CallOverrides): Promise<string>;
 
@@ -1598,6 +1618,10 @@ export class Reserve extends Contract {
       newOwner: string,
       overrides?: CallOverrides
     ): Promise<void>;
+
+    treasurerUpdate(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "treasurerUpdate()"(overrides?: CallOverrides): Promise<BigNumber>;
 
     withdraw(
       from: string,
@@ -1753,13 +1777,11 @@ export class Reserve extends Contract {
 
     calculateDeposit(
       amount: BigNumberish,
-      investor: string,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    "calculateDeposit(uint256,address)"(
+    "calculateDeposit(uint256)"(
       amount: BigNumberish,
-      investor: string,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
@@ -1913,6 +1935,10 @@ export class Reserve extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
+    migrate(overrides?: Overrides): Promise<BigNumber>;
+
+    "migrate()"(overrides?: Overrides): Promise<BigNumber>;
+
     name(overrides?: CallOverrides): Promise<BigNumber>;
 
     "name()"(overrides?: CallOverrides): Promise<BigNumber>;
@@ -1944,9 +1970,9 @@ export class Reserve extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    sweepFee(to: string, overrides?: Overrides): Promise<BigNumber>;
+    sweepFee(overrides?: Overrides): Promise<BigNumber>;
 
-    "sweepFee(address)"(to: string, overrides?: Overrides): Promise<BigNumber>;
+    "sweepFee()"(overrides?: Overrides): Promise<BigNumber>;
 
     symbol(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -2005,6 +2031,10 @@ export class Reserve extends Contract {
       newOwner: string,
       overrides?: Overrides
     ): Promise<BigNumber>;
+
+    treasurerUpdate(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "treasurerUpdate()"(overrides?: CallOverrides): Promise<BigNumber>;
 
     withdraw(
       from: string,
@@ -2086,13 +2116,11 @@ export class Reserve extends Contract {
 
     calculateDeposit(
       amount: BigNumberish,
-      investor: string,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    "calculateDeposit(uint256,address)"(
+    "calculateDeposit(uint256)"(
       amount: BigNumberish,
-      investor: string,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
@@ -2270,6 +2298,10 @@ export class Reserve extends Contract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
+    migrate(overrides?: Overrides): Promise<PopulatedTransaction>;
+
+    "migrate()"(overrides?: Overrides): Promise<PopulatedTransaction>;
+
     name(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     "name()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
@@ -2304,12 +2336,9 @@ export class Reserve extends Contract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    sweepFee(to: string, overrides?: Overrides): Promise<PopulatedTransaction>;
+    sweepFee(overrides?: Overrides): Promise<PopulatedTransaction>;
 
-    "sweepFee(address)"(
-      to: string,
-      overrides?: Overrides
-    ): Promise<PopulatedTransaction>;
+    "sweepFee()"(overrides?: Overrides): Promise<PopulatedTransaction>;
 
     symbol(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
@@ -2367,6 +2396,12 @@ export class Reserve extends Contract {
     "transferOwnership(address)"(
       newOwner: string,
       overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
+
+    treasurerUpdate(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    "treasurerUpdate()"(
+      overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
     withdraw(

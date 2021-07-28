@@ -25,7 +25,7 @@ interface IReserveInterface extends ethers.utils.Interface {
   functions: {
     "borrow(address,uint256,uint256)": FunctionFragment;
     "calculateBorrow(uint256,uint256)": FunctionFragment;
-    "calculateDeposit(uint256,address)": FunctionFragment;
+    "calculateDeposit(uint256)": FunctionFragment;
     "calculateWithdraw(uint256,address)": FunctionFragment;
     "deposit(address)": FunctionFragment;
     "fill()": FunctionFragment;
@@ -45,7 +45,7 @@ interface IReserveInterface extends ethers.utils.Interface {
     "liquidityOf(address)": FunctionFragment;
     "repay(address,address)": FunctionFragment;
     "shareOf(address)": FunctionFragment;
-    "sweepFee(address)": FunctionFragment;
+    "sweepFee()": FunctionFragment;
     "transferDebt(address,address,uint256)": FunctionFragment;
     "withdraw(address,address)": FunctionFragment;
   };
@@ -60,7 +60,7 @@ interface IReserveInterface extends ethers.utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "calculateDeposit",
-    values: [BigNumberish, string]
+    values: [BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "calculateWithdraw",
@@ -117,7 +117,7 @@ interface IReserveInterface extends ethers.utils.Interface {
     values: [string, string]
   ): string;
   encodeFunctionData(functionFragment: "shareOf", values: [string]): string;
-  encodeFunctionData(functionFragment: "sweepFee", values: [string]): string;
+  encodeFunctionData(functionFragment: "sweepFee", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "transferDebt",
     values: [string, string, BigNumberish]
@@ -284,13 +284,11 @@ export class IReserve extends Contract {
 
     calculateDeposit(
       amount: BigNumberish,
-      investor: string,
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
 
-    "calculateDeposit(uint256,address)"(
+    "calculateDeposit(uint256)"(
       amount: BigNumberish,
-      investor: string,
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
 
@@ -507,12 +505,9 @@ export class IReserve extends Contract {
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
 
-    sweepFee(to: string, overrides?: Overrides): Promise<ContractTransaction>;
+    sweepFee(overrides?: Overrides): Promise<ContractTransaction>;
 
-    "sweepFee(address)"(
-      to: string,
-      overrides?: Overrides
-    ): Promise<ContractTransaction>;
+    "sweepFee()"(overrides?: Overrides): Promise<ContractTransaction>;
 
     transferDebt(
       from: string,
@@ -569,13 +564,11 @@ export class IReserve extends Contract {
 
   calculateDeposit(
     amount: BigNumberish,
-    investor: string,
     overrides?: CallOverrides
   ): Promise<BigNumber>;
 
-  "calculateDeposit(uint256,address)"(
+  "calculateDeposit(uint256)"(
     amount: BigNumberish,
-    investor: string,
     overrides?: CallOverrides
   ): Promise<BigNumber>;
 
@@ -781,12 +774,9 @@ export class IReserve extends Contract {
     overrides?: CallOverrides
   ): Promise<BigNumber>;
 
-  sweepFee(to: string, overrides?: Overrides): Promise<ContractTransaction>;
+  sweepFee(overrides?: Overrides): Promise<ContractTransaction>;
 
-  "sweepFee(address)"(
-    to: string,
-    overrides?: Overrides
-  ): Promise<ContractTransaction>;
+  "sweepFee()"(overrides?: Overrides): Promise<ContractTransaction>;
 
   transferDebt(
     from: string,
@@ -843,13 +833,11 @@ export class IReserve extends Contract {
 
     calculateDeposit(
       amount: BigNumberish,
-      investor: string,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    "calculateDeposit(uint256,address)"(
+    "calculateDeposit(uint256)"(
       amount: BigNumberish,
-      investor: string,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
@@ -1052,9 +1040,9 @@ export class IReserve extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    sweepFee(to: string, overrides?: CallOverrides): Promise<void>;
+    sweepFee(overrides?: CallOverrides): Promise<void>;
 
-    "sweepFee(address)"(to: string, overrides?: CallOverrides): Promise<void>;
+    "sweepFee()"(overrides?: CallOverrides): Promise<void>;
 
     transferDebt(
       from: string,
@@ -1163,13 +1151,11 @@ export class IReserve extends Contract {
 
     calculateDeposit(
       amount: BigNumberish,
-      investor: string,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    "calculateDeposit(uint256,address)"(
+    "calculateDeposit(uint256)"(
       amount: BigNumberish,
-      investor: string,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
@@ -1296,9 +1282,9 @@ export class IReserve extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    sweepFee(to: string, overrides?: Overrides): Promise<BigNumber>;
+    sweepFee(overrides?: Overrides): Promise<BigNumber>;
 
-    "sweepFee(address)"(to: string, overrides?: Overrides): Promise<BigNumber>;
+    "sweepFee()"(overrides?: Overrides): Promise<BigNumber>;
 
     transferDebt(
       from: string,
@@ -1356,13 +1342,11 @@ export class IReserve extends Contract {
 
     calculateDeposit(
       amount: BigNumberish,
-      investor: string,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    "calculateDeposit(uint256,address)"(
+    "calculateDeposit(uint256)"(
       amount: BigNumberish,
-      investor: string,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
@@ -1516,12 +1500,9 @@ export class IReserve extends Contract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    sweepFee(to: string, overrides?: Overrides): Promise<PopulatedTransaction>;
+    sweepFee(overrides?: Overrides): Promise<PopulatedTransaction>;
 
-    "sweepFee(address)"(
-      to: string,
-      overrides?: Overrides
-    ): Promise<PopulatedTransaction>;
+    "sweepFee()"(overrides?: Overrides): Promise<PopulatedTransaction>;
 
     transferDebt(
       from: string,

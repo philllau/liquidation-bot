@@ -42,6 +42,19 @@ const _abi = [
   },
   {
     inputs: [],
+    name: "m_reserveDeployer",
+    outputs: [
+      {
+        internalType: "contract IReserveDeployer",
+        name: "",
+        type: "address",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
     name: "owner",
     outputs: [
       {

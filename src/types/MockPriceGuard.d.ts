@@ -23,25 +23,61 @@ import { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
 
 interface MockPriceGuardInterface extends ethers.utils.Interface {
   functions: {
+    "destDecimals()": FunctionFragment;
+    "getAmountOut(uint256)": FunctionFragment;
+    "getPrice()": FunctionFragment;
     "getThreshold(uint256,uint256)": FunctionFragment;
+    "setPrice(uint256)": FunctionFragment;
     "setThreshold(uint256)": FunctionFragment;
+    "srcDecimals()": FunctionFragment;
   };
 
+  encodeFunctionData(
+    functionFragment: "destDecimals",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "getAmountOut",
+    values: [BigNumberish]
+  ): string;
+  encodeFunctionData(functionFragment: "getPrice", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "getThreshold",
     values: [BigNumberish, BigNumberish]
   ): string;
   encodeFunctionData(
+    functionFragment: "setPrice",
+    values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
     functionFragment: "setThreshold",
     values: [BigNumberish]
   ): string;
+  encodeFunctionData(
+    functionFragment: "srcDecimals",
+    values?: undefined
+  ): string;
 
+  decodeFunctionResult(
+    functionFragment: "destDecimals",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "getAmountOut",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: "getPrice", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "getThreshold",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "setPrice", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "setThreshold",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "srcDecimals",
     data: BytesLike
   ): Result;
 
@@ -92,6 +128,24 @@ export class MockPriceGuard extends Contract {
   interface: MockPriceGuardInterface;
 
   functions: {
+    destDecimals(overrides?: CallOverrides): Promise<[number]>;
+
+    "destDecimals()"(overrides?: CallOverrides): Promise<[number]>;
+
+    getAmountOut(
+      amountIn: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber]>;
+
+    "getAmountOut(uint256)"(
+      amountIn: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber]>;
+
+    getPrice(overrides?: CallOverrides): Promise<[BigNumber]>;
+
+    "getPrice()"(overrides?: CallOverrides): Promise<[BigNumber]>;
+
     getThreshold(
       amountIn: BigNumberish,
       amountOut: BigNumberish,
@@ -104,6 +158,16 @@ export class MockPriceGuard extends Contract {
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
 
+    setPrice(
+      value: BigNumberish,
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
+
+    "setPrice(uint256)"(
+      value: BigNumberish,
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
+
     setThreshold(
       value: BigNumberish,
       overrides?: Overrides
@@ -113,7 +177,29 @@ export class MockPriceGuard extends Contract {
       value: BigNumberish,
       overrides?: Overrides
     ): Promise<ContractTransaction>;
+
+    srcDecimals(overrides?: CallOverrides): Promise<[number]>;
+
+    "srcDecimals()"(overrides?: CallOverrides): Promise<[number]>;
   };
+
+  destDecimals(overrides?: CallOverrides): Promise<number>;
+
+  "destDecimals()"(overrides?: CallOverrides): Promise<number>;
+
+  getAmountOut(
+    amountIn: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<BigNumber>;
+
+  "getAmountOut(uint256)"(
+    amountIn: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<BigNumber>;
+
+  getPrice(overrides?: CallOverrides): Promise<BigNumber>;
+
+  "getPrice()"(overrides?: CallOverrides): Promise<BigNumber>;
 
   getThreshold(
     amountIn: BigNumberish,
@@ -127,6 +213,16 @@ export class MockPriceGuard extends Contract {
     overrides?: CallOverrides
   ): Promise<BigNumber>;
 
+  setPrice(
+    value: BigNumberish,
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
+
+  "setPrice(uint256)"(
+    value: BigNumberish,
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
+
   setThreshold(
     value: BigNumberish,
     overrides?: Overrides
@@ -137,7 +233,29 @@ export class MockPriceGuard extends Contract {
     overrides?: Overrides
   ): Promise<ContractTransaction>;
 
+  srcDecimals(overrides?: CallOverrides): Promise<number>;
+
+  "srcDecimals()"(overrides?: CallOverrides): Promise<number>;
+
   callStatic: {
+    destDecimals(overrides?: CallOverrides): Promise<number>;
+
+    "destDecimals()"(overrides?: CallOverrides): Promise<number>;
+
+    getAmountOut(
+      amountIn: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "getAmountOut(uint256)"(
+      amountIn: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    getPrice(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "getPrice()"(overrides?: CallOverrides): Promise<BigNumber>;
+
     getThreshold(
       amountIn: BigNumberish,
       amountOut: BigNumberish,
@@ -149,6 +267,13 @@ export class MockPriceGuard extends Contract {
       amountOut: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
+
+    setPrice(value: BigNumberish, overrides?: CallOverrides): Promise<void>;
+
+    "setPrice(uint256)"(
+      value: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<void>;
 
     setThreshold(value: BigNumberish, overrides?: CallOverrides): Promise<void>;
 
@@ -156,11 +281,33 @@ export class MockPriceGuard extends Contract {
       value: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
+
+    srcDecimals(overrides?: CallOverrides): Promise<number>;
+
+    "srcDecimals()"(overrides?: CallOverrides): Promise<number>;
   };
 
   filters: {};
 
   estimateGas: {
+    destDecimals(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "destDecimals()"(overrides?: CallOverrides): Promise<BigNumber>;
+
+    getAmountOut(
+      amountIn: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "getAmountOut(uint256)"(
+      amountIn: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    getPrice(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "getPrice()"(overrides?: CallOverrides): Promise<BigNumber>;
+
     getThreshold(
       amountIn: BigNumberish,
       amountOut: BigNumberish,
@@ -173,6 +320,13 @@ export class MockPriceGuard extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
+    setPrice(value: BigNumberish, overrides?: Overrides): Promise<BigNumber>;
+
+    "setPrice(uint256)"(
+      value: BigNumberish,
+      overrides?: Overrides
+    ): Promise<BigNumber>;
+
     setThreshold(
       value: BigNumberish,
       overrides?: Overrides
@@ -182,9 +336,31 @@ export class MockPriceGuard extends Contract {
       value: BigNumberish,
       overrides?: Overrides
     ): Promise<BigNumber>;
+
+    srcDecimals(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "srcDecimals()"(overrides?: CallOverrides): Promise<BigNumber>;
   };
 
   populateTransaction: {
+    destDecimals(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    "destDecimals()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    getAmountOut(
+      amountIn: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    "getAmountOut(uint256)"(
+      amountIn: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    getPrice(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    "getPrice()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
     getThreshold(
       amountIn: BigNumberish,
       amountOut: BigNumberish,
@@ -197,6 +373,16 @@ export class MockPriceGuard extends Contract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
+    setPrice(
+      value: BigNumberish,
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
+
+    "setPrice(uint256)"(
+      value: BigNumberish,
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
+
     setThreshold(
       value: BigNumberish,
       overrides?: Overrides
@@ -206,5 +392,9 @@ export class MockPriceGuard extends Contract {
       value: BigNumberish,
       overrides?: Overrides
     ): Promise<PopulatedTransaction>;
+
+    srcDecimals(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    "srcDecimals()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
   };
 }

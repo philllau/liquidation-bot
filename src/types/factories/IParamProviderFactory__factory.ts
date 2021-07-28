@@ -62,6 +62,25 @@ const _abi = [
   {
     inputs: [
       {
+        internalType: "address[]",
+        name: "path",
+        type: "address[]",
+      },
+    ],
+    name: "createShortingPairParamProvider",
+    outputs: [
+      {
+        internalType: "address",
+        name: "",
+        type: "address",
+      },
+    ],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
         internalType: "address",
         name: "lendable",
         type: "address",
@@ -135,6 +154,59 @@ const _abi = [
     inputs: [
       {
         internalType: "address",
+        name: "lendable",
+        type: "address",
+      },
+      {
+        internalType: "address",
+        name: "proxyLendable",
+        type: "address",
+      },
+      {
+        internalType: "address",
+        name: "shortable",
+        type: "address",
+      },
+    ],
+    name: "getRoutableShortingPairParamProvider",
+    outputs: [
+      {
+        internalType: "address",
+        name: "",
+        type: "address",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "lendable",
+        type: "address",
+      },
+      {
+        internalType: "address",
+        name: "shortable",
+        type: "address",
+      },
+    ],
+    name: "getShortingPairParamProvider",
+    outputs: [
+      {
+        internalType: "address",
+        name: "",
+        type: "address",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
         name: "swapRouter",
         type: "address",
       },
@@ -166,6 +238,19 @@ const _abi = [
       },
     ],
     name: "upgradeReserveParamProvider",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address[]",
+        name: "path",
+        type: "address[]",
+      },
+    ],
+    name: "upgradeShortingPairParamProvider",
     outputs: [],
     stateMutability: "nonpayable",
     type: "function",

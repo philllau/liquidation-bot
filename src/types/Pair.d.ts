@@ -29,6 +29,7 @@ interface PairInterface extends ethers.utils.Interface {
     "balanceOf(address)": FunctionFragment;
     "calcProfitFee(uint256,uint256)": FunctionFragment;
     "closePosition(address,uint256)": FunctionFragment;
+    "closePositionWithReferrer(address,uint256,address)": FunctionFragment;
     "decimals()": FunctionFragment;
     "decreaseAllowance(address,uint256)": FunctionFragment;
     "getAmountOut(uint256)": FunctionFragment;
@@ -37,13 +38,15 @@ interface PairInterface extends ethers.utils.Interface {
     "getLiquidationCost(uint256)": FunctionFragment;
     "getLoan(address)": FunctionFragment;
     "getRateMultiplier(uint256)": FunctionFragment;
+    "getReserve()": FunctionFragment;
     "getTotalDeposit()": FunctionFragment;
     "getTotalLoan()": FunctionFragment;
     "increaseAllowance(address,uint256)": FunctionFragment;
-    "initialize(address,address,address,address,address[],string,string)": FunctionFragment;
+    "initialize(address,address,address,address[],string,string)": FunctionFragment;
     "liquidatePosition(address,address)": FunctionFragment;
     "name()": FunctionFragment;
     "openPosition(address,uint256,uint256)": FunctionFragment;
+    "openPositionWithReferrer(address,uint256,uint256,address)": FunctionFragment;
     "positionCosts(address)": FunctionFragment;
     "symbol()": FunctionFragment;
     "totalSupply()": FunctionFragment;
@@ -69,6 +72,10 @@ interface PairInterface extends ethers.utils.Interface {
     functionFragment: "closePosition",
     values: [string, BigNumberish]
   ): string;
+  encodeFunctionData(
+    functionFragment: "closePositionWithReferrer",
+    values: [string, BigNumberish, string]
+  ): string;
   encodeFunctionData(functionFragment: "decimals", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "decreaseAllowance",
@@ -93,6 +100,10 @@ interface PairInterface extends ethers.utils.Interface {
     values: [BigNumberish]
   ): string;
   encodeFunctionData(
+    functionFragment: "getReserve",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
     functionFragment: "getTotalDeposit",
     values?: undefined
   ): string;
@@ -106,7 +117,7 @@ interface PairInterface extends ethers.utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "initialize",
-    values: [string, string, string, string, string[], string, string]
+    values: [string, string, string, string[], string, string]
   ): string;
   encodeFunctionData(
     functionFragment: "liquidatePosition",
@@ -116,6 +127,10 @@ interface PairInterface extends ethers.utils.Interface {
   encodeFunctionData(
     functionFragment: "openPosition",
     values: [string, BigNumberish, BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "openPositionWithReferrer",
+    values: [string, BigNumberish, BigNumberish, string]
   ): string;
   encodeFunctionData(
     functionFragment: "positionCosts",
@@ -147,6 +162,10 @@ interface PairInterface extends ethers.utils.Interface {
     functionFragment: "closePosition",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(
+    functionFragment: "closePositionWithReferrer",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "decimals", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "decreaseAllowance",
@@ -170,6 +189,7 @@ interface PairInterface extends ethers.utils.Interface {
     functionFragment: "getRateMultiplier",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "getReserve", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "getTotalDeposit",
     data: BytesLike
@@ -190,6 +210,10 @@ interface PairInterface extends ethers.utils.Interface {
   decodeFunctionResult(functionFragment: "name", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "openPosition",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "openPositionWithReferrer",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -323,6 +347,20 @@ export class Pair extends Contract {
       overrides?: Overrides
     ): Promise<ContractTransaction>;
 
+    closePositionWithReferrer(
+      trader: string,
+      amountOutMin: BigNumberish,
+      referrer: string,
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
+
+    "closePositionWithReferrer(address,uint256,address)"(
+      trader: string,
+      amountOutMin: BigNumberish,
+      referrer: string,
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
+
     decimals(overrides?: CallOverrides): Promise<[number]>;
 
     "decimals()"(overrides?: CallOverrides): Promise<[number]>;
@@ -387,6 +425,10 @@ export class Pair extends Contract {
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
 
+    getReserve(overrides?: CallOverrides): Promise<[string]>;
+
+    "getReserve()"(overrides?: CallOverrides): Promise<[string]>;
+
     getTotalDeposit(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     "getTotalDeposit()"(overrides?: CallOverrides): Promise<[BigNumber]>;
@@ -410,7 +452,6 @@ export class Pair extends Contract {
     initialize(
       reserve: string,
       paramProvider: string,
-      treasurer: string,
       wow: string,
       path: string[],
       name: string,
@@ -418,10 +459,9 @@ export class Pair extends Contract {
       overrides?: Overrides
     ): Promise<ContractTransaction>;
 
-    "initialize(address,address,address,address,address[],string,string)"(
+    "initialize(address,address,address,address[],string,string)"(
       reserve: string,
       paramProvider: string,
-      treasurer: string,
       wow: string,
       path: string[],
       name: string,
@@ -456,6 +496,22 @@ export class Pair extends Contract {
       trader: string,
       leverageFactor: BigNumberish,
       amountOutMin: BigNumberish,
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
+
+    openPositionWithReferrer(
+      trader: string,
+      leverageFactor: BigNumberish,
+      amountOutMin: BigNumberish,
+      referrer: string,
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
+
+    "openPositionWithReferrer(address,uint256,uint256,address)"(
+      trader: string,
+      leverageFactor: BigNumberish,
+      amountOutMin: BigNumberish,
+      referrer: string,
       overrides?: Overrides
     ): Promise<ContractTransaction>;
 
@@ -573,6 +629,20 @@ export class Pair extends Contract {
     overrides?: Overrides
   ): Promise<ContractTransaction>;
 
+  closePositionWithReferrer(
+    trader: string,
+    amountOutMin: BigNumberish,
+    referrer: string,
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
+
+  "closePositionWithReferrer(address,uint256,address)"(
+    trader: string,
+    amountOutMin: BigNumberish,
+    referrer: string,
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
+
   decimals(overrides?: CallOverrides): Promise<number>;
 
   "decimals()"(overrides?: CallOverrides): Promise<number>;
@@ -637,6 +707,10 @@ export class Pair extends Contract {
     overrides?: CallOverrides
   ): Promise<BigNumber>;
 
+  getReserve(overrides?: CallOverrides): Promise<string>;
+
+  "getReserve()"(overrides?: CallOverrides): Promise<string>;
+
   getTotalDeposit(overrides?: CallOverrides): Promise<BigNumber>;
 
   "getTotalDeposit()"(overrides?: CallOverrides): Promise<BigNumber>;
@@ -660,7 +734,6 @@ export class Pair extends Contract {
   initialize(
     reserve: string,
     paramProvider: string,
-    treasurer: string,
     wow: string,
     path: string[],
     name: string,
@@ -668,10 +741,9 @@ export class Pair extends Contract {
     overrides?: Overrides
   ): Promise<ContractTransaction>;
 
-  "initialize(address,address,address,address,address[],string,string)"(
+  "initialize(address,address,address,address[],string,string)"(
     reserve: string,
     paramProvider: string,
-    treasurer: string,
     wow: string,
     path: string[],
     name: string,
@@ -706,6 +778,22 @@ export class Pair extends Contract {
     trader: string,
     leverageFactor: BigNumberish,
     amountOutMin: BigNumberish,
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
+
+  openPositionWithReferrer(
+    trader: string,
+    leverageFactor: BigNumberish,
+    amountOutMin: BigNumberish,
+    referrer: string,
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
+
+  "openPositionWithReferrer(address,uint256,uint256,address)"(
+    trader: string,
+    leverageFactor: BigNumberish,
+    amountOutMin: BigNumberish,
+    referrer: string,
     overrides?: Overrides
   ): Promise<ContractTransaction>;
 
@@ -823,6 +911,20 @@ export class Pair extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
+    closePositionWithReferrer(
+      trader: string,
+      amountOutMin: BigNumberish,
+      referrer: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "closePositionWithReferrer(address,uint256,address)"(
+      trader: string,
+      amountOutMin: BigNumberish,
+      referrer: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
     decimals(overrides?: CallOverrides): Promise<number>;
 
     "decimals()"(overrides?: CallOverrides): Promise<number>;
@@ -887,6 +989,10 @@ export class Pair extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
+    getReserve(overrides?: CallOverrides): Promise<string>;
+
+    "getReserve()"(overrides?: CallOverrides): Promise<string>;
+
     getTotalDeposit(overrides?: CallOverrides): Promise<BigNumber>;
 
     "getTotalDeposit()"(overrides?: CallOverrides): Promise<BigNumber>;
@@ -910,7 +1016,6 @@ export class Pair extends Contract {
     initialize(
       reserve: string,
       paramProvider: string,
-      treasurer: string,
       wow: string,
       path: string[],
       name: string,
@@ -918,10 +1023,9 @@ export class Pair extends Contract {
       overrides?: CallOverrides
     ): Promise<void>;
 
-    "initialize(address,address,address,address,address[],string,string)"(
+    "initialize(address,address,address,address[],string,string)"(
       reserve: string,
       paramProvider: string,
-      treasurer: string,
       wow: string,
       path: string[],
       name: string,
@@ -956,6 +1060,22 @@ export class Pair extends Contract {
       trader: string,
       leverageFactor: BigNumberish,
       amountOutMin: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    openPositionWithReferrer(
+      trader: string,
+      leverageFactor: BigNumberish,
+      amountOutMin: BigNumberish,
+      referrer: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "openPositionWithReferrer(address,uint256,uint256,address)"(
+      trader: string,
+      leverageFactor: BigNumberish,
+      amountOutMin: BigNumberish,
+      referrer: string,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
@@ -1128,6 +1248,20 @@ export class Pair extends Contract {
       overrides?: Overrides
     ): Promise<BigNumber>;
 
+    closePositionWithReferrer(
+      trader: string,
+      amountOutMin: BigNumberish,
+      referrer: string,
+      overrides?: Overrides
+    ): Promise<BigNumber>;
+
+    "closePositionWithReferrer(address,uint256,address)"(
+      trader: string,
+      amountOutMin: BigNumberish,
+      referrer: string,
+      overrides?: Overrides
+    ): Promise<BigNumber>;
+
     decimals(overrides?: CallOverrides): Promise<BigNumber>;
 
     "decimals()"(overrides?: CallOverrides): Promise<BigNumber>;
@@ -1192,6 +1326,10 @@ export class Pair extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
+    getReserve(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "getReserve()"(overrides?: CallOverrides): Promise<BigNumber>;
+
     getTotalDeposit(overrides?: CallOverrides): Promise<BigNumber>;
 
     "getTotalDeposit()"(overrides?: CallOverrides): Promise<BigNumber>;
@@ -1215,7 +1353,6 @@ export class Pair extends Contract {
     initialize(
       reserve: string,
       paramProvider: string,
-      treasurer: string,
       wow: string,
       path: string[],
       name: string,
@@ -1223,10 +1360,9 @@ export class Pair extends Contract {
       overrides?: Overrides
     ): Promise<BigNumber>;
 
-    "initialize(address,address,address,address,address[],string,string)"(
+    "initialize(address,address,address,address[],string,string)"(
       reserve: string,
       paramProvider: string,
-      treasurer: string,
       wow: string,
       path: string[],
       name: string,
@@ -1261,6 +1397,22 @@ export class Pair extends Contract {
       trader: string,
       leverageFactor: BigNumberish,
       amountOutMin: BigNumberish,
+      overrides?: Overrides
+    ): Promise<BigNumber>;
+
+    openPositionWithReferrer(
+      trader: string,
+      leverageFactor: BigNumberish,
+      amountOutMin: BigNumberish,
+      referrer: string,
+      overrides?: Overrides
+    ): Promise<BigNumber>;
+
+    "openPositionWithReferrer(address,uint256,uint256,address)"(
+      trader: string,
+      leverageFactor: BigNumberish,
+      amountOutMin: BigNumberish,
+      referrer: string,
       overrides?: Overrides
     ): Promise<BigNumber>;
 
@@ -1372,6 +1524,20 @@ export class Pair extends Contract {
       overrides?: Overrides
     ): Promise<PopulatedTransaction>;
 
+    closePositionWithReferrer(
+      trader: string,
+      amountOutMin: BigNumberish,
+      referrer: string,
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
+
+    "closePositionWithReferrer(address,uint256,address)"(
+      trader: string,
+      amountOutMin: BigNumberish,
+      referrer: string,
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
+
     decimals(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     "decimals()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
@@ -1444,6 +1610,10 @@ export class Pair extends Contract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
+    getReserve(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    "getReserve()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
     getTotalDeposit(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     "getTotalDeposit()"(
@@ -1469,7 +1639,6 @@ export class Pair extends Contract {
     initialize(
       reserve: string,
       paramProvider: string,
-      treasurer: string,
       wow: string,
       path: string[],
       name: string,
@@ -1477,10 +1646,9 @@ export class Pair extends Contract {
       overrides?: Overrides
     ): Promise<PopulatedTransaction>;
 
-    "initialize(address,address,address,address,address[],string,string)"(
+    "initialize(address,address,address,address[],string,string)"(
       reserve: string,
       paramProvider: string,
-      treasurer: string,
       wow: string,
       path: string[],
       name: string,
@@ -1515,6 +1683,22 @@ export class Pair extends Contract {
       trader: string,
       leverageFactor: BigNumberish,
       amountOutMin: BigNumberish,
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
+
+    openPositionWithReferrer(
+      trader: string,
+      leverageFactor: BigNumberish,
+      amountOutMin: BigNumberish,
+      referrer: string,
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
+
+    "openPositionWithReferrer(address,uint256,uint256,address)"(
+      trader: string,
+      leverageFactor: BigNumberish,
+      amountOutMin: BigNumberish,
+      referrer: string,
       overrides?: Overrides
     ): Promise<PopulatedTransaction>;
 

@@ -18,6 +18,51 @@ export class IPriceGuard__factory {
 
 const _abi = [
   {
+    inputs: [],
+    name: "destDecimals",
+    outputs: [
+      {
+        internalType: "uint8",
+        name: "",
+        type: "uint8",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "amountIn",
+        type: "uint256",
+      },
+    ],
+    name: "getAmountOut",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "getPrice",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
     inputs: [
       {
         internalType: "uint256",
@@ -36,6 +81,19 @@ const _abi = [
         internalType: "uint256",
         name: "",
         type: "uint256",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "srcDecimals",
+    outputs: [
+      {
+        internalType: "uint8",
+        name: "",
+        type: "uint8",
       },
     ],
     stateMutability: "view",

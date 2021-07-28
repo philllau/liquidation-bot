@@ -57,6 +57,11 @@ const _abi = [
     outputs: [
       {
         internalType: "uint256",
+        name: "amountOut",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
         name: "profit",
         type: "uint256",
       },
@@ -191,6 +196,109 @@ const _abi = [
       },
       {
         internalType: "address",
+        name: "shortable",
+        type: "address",
+      },
+      {
+        internalType: "uint256",
+        name: "amount",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "leverageFactor",
+        type: "uint256",
+      },
+    ],
+    name: "calculateOpenProxyShortPosition",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "maxAmountIn",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "borrowAmount",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "borrowRate",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "liquidationCost",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "lendable",
+        type: "address",
+      },
+      {
+        internalType: "address",
+        name: "shortable",
+        type: "address",
+      },
+      {
+        internalType: "uint256",
+        name: "amount",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "leverageFactor",
+        type: "uint256",
+      },
+    ],
+    name: "calculateOpenShortPosition",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "maxAmountIn",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "borrowAmount",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "borrowRate",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "liquidationCost",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "lendable",
+        type: "address",
+      },
+      {
+        internalType: "address",
+        name: "proxyLendable",
+        type: "address",
+      },
+      {
+        internalType: "address",
         name: "tradable",
         type: "address",
       },
@@ -207,6 +315,114 @@ const _abi = [
     ],
     name: "calculateProxyBalance",
     outputs: [
+      {
+        internalType: "uint256",
+        name: "amountOut",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "profit",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "debtPayable",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "protocolFee",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "lendable",
+        type: "address",
+      },
+      {
+        internalType: "address",
+        name: "proxyLendable",
+        type: "address",
+      },
+      {
+        internalType: "address",
+        name: "shortable",
+        type: "address",
+      },
+      {
+        internalType: "address",
+        name: "trader",
+        type: "address",
+      },
+      {
+        internalType: "uint256",
+        name: "amountIn",
+        type: "uint256",
+      },
+    ],
+    name: "calculateProxyShortBalance",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "amountOut",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "profit",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "debtPayable",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "protocolFee",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "lendable",
+        type: "address",
+      },
+      {
+        internalType: "address",
+        name: "shortable",
+        type: "address",
+      },
+      {
+        internalType: "address",
+        name: "trader",
+        type: "address",
+      },
+      {
+        internalType: "uint256",
+        name: "amountIn",
+        type: "uint256",
+      },
+    ],
+    name: "calculateShortBalance",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "amountOut",
+        type: "uint256",
+      },
       {
         internalType: "uint256",
         name: "profit",
@@ -323,6 +539,99 @@ const _abi = [
       },
       {
         internalType: "address",
+        name: "tradable",
+        type: "address",
+      },
+      {
+        internalType: "address",
+        name: "trader",
+        type: "address",
+      },
+      {
+        internalType: "uint256",
+        name: "deadline",
+        type: "uint256",
+      },
+      {
+        internalType: "address",
+        name: "referrer",
+        type: "address",
+      },
+    ],
+    name: "closePositionETHWithReferrer",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "amountIn",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "amountOutMin",
+        type: "uint256",
+      },
+      {
+        internalType: "address",
+        name: "lendable",
+        type: "address",
+      },
+      {
+        internalType: "address",
+        name: "shortable",
+        type: "address",
+      },
+      {
+        internalType: "address",
+        name: "trader",
+        type: "address",
+      },
+      {
+        internalType: "uint256",
+        name: "deadline",
+        type: "uint256",
+      },
+      {
+        internalType: "address",
+        name: "referrer",
+        type: "address",
+      },
+    ],
+    name: "closePositionWithReferrer",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "amountIn",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "amountOutMin",
+        type: "uint256",
+      },
+      {
+        internalType: "address",
         name: "lendable",
         type: "address",
       },
@@ -348,6 +657,349 @@ const _abi = [
       },
     ],
     name: "closeProxyPosition",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "amountIn",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "amountOutMin",
+        type: "uint256",
+      },
+      {
+        internalType: "address",
+        name: "proxyLendable",
+        type: "address",
+      },
+      {
+        internalType: "address",
+        name: "tradable",
+        type: "address",
+      },
+      {
+        internalType: "address",
+        name: "trader",
+        type: "address",
+      },
+      {
+        internalType: "uint256",
+        name: "deadline",
+        type: "uint256",
+      },
+    ],
+    name: "closeProxyPositionETH",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "amountIn",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "amountOutMin",
+        type: "uint256",
+      },
+      {
+        internalType: "address",
+        name: "proxyLendable",
+        type: "address",
+      },
+      {
+        internalType: "address",
+        name: "tradable",
+        type: "address",
+      },
+      {
+        internalType: "address",
+        name: "trader",
+        type: "address",
+      },
+      {
+        internalType: "uint256",
+        name: "deadline",
+        type: "uint256",
+      },
+      {
+        internalType: "address",
+        name: "referrer",
+        type: "address",
+      },
+    ],
+    name: "closeProxyPositionETHWithReferrer",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "amountIn",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "amountOutMin",
+        type: "uint256",
+      },
+      {
+        internalType: "address",
+        name: "lendable",
+        type: "address",
+      },
+      {
+        internalType: "address",
+        name: "proxyLendable",
+        type: "address",
+      },
+      {
+        internalType: "address",
+        name: "tradable",
+        type: "address",
+      },
+      {
+        internalType: "address",
+        name: "trader",
+        type: "address",
+      },
+      {
+        internalType: "uint256",
+        name: "deadline",
+        type: "uint256",
+      },
+      {
+        internalType: "address",
+        name: "referrer",
+        type: "address",
+      },
+    ],
+    name: "closeProxyPositionWithReferrer",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "amountIn",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "amountOutMin",
+        type: "uint256",
+      },
+      {
+        internalType: "address",
+        name: "lendable",
+        type: "address",
+      },
+      {
+        internalType: "address",
+        name: "proxyLendable",
+        type: "address",
+      },
+      {
+        internalType: "address",
+        name: "tradable",
+        type: "address",
+      },
+      {
+        internalType: "address",
+        name: "trader",
+        type: "address",
+      },
+      {
+        internalType: "uint256",
+        name: "deadline",
+        type: "uint256",
+      },
+    ],
+    name: "closeProxyShortPosition",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "amountIn",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "amountOutMin",
+        type: "uint256",
+      },
+      {
+        internalType: "address",
+        name: "lendable",
+        type: "address",
+      },
+      {
+        internalType: "address",
+        name: "proxyLendable",
+        type: "address",
+      },
+      {
+        internalType: "address",
+        name: "tradable",
+        type: "address",
+      },
+      {
+        internalType: "address",
+        name: "trader",
+        type: "address",
+      },
+      {
+        internalType: "uint256",
+        name: "deadline",
+        type: "uint256",
+      },
+      {
+        internalType: "address",
+        name: "referrer",
+        type: "address",
+      },
+    ],
+    name: "closeProxyShortPositionWithReferrer",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "amountIn",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "amountOutMin",
+        type: "uint256",
+      },
+      {
+        internalType: "address",
+        name: "lendable",
+        type: "address",
+      },
+      {
+        internalType: "address",
+        name: "shortable",
+        type: "address",
+      },
+      {
+        internalType: "address",
+        name: "trader",
+        type: "address",
+      },
+      {
+        internalType: "uint256",
+        name: "deadline",
+        type: "uint256",
+      },
+    ],
+    name: "closeShortPosition",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "amountIn",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "amountOutMin",
+        type: "uint256",
+      },
+      {
+        internalType: "address",
+        name: "lendable",
+        type: "address",
+      },
+      {
+        internalType: "address",
+        name: "shortable",
+        type: "address",
+      },
+      {
+        internalType: "address",
+        name: "trader",
+        type: "address",
+      },
+      {
+        internalType: "uint256",
+        name: "deadline",
+        type: "uint256",
+      },
+      {
+        internalType: "address",
+        name: "referrer",
+        type: "address",
+      },
+    ],
+    name: "closeShortPositionWithReferrer",
     outputs: [
       {
         internalType: "uint256",
@@ -392,6 +1044,29 @@ const _abi = [
     name: "depositETH",
     outputs: [],
     stateMutability: "payable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "shortable",
+        type: "address",
+      },
+      {
+        internalType: "uint256",
+        name: "amount",
+        type: "uint256",
+      },
+      {
+        internalType: "address",
+        name: "to",
+        type: "address",
+      },
+    ],
+    name: "depositShortable",
+    outputs: [],
+    stateMutability: "nonpayable",
     type: "function",
   },
   {
@@ -545,27 +1220,9 @@ const _abi = [
     inputs: [
       {
         internalType: "address",
-        name: "lendable",
-        type: "address",
-      },
-      {
-        internalType: "address",
-        name: "tradable",
-        type: "address",
-      },
-      {
-        internalType: "address",
         name: "trader",
         type: "address",
       },
-    ],
-    name: "liquidatePosition",
-    outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    inputs: [
       {
         internalType: "address",
         name: "lendable",
@@ -578,18 +1235,132 @@ const _abi = [
       },
       {
         internalType: "address",
-        name: "tradable",
+        name: "shortable",
         type: "address",
       },
+    ],
+    name: "getProxyShortPosition",
+    outputs: [
+      {
+        components: [
+          {
+            internalType: "uint256",
+            name: "amount",
+            type: "uint256",
+          },
+          {
+            internalType: "uint256",
+            name: "value",
+            type: "uint256",
+          },
+          {
+            internalType: "uint256",
+            name: "selfValue",
+            type: "uint256",
+          },
+          {
+            internalType: "uint256",
+            name: "principalDebt",
+            type: "uint256",
+          },
+          {
+            internalType: "uint256",
+            name: "currentDebt",
+            type: "uint256",
+          },
+          {
+            internalType: "uint256",
+            name: "rate",
+            type: "uint256",
+          },
+          {
+            internalType: "uint256",
+            name: "currentCost",
+            type: "uint256",
+          },
+          {
+            internalType: "uint256",
+            name: "liquidationCost",
+            type: "uint256",
+          },
+        ],
+        internalType: "struct Position",
+        name: "position",
+        type: "tuple",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
       {
         internalType: "address",
         name: "trader",
         type: "address",
       },
+      {
+        internalType: "address",
+        name: "lendable",
+        type: "address",
+      },
+      {
+        internalType: "address",
+        name: "shortable",
+        type: "address",
+      },
     ],
-    name: "liquidateProxyPosition",
-    outputs: [],
-    stateMutability: "nonpayable",
+    name: "getShortPosition",
+    outputs: [
+      {
+        components: [
+          {
+            internalType: "uint256",
+            name: "amount",
+            type: "uint256",
+          },
+          {
+            internalType: "uint256",
+            name: "value",
+            type: "uint256",
+          },
+          {
+            internalType: "uint256",
+            name: "selfValue",
+            type: "uint256",
+          },
+          {
+            internalType: "uint256",
+            name: "principalDebt",
+            type: "uint256",
+          },
+          {
+            internalType: "uint256",
+            name: "currentDebt",
+            type: "uint256",
+          },
+          {
+            internalType: "uint256",
+            name: "rate",
+            type: "uint256",
+          },
+          {
+            internalType: "uint256",
+            name: "currentCost",
+            type: "uint256",
+          },
+          {
+            internalType: "uint256",
+            name: "liquidationCost",
+            type: "uint256",
+          },
+        ],
+        internalType: "struct Position",
+        name: "position",
+        type: "tuple",
+      },
+    ],
+    stateMutability: "view",
     type: "function",
   },
   {
@@ -673,11 +1444,109 @@ const _abi = [
     outputs: [
       {
         internalType: "uint256",
-        name: "amountOut",
+        name: "",
         type: "uint256",
       },
     ],
     stateMutability: "payable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "leverageFactor",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "amountOutMin",
+        type: "uint256",
+      },
+      {
+        internalType: "address",
+        name: "tradable",
+        type: "address",
+      },
+      {
+        internalType: "address",
+        name: "trader",
+        type: "address",
+      },
+      {
+        internalType: "uint256",
+        name: "deadline",
+        type: "uint256",
+      },
+      {
+        internalType: "address",
+        name: "referrer",
+        type: "address",
+      },
+    ],
+    name: "openPositionETHWithReferrer",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "payable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "amountIn",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "leverageFactor",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "amountOutMin",
+        type: "uint256",
+      },
+      {
+        internalType: "address",
+        name: "lendable",
+        type: "address",
+      },
+      {
+        internalType: "address",
+        name: "tradable",
+        type: "address",
+      },
+      {
+        internalType: "address",
+        name: "trader",
+        type: "address",
+      },
+      {
+        internalType: "uint256",
+        name: "deadline",
+        type: "uint256",
+      },
+      {
+        internalType: "address",
+        name: "referrer",
+        type: "address",
+      },
+    ],
+    name: "openPositionWithReferrer",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "nonpayable",
     type: "function",
   },
   {
@@ -735,6 +1604,374 @@ const _abi = [
     type: "function",
   },
   {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "leverageFactor",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "amountOutMin",
+        type: "uint256",
+      },
+      {
+        internalType: "address",
+        name: "proxyLendable",
+        type: "address",
+      },
+      {
+        internalType: "address",
+        name: "tradable",
+        type: "address",
+      },
+      {
+        internalType: "address",
+        name: "trader",
+        type: "address",
+      },
+      {
+        internalType: "uint256",
+        name: "deadline",
+        type: "uint256",
+      },
+    ],
+    name: "openProxyPositionETH",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "payable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "leverageFactor",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "amountOutMin",
+        type: "uint256",
+      },
+      {
+        internalType: "address",
+        name: "proxyLendable",
+        type: "address",
+      },
+      {
+        internalType: "address",
+        name: "tradable",
+        type: "address",
+      },
+      {
+        internalType: "address",
+        name: "trader",
+        type: "address",
+      },
+      {
+        internalType: "uint256",
+        name: "deadline",
+        type: "uint256",
+      },
+      {
+        internalType: "address",
+        name: "referrer",
+        type: "address",
+      },
+    ],
+    name: "openProxyPositionETHWithReferrer",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "payable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "amountIn",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "leverageFactor",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "amountOutMin",
+        type: "uint256",
+      },
+      {
+        internalType: "address",
+        name: "lendable",
+        type: "address",
+      },
+      {
+        internalType: "address",
+        name: "proxyLendable",
+        type: "address",
+      },
+      {
+        internalType: "address",
+        name: "tradable",
+        type: "address",
+      },
+      {
+        internalType: "address",
+        name: "trader",
+        type: "address",
+      },
+      {
+        internalType: "uint256",
+        name: "deadline",
+        type: "uint256",
+      },
+      {
+        internalType: "address",
+        name: "referrer",
+        type: "address",
+      },
+    ],
+    name: "openProxyPositionWithReferrer",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "amountIn",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "leverageFactor",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "amountOutMin",
+        type: "uint256",
+      },
+      {
+        internalType: "address",
+        name: "lendable",
+        type: "address",
+      },
+      {
+        internalType: "address",
+        name: "proxyLendable",
+        type: "address",
+      },
+      {
+        internalType: "address",
+        name: "shortable",
+        type: "address",
+      },
+      {
+        internalType: "address",
+        name: "trader",
+        type: "address",
+      },
+      {
+        internalType: "uint256",
+        name: "deadline",
+        type: "uint256",
+      },
+    ],
+    name: "openProxyShortPosition",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "amountIn",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "leverageFactor",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "amountOutMin",
+        type: "uint256",
+      },
+      {
+        internalType: "address",
+        name: "lendable",
+        type: "address",
+      },
+      {
+        internalType: "address",
+        name: "proxyLendable",
+        type: "address",
+      },
+      {
+        internalType: "address",
+        name: "shortable",
+        type: "address",
+      },
+      {
+        internalType: "address",
+        name: "trader",
+        type: "address",
+      },
+      {
+        internalType: "uint256",
+        name: "deadline",
+        type: "uint256",
+      },
+      {
+        internalType: "address",
+        name: "referrer",
+        type: "address",
+      },
+    ],
+    name: "openProxyShortPositionWithReferrer",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "amountIn",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "leverageFactor",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "amountOutMin",
+        type: "uint256",
+      },
+      {
+        internalType: "address",
+        name: "lendable",
+        type: "address",
+      },
+      {
+        internalType: "address",
+        name: "shortable",
+        type: "address",
+      },
+      {
+        internalType: "address",
+        name: "trader",
+        type: "address",
+      },
+      {
+        internalType: "uint256",
+        name: "deadline",
+        type: "uint256",
+      },
+    ],
+    name: "openShortPosition",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "amountIn",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "leverageFactor",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "amountOutMin",
+        type: "uint256",
+      },
+      {
+        internalType: "address",
+        name: "lendable",
+        type: "address",
+      },
+      {
+        internalType: "address",
+        name: "shortable",
+        type: "address",
+      },
+      {
+        internalType: "address",
+        name: "trader",
+        type: "address",
+      },
+      {
+        internalType: "uint256",
+        name: "deadline",
+        type: "uint256",
+      },
+      {
+        internalType: "address",
+        name: "referrer",
+        type: "address",
+      },
+    ],
+    name: "openShortPositionWithReferrer",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
     inputs: [],
     name: "pairFactory",
     outputs: [
@@ -757,6 +1994,34 @@ const _abi = [
         type: "address",
       },
     ],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "token",
+        type: "address",
+      },
+      {
+        internalType: "uint256",
+        name: "amount",
+        type: "uint256",
+      },
+      {
+        internalType: "uint16",
+        name: "period",
+        type: "uint16",
+      },
+      {
+        internalType: "address",
+        name: "to",
+        type: "address",
+      },
+    ],
+    name: "stake",
+    outputs: [],
     stateMutability: "nonpayable",
     type: "function",
   },
@@ -793,13 +2058,39 @@ const _abi = [
         name: "lendable",
         type: "address",
       },
+    ],
+    name: "sweepReserveFee",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "shortable",
+        type: "address",
+      },
+    ],
+    name: "sweepShortingReserveFee",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "token",
+        type: "address",
+      },
       {
         internalType: "address",
         name: "to",
         type: "address",
       },
     ],
-    name: "sweepFee",
+    name: "unstake",
     outputs: [],
     stateMutability: "nonpayable",
     type: "function",
@@ -841,6 +2132,29 @@ const _abi = [
       },
     ],
     name: "withdrawETH",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "shortable",
+        type: "address",
+      },
+      {
+        internalType: "uint256",
+        name: "amount",
+        type: "uint256",
+      },
+      {
+        internalType: "address",
+        name: "to",
+        type: "address",
+      },
+    ],
+    name: "withdrawShortable",
     outputs: [],
     stateMutability: "nonpayable",
     type: "function",

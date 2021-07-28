@@ -24,44 +24,64 @@ import { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
 
 interface RouterInterface extends ethers.utils.Interface {
   functions: {
+    "REVISION()": FunctionFragment;
     "WETH()": FunctionFragment;
-    "__Router_init(address,address,address,address)": FunctionFragment;
-    "__Router_init_unchained(address,address,address,address)": FunctionFragment;
     "calculateBalance(address,address,address,uint256)": FunctionFragment;
     "calculateOpenPosition(address,address,uint256,uint256)": FunctionFragment;
     "calculateOpenProxyPosition(address,address,address,uint256,uint256)": FunctionFragment;
+    "calculateOpenProxyShortPosition(address,address,address,uint256,uint256)": FunctionFragment;
+    "calculateOpenShortPosition(address,address,uint256,uint256)": FunctionFragment;
     "calculateProxyBalance(address,address,address,address,uint256)": FunctionFragment;
+    "calculateProxyShortBalance(address,address,address,address,uint256)": FunctionFragment;
+    "calculateShortBalance(address,address,address,uint256)": FunctionFragment;
     "closePosition(uint256,uint256,address,address,address,uint256)": FunctionFragment;
     "closePositionETH(uint256,uint256,address,address,uint256)": FunctionFragment;
+    "closePositionETHWithReferrer(uint256,uint256,address,address,uint256,address)": FunctionFragment;
+    "closePositionWithReferrer(uint256,uint256,address,address,address,uint256,address)": FunctionFragment;
     "closeProxyPosition(uint256,uint256,address,address,address,address,uint256)": FunctionFragment;
+    "closeProxyPositionETH(uint256,uint256,address,address,address,uint256)": FunctionFragment;
+    "closeProxyPositionETHWithReferrer(uint256,uint256,address,address,address,uint256,address)": FunctionFragment;
+    "closeProxyPositionWithReferrer(uint256,uint256,address,address,address,address,uint256,address)": FunctionFragment;
+    "closeProxyShortPosition(uint256,uint256,address,address,address,address,uint256)": FunctionFragment;
+    "closeProxyShortPositionWithReferrer(uint256,uint256,address,address,address,address,uint256,address)": FunctionFragment;
+    "closeShortPosition(uint256,uint256,address,address,address,uint256)": FunctionFragment;
+    "closeShortPositionWithReferrer(uint256,uint256,address,address,address,uint256,address)": FunctionFragment;
     "deposit(address,uint256,address)": FunctionFragment;
     "depositETH(address)": FunctionFragment;
+    "depositShortable(address,uint256,address)": FunctionFragment;
     "getPosition(address,address,address)": FunctionFragment;
     "getProxyPosition(address,address,address,address)": FunctionFragment;
-    "initialize(address,address,address,address)": FunctionFragment;
-    "liquidatePosition(address,address,address)": FunctionFragment;
-    "liquidateProxyPosition(address,address,address,address)": FunctionFragment;
+    "getProxyShortPosition(address,address,address,address)": FunctionFragment;
+    "getShortPosition(address,address,address)": FunctionFragment;
+    "incentivize(address,uint256)": FunctionFragment;
+    "initialize(address,address,address,address,address,address)": FunctionFragment;
     "openPosition(uint256,uint256,uint256,address,address,address,uint256)": FunctionFragment;
     "openPositionETH(uint256,uint256,address,address,uint256)": FunctionFragment;
+    "openPositionETHWithReferrer(uint256,uint256,address,address,uint256,address)": FunctionFragment;
+    "openPositionWithReferrer(uint256,uint256,uint256,address,address,address,uint256,address)": FunctionFragment;
     "openProxyPosition(uint256,uint256,uint256,address,address,address,address,uint256)": FunctionFragment;
+    "openProxyPositionETH(uint256,uint256,address,address,address,uint256)": FunctionFragment;
+    "openProxyPositionETHWithReferrer(uint256,uint256,address,address,address,uint256,address)": FunctionFragment;
+    "openProxyPositionWithReferrer(uint256,uint256,uint256,address,address,address,address,uint256,address)": FunctionFragment;
+    "openProxyShortPosition(uint256,uint256,uint256,address,address,address,address,uint256)": FunctionFragment;
+    "openProxyShortPositionWithReferrer(uint256,uint256,uint256,address,address,address,address,uint256,address)": FunctionFragment;
+    "openShortPosition(uint256,uint256,uint256,address,address,address,uint256)": FunctionFragment;
+    "openShortPositionWithReferrer(uint256,uint256,uint256,address,address,address,uint256,address)": FunctionFragment;
     "pairFactory()": FunctionFragment;
     "reserveFactory()": FunctionFragment;
+    "stake(address,uint256,uint16,address)": FunctionFragment;
     "swapFactory()": FunctionFragment;
     "swapRouter()": FunctionFragment;
-    "sweepFee(address,address)": FunctionFragment;
+    "sweepReserveFee(address)": FunctionFragment;
+    "sweepShortingReserveFee(address)": FunctionFragment;
+    "unstake(address,address)": FunctionFragment;
     "withdraw(address,uint256,address)": FunctionFragment;
     "withdrawETH(uint256,address)": FunctionFragment;
+    "withdrawShortable(address,uint256,address)": FunctionFragment;
   };
 
+  encodeFunctionData(functionFragment: "REVISION", values?: undefined): string;
   encodeFunctionData(functionFragment: "WETH", values?: undefined): string;
-  encodeFunctionData(
-    functionFragment: "__Router_init",
-    values: [string, string, string, string]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "__Router_init_unchained",
-    values: [string, string, string, string]
-  ): string;
   encodeFunctionData(
     functionFragment: "calculateBalance",
     values: [string, string, string, BigNumberish]
@@ -75,8 +95,24 @@ interface RouterInterface extends ethers.utils.Interface {
     values: [string, string, string, BigNumberish, BigNumberish]
   ): string;
   encodeFunctionData(
+    functionFragment: "calculateOpenProxyShortPosition",
+    values: [string, string, string, BigNumberish, BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "calculateOpenShortPosition",
+    values: [string, string, BigNumberish, BigNumberish]
+  ): string;
+  encodeFunctionData(
     functionFragment: "calculateProxyBalance",
     values: [string, string, string, string, BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "calculateProxyShortBalance",
+    values: [string, string, string, string, BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "calculateShortBalance",
+    values: [string, string, string, BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "closePosition",
@@ -85,6 +121,22 @@ interface RouterInterface extends ethers.utils.Interface {
   encodeFunctionData(
     functionFragment: "closePositionETH",
     values: [BigNumberish, BigNumberish, string, string, BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "closePositionETHWithReferrer",
+    values: [BigNumberish, BigNumberish, string, string, BigNumberish, string]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "closePositionWithReferrer",
+    values: [
+      BigNumberish,
+      BigNumberish,
+      string,
+      string,
+      string,
+      BigNumberish,
+      string
+    ]
   ): string;
   encodeFunctionData(
     functionFragment: "closeProxyPosition",
@@ -99,10 +151,84 @@ interface RouterInterface extends ethers.utils.Interface {
     ]
   ): string;
   encodeFunctionData(
+    functionFragment: "closeProxyPositionETH",
+    values: [BigNumberish, BigNumberish, string, string, string, BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "closeProxyPositionETHWithReferrer",
+    values: [
+      BigNumberish,
+      BigNumberish,
+      string,
+      string,
+      string,
+      BigNumberish,
+      string
+    ]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "closeProxyPositionWithReferrer",
+    values: [
+      BigNumberish,
+      BigNumberish,
+      string,
+      string,
+      string,
+      string,
+      BigNumberish,
+      string
+    ]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "closeProxyShortPosition",
+    values: [
+      BigNumberish,
+      BigNumberish,
+      string,
+      string,
+      string,
+      string,
+      BigNumberish
+    ]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "closeProxyShortPositionWithReferrer",
+    values: [
+      BigNumberish,
+      BigNumberish,
+      string,
+      string,
+      string,
+      string,
+      BigNumberish,
+      string
+    ]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "closeShortPosition",
+    values: [BigNumberish, BigNumberish, string, string, string, BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "closeShortPositionWithReferrer",
+    values: [
+      BigNumberish,
+      BigNumberish,
+      string,
+      string,
+      string,
+      BigNumberish,
+      string
+    ]
+  ): string;
+  encodeFunctionData(
     functionFragment: "deposit",
     values: [string, BigNumberish, string]
   ): string;
   encodeFunctionData(functionFragment: "depositETH", values: [string]): string;
+  encodeFunctionData(
+    functionFragment: "depositShortable",
+    values: [string, BigNumberish, string]
+  ): string;
   encodeFunctionData(
     functionFragment: "getPosition",
     values: [string, string, string]
@@ -112,16 +238,20 @@ interface RouterInterface extends ethers.utils.Interface {
     values: [string, string, string, string]
   ): string;
   encodeFunctionData(
-    functionFragment: "initialize",
+    functionFragment: "getProxyShortPosition",
     values: [string, string, string, string]
   ): string;
   encodeFunctionData(
-    functionFragment: "liquidatePosition",
+    functionFragment: "getShortPosition",
     values: [string, string, string]
   ): string;
   encodeFunctionData(
-    functionFragment: "liquidateProxyPosition",
-    values: [string, string, string, string]
+    functionFragment: "incentivize",
+    values: [string, BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "initialize",
+    values: [string, string, string, string, string, string]
   ): string;
   encodeFunctionData(
     functionFragment: "openPosition",
@@ -140,6 +270,23 @@ interface RouterInterface extends ethers.utils.Interface {
     values: [BigNumberish, BigNumberish, string, string, BigNumberish]
   ): string;
   encodeFunctionData(
+    functionFragment: "openPositionETHWithReferrer",
+    values: [BigNumberish, BigNumberish, string, string, BigNumberish, string]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "openPositionWithReferrer",
+    values: [
+      BigNumberish,
+      BigNumberish,
+      BigNumberish,
+      string,
+      string,
+      string,
+      BigNumberish,
+      string
+    ]
+  ): string;
+  encodeFunctionData(
     functionFragment: "openProxyPosition",
     values: [
       BigNumberish,
@@ -153,12 +300,98 @@ interface RouterInterface extends ethers.utils.Interface {
     ]
   ): string;
   encodeFunctionData(
+    functionFragment: "openProxyPositionETH",
+    values: [BigNumberish, BigNumberish, string, string, string, BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "openProxyPositionETHWithReferrer",
+    values: [
+      BigNumberish,
+      BigNumberish,
+      string,
+      string,
+      string,
+      BigNumberish,
+      string
+    ]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "openProxyPositionWithReferrer",
+    values: [
+      BigNumberish,
+      BigNumberish,
+      BigNumberish,
+      string,
+      string,
+      string,
+      string,
+      BigNumberish,
+      string
+    ]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "openProxyShortPosition",
+    values: [
+      BigNumberish,
+      BigNumberish,
+      BigNumberish,
+      string,
+      string,
+      string,
+      string,
+      BigNumberish
+    ]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "openProxyShortPositionWithReferrer",
+    values: [
+      BigNumberish,
+      BigNumberish,
+      BigNumberish,
+      string,
+      string,
+      string,
+      string,
+      BigNumberish,
+      string
+    ]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "openShortPosition",
+    values: [
+      BigNumberish,
+      BigNumberish,
+      BigNumberish,
+      string,
+      string,
+      string,
+      BigNumberish
+    ]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "openShortPositionWithReferrer",
+    values: [
+      BigNumberish,
+      BigNumberish,
+      BigNumberish,
+      string,
+      string,
+      string,
+      BigNumberish,
+      string
+    ]
+  ): string;
+  encodeFunctionData(
     functionFragment: "pairFactory",
     values?: undefined
   ): string;
   encodeFunctionData(
     functionFragment: "reserveFactory",
     values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "stake",
+    values: [string, BigNumberish, BigNumberish, string]
   ): string;
   encodeFunctionData(
     functionFragment: "swapFactory",
@@ -169,7 +402,15 @@ interface RouterInterface extends ethers.utils.Interface {
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "sweepFee",
+    functionFragment: "sweepReserveFee",
+    values: [string]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "sweepShortingReserveFee",
+    values: [string]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "unstake",
     values: [string, string]
   ): string;
   encodeFunctionData(
@@ -180,16 +421,13 @@ interface RouterInterface extends ethers.utils.Interface {
     functionFragment: "withdrawETH",
     values: [BigNumberish, string]
   ): string;
+  encodeFunctionData(
+    functionFragment: "withdrawShortable",
+    values: [string, BigNumberish, string]
+  ): string;
 
+  decodeFunctionResult(functionFragment: "REVISION", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "WETH", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "__Router_init",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "__Router_init_unchained",
-    data: BytesLike
-  ): Result;
   decodeFunctionResult(
     functionFragment: "calculateBalance",
     data: BytesLike
@@ -203,7 +441,23 @@ interface RouterInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
+    functionFragment: "calculateOpenProxyShortPosition",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "calculateOpenShortPosition",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "calculateProxyBalance",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "calculateProxyShortBalance",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "calculateShortBalance",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -215,11 +469,51 @@ interface RouterInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
+    functionFragment: "closePositionETHWithReferrer",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "closePositionWithReferrer",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "closeProxyPosition",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "closeProxyPositionETH",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "closeProxyPositionETHWithReferrer",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "closeProxyPositionWithReferrer",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "closeProxyShortPosition",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "closeProxyShortPositionWithReferrer",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "closeShortPosition",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "closeShortPositionWithReferrer",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "deposit", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "depositETH", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "depositShortable",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(
     functionFragment: "getPosition",
     data: BytesLike
@@ -228,15 +522,19 @@ interface RouterInterface extends ethers.utils.Interface {
     functionFragment: "getProxyPosition",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(
+    functionFragment: "getProxyShortPosition",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "getShortPosition",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "incentivize",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "initialize", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "liquidatePosition",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "liquidateProxyPosition",
-    data: BytesLike
-  ): Result;
   decodeFunctionResult(
     functionFragment: "openPosition",
     data: BytesLike
@@ -246,7 +544,43 @@ interface RouterInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
+    functionFragment: "openPositionETHWithReferrer",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "openPositionWithReferrer",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "openProxyPosition",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "openProxyPositionETH",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "openProxyPositionETHWithReferrer",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "openProxyPositionWithReferrer",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "openProxyShortPosition",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "openProxyShortPositionWithReferrer",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "openShortPosition",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "openShortPositionWithReferrer",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -257,15 +591,28 @@ interface RouterInterface extends ethers.utils.Interface {
     functionFragment: "reserveFactory",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "stake", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "swapFactory",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "swapRouter", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "sweepFee", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "sweepReserveFee",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "sweepShortingReserveFee",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: "unstake", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "withdraw", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "withdrawETH",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "withdrawShortable",
     data: BytesLike
   ): Result;
 
@@ -316,41 +663,13 @@ export class Router extends Contract {
   interface: RouterInterface;
 
   functions: {
+    REVISION(overrides?: CallOverrides): Promise<[BigNumber]>;
+
+    "REVISION()"(overrides?: CallOverrides): Promise<[BigNumber]>;
+
     WETH(overrides?: CallOverrides): Promise<[string]>;
 
     "WETH()"(overrides?: CallOverrides): Promise<[string]>;
-
-    __Router_init(
-      _reserveFactory: string,
-      _pairFactory: string,
-      _swapRouter: string,
-      _WETH: string,
-      overrides?: Overrides
-    ): Promise<ContractTransaction>;
-
-    "__Router_init(address,address,address,address)"(
-      _reserveFactory: string,
-      _pairFactory: string,
-      _swapRouter: string,
-      _WETH: string,
-      overrides?: Overrides
-    ): Promise<ContractTransaction>;
-
-    __Router_init_unchained(
-      _reserveFactory: string,
-      _pairFactory: string,
-      _swapRouter: string,
-      _WETH: string,
-      overrides?: Overrides
-    ): Promise<ContractTransaction>;
-
-    "__Router_init_unchained(address,address,address,address)"(
-      _reserveFactory: string,
-      _pairFactory: string,
-      _swapRouter: string,
-      _WETH: string,
-      overrides?: Overrides
-    ): Promise<ContractTransaction>;
 
     calculateBalance(
       lendable: string,
@@ -359,7 +678,8 @@ export class Router extends Contract {
       amountIn: BigNumberish,
       overrides?: CallOverrides
     ): Promise<
-      [BigNumber, BigNumber, BigNumber] & {
+      [BigNumber, BigNumber, BigNumber, BigNumber] & {
+        amountOut: BigNumber;
         profit: BigNumber;
         debtPayable: BigNumber;
         protocolFee: BigNumber;
@@ -373,7 +693,8 @@ export class Router extends Contract {
       amountIn: BigNumberish,
       overrides?: CallOverrides
     ): Promise<
-      [BigNumber, BigNumber, BigNumber] & {
+      [BigNumber, BigNumber, BigNumber, BigNumber] & {
+        amountOut: BigNumber;
         profit: BigNumber;
         debtPayable: BigNumber;
         protocolFee: BigNumber;
@@ -442,6 +763,68 @@ export class Router extends Contract {
       }
     >;
 
+    calculateOpenProxyShortPosition(
+      lendable: string,
+      proxyLendable: string,
+      shortable: string,
+      amount: BigNumberish,
+      leverageFactor: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<
+      [BigNumber, BigNumber, BigNumber, BigNumber] & {
+        maxAmountIn: BigNumber;
+        borrowAmount: BigNumber;
+        borrowRate: BigNumber;
+        liquidationCost: BigNumber;
+      }
+    >;
+
+    "calculateOpenProxyShortPosition(address,address,address,uint256,uint256)"(
+      lendable: string,
+      proxyLendable: string,
+      shortable: string,
+      amount: BigNumberish,
+      leverageFactor: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<
+      [BigNumber, BigNumber, BigNumber, BigNumber] & {
+        maxAmountIn: BigNumber;
+        borrowAmount: BigNumber;
+        borrowRate: BigNumber;
+        liquidationCost: BigNumber;
+      }
+    >;
+
+    calculateOpenShortPosition(
+      lendable: string,
+      shortable: string,
+      amount: BigNumberish,
+      leverageFactor: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<
+      [BigNumber, BigNumber, BigNumber, BigNumber] & {
+        maxAmountIn: BigNumber;
+        borrowAmount: BigNumber;
+        borrowRate: BigNumber;
+        liquidationCost: BigNumber;
+      }
+    >;
+
+    "calculateOpenShortPosition(address,address,uint256,uint256)"(
+      lendable: string,
+      shortable: string,
+      amount: BigNumberish,
+      leverageFactor: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<
+      [BigNumber, BigNumber, BigNumber, BigNumber] & {
+        maxAmountIn: BigNumber;
+        borrowAmount: BigNumber;
+        borrowRate: BigNumber;
+        liquidationCost: BigNumber;
+      }
+    >;
+
     calculateProxyBalance(
       lendable: string,
       proxyLendable: string,
@@ -450,7 +833,8 @@ export class Router extends Contract {
       amountIn: BigNumberish,
       overrides?: CallOverrides
     ): Promise<
-      [BigNumber, BigNumber, BigNumber] & {
+      [BigNumber, BigNumber, BigNumber, BigNumber] & {
+        amountOut: BigNumber;
         profit: BigNumber;
         debtPayable: BigNumber;
         protocolFee: BigNumber;
@@ -465,7 +849,70 @@ export class Router extends Contract {
       amountIn: BigNumberish,
       overrides?: CallOverrides
     ): Promise<
-      [BigNumber, BigNumber, BigNumber] & {
+      [BigNumber, BigNumber, BigNumber, BigNumber] & {
+        amountOut: BigNumber;
+        profit: BigNumber;
+        debtPayable: BigNumber;
+        protocolFee: BigNumber;
+      }
+    >;
+
+    calculateProxyShortBalance(
+      lendable: string,
+      proxyLendable: string,
+      shortable: string,
+      trader: string,
+      amountIn: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<
+      [BigNumber, BigNumber, BigNumber, BigNumber] & {
+        amountOut: BigNumber;
+        profit: BigNumber;
+        debtPayable: BigNumber;
+        protocolFee: BigNumber;
+      }
+    >;
+
+    "calculateProxyShortBalance(address,address,address,address,uint256)"(
+      lendable: string,
+      proxyLendable: string,
+      shortable: string,
+      trader: string,
+      amountIn: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<
+      [BigNumber, BigNumber, BigNumber, BigNumber] & {
+        amountOut: BigNumber;
+        profit: BigNumber;
+        debtPayable: BigNumber;
+        protocolFee: BigNumber;
+      }
+    >;
+
+    calculateShortBalance(
+      lendable: string,
+      shortable: string,
+      trader: string,
+      amountIn: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<
+      [BigNumber, BigNumber, BigNumber, BigNumber] & {
+        amountOut: BigNumber;
+        profit: BigNumber;
+        debtPayable: BigNumber;
+        protocolFee: BigNumber;
+      }
+    >;
+
+    "calculateShortBalance(address,address,address,uint256)"(
+      lendable: string,
+      shortable: string,
+      trader: string,
+      amountIn: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<
+      [BigNumber, BigNumber, BigNumber, BigNumber] & {
+        amountOut: BigNumber;
         profit: BigNumber;
         debtPayable: BigNumber;
         protocolFee: BigNumber;
@@ -510,6 +957,48 @@ export class Router extends Contract {
       overrides?: Overrides
     ): Promise<ContractTransaction>;
 
+    closePositionETHWithReferrer(
+      amountIn: BigNumberish,
+      amountOutMin: BigNumberish,
+      tradable: string,
+      trader: string,
+      deadline: BigNumberish,
+      referrer: string,
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
+
+    "closePositionETHWithReferrer(uint256,uint256,address,address,uint256,address)"(
+      amountIn: BigNumberish,
+      amountOutMin: BigNumberish,
+      tradable: string,
+      trader: string,
+      deadline: BigNumberish,
+      referrer: string,
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
+
+    closePositionWithReferrer(
+      amountIn: BigNumberish,
+      amountOutMin: BigNumberish,
+      lendable: string,
+      tradable: string,
+      trader: string,
+      deadline: BigNumberish,
+      referrer: string,
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
+
+    "closePositionWithReferrer(uint256,uint256,address,address,address,uint256,address)"(
+      amountIn: BigNumberish,
+      amountOutMin: BigNumberish,
+      lendable: string,
+      tradable: string,
+      trader: string,
+      deadline: BigNumberish,
+      referrer: string,
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
+
     closeProxyPosition(
       amountIn: BigNumberish,
       amountOutMin: BigNumberish,
@@ -529,6 +1018,160 @@ export class Router extends Contract {
       tradable: string,
       trader: string,
       deadline: BigNumberish,
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
+
+    closeProxyPositionETH(
+      amountIn: BigNumberish,
+      amountOutMin: BigNumberish,
+      proxyLendable: string,
+      tradable: string,
+      trader: string,
+      deadline: BigNumberish,
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
+
+    "closeProxyPositionETH(uint256,uint256,address,address,address,uint256)"(
+      amountIn: BigNumberish,
+      amountOutMin: BigNumberish,
+      proxyLendable: string,
+      tradable: string,
+      trader: string,
+      deadline: BigNumberish,
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
+
+    closeProxyPositionETHWithReferrer(
+      amountIn: BigNumberish,
+      amountOutMin: BigNumberish,
+      proxyLendable: string,
+      tradable: string,
+      trader: string,
+      deadline: BigNumberish,
+      referrer: string,
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
+
+    "closeProxyPositionETHWithReferrer(uint256,uint256,address,address,address,uint256,address)"(
+      amountIn: BigNumberish,
+      amountOutMin: BigNumberish,
+      proxyLendable: string,
+      tradable: string,
+      trader: string,
+      deadline: BigNumberish,
+      referrer: string,
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
+
+    closeProxyPositionWithReferrer(
+      amountIn: BigNumberish,
+      amountOutMin: BigNumberish,
+      lendable: string,
+      proxyLendable: string,
+      tradable: string,
+      trader: string,
+      deadline: BigNumberish,
+      referrer: string,
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
+
+    "closeProxyPositionWithReferrer(uint256,uint256,address,address,address,address,uint256,address)"(
+      amountIn: BigNumberish,
+      amountOutMin: BigNumberish,
+      lendable: string,
+      proxyLendable: string,
+      tradable: string,
+      trader: string,
+      deadline: BigNumberish,
+      referrer: string,
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
+
+    closeProxyShortPosition(
+      amountIn: BigNumberish,
+      amountOutMin: BigNumberish,
+      lendable: string,
+      proxyLendable: string,
+      shortable: string,
+      trader: string,
+      deadline: BigNumberish,
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
+
+    "closeProxyShortPosition(uint256,uint256,address,address,address,address,uint256)"(
+      amountIn: BigNumberish,
+      amountOutMin: BigNumberish,
+      lendable: string,
+      proxyLendable: string,
+      shortable: string,
+      trader: string,
+      deadline: BigNumberish,
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
+
+    closeProxyShortPositionWithReferrer(
+      amountIn: BigNumberish,
+      amountOutMin: BigNumberish,
+      lendable: string,
+      proxyLendable: string,
+      shortable: string,
+      trader: string,
+      deadline: BigNumberish,
+      referrer: string,
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
+
+    "closeProxyShortPositionWithReferrer(uint256,uint256,address,address,address,address,uint256,address)"(
+      amountIn: BigNumberish,
+      amountOutMin: BigNumberish,
+      lendable: string,
+      proxyLendable: string,
+      shortable: string,
+      trader: string,
+      deadline: BigNumberish,
+      referrer: string,
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
+
+    closeShortPosition(
+      amountIn: BigNumberish,
+      amountOutMin: BigNumberish,
+      lendable: string,
+      shortable: string,
+      trader: string,
+      deadline: BigNumberish,
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
+
+    "closeShortPosition(uint256,uint256,address,address,address,uint256)"(
+      amountIn: BigNumberish,
+      amountOutMin: BigNumberish,
+      lendable: string,
+      shortable: string,
+      trader: string,
+      deadline: BigNumberish,
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
+
+    closeShortPositionWithReferrer(
+      amountIn: BigNumberish,
+      amountOutMin: BigNumberish,
+      lendable: string,
+      shortable: string,
+      trader: string,
+      deadline: BigNumberish,
+      referrer: string,
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
+
+    "closeShortPositionWithReferrer(uint256,uint256,address,address,address,uint256,address)"(
+      amountIn: BigNumberish,
+      amountOutMin: BigNumberish,
+      lendable: string,
+      shortable: string,
+      trader: string,
+      deadline: BigNumberish,
+      referrer: string,
       overrides?: Overrides
     ): Promise<ContractTransaction>;
 
@@ -554,6 +1197,20 @@ export class Router extends Contract {
     "depositETH(address)"(
       to: string,
       overrides?: PayableOverrides
+    ): Promise<ContractTransaction>;
+
+    depositShortable(
+      shortable: string,
+      amount: BigNumberish,
+      to: string,
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
+
+    "depositShortable(address,uint256,address)"(
+      shortable: string,
+      amount: BigNumberish,
+      to: string,
+      overrides?: Overrides
     ): Promise<ContractTransaction>;
 
     getPosition(
@@ -754,49 +1411,233 @@ export class Router extends Contract {
       }
     >;
 
+    getProxyShortPosition(
+      trader: string,
+      lendable: string,
+      proxyLendable: string,
+      shortable: string,
+      overrides?: CallOverrides
+    ): Promise<
+      [
+        [
+          BigNumber,
+          BigNumber,
+          BigNumber,
+          BigNumber,
+          BigNumber,
+          BigNumber,
+          BigNumber,
+          BigNumber
+        ] & {
+          amount: BigNumber;
+          value: BigNumber;
+          selfValue: BigNumber;
+          principalDebt: BigNumber;
+          currentDebt: BigNumber;
+          rate: BigNumber;
+          currentCost: BigNumber;
+          liquidationCost: BigNumber;
+        }
+      ] & {
+        position: [
+          BigNumber,
+          BigNumber,
+          BigNumber,
+          BigNumber,
+          BigNumber,
+          BigNumber,
+          BigNumber,
+          BigNumber
+        ] & {
+          amount: BigNumber;
+          value: BigNumber;
+          selfValue: BigNumber;
+          principalDebt: BigNumber;
+          currentDebt: BigNumber;
+          rate: BigNumber;
+          currentCost: BigNumber;
+          liquidationCost: BigNumber;
+        };
+      }
+    >;
+
+    "getProxyShortPosition(address,address,address,address)"(
+      trader: string,
+      lendable: string,
+      proxyLendable: string,
+      shortable: string,
+      overrides?: CallOverrides
+    ): Promise<
+      [
+        [
+          BigNumber,
+          BigNumber,
+          BigNumber,
+          BigNumber,
+          BigNumber,
+          BigNumber,
+          BigNumber,
+          BigNumber
+        ] & {
+          amount: BigNumber;
+          value: BigNumber;
+          selfValue: BigNumber;
+          principalDebt: BigNumber;
+          currentDebt: BigNumber;
+          rate: BigNumber;
+          currentCost: BigNumber;
+          liquidationCost: BigNumber;
+        }
+      ] & {
+        position: [
+          BigNumber,
+          BigNumber,
+          BigNumber,
+          BigNumber,
+          BigNumber,
+          BigNumber,
+          BigNumber,
+          BigNumber
+        ] & {
+          amount: BigNumber;
+          value: BigNumber;
+          selfValue: BigNumber;
+          principalDebt: BigNumber;
+          currentDebt: BigNumber;
+          rate: BigNumber;
+          currentCost: BigNumber;
+          liquidationCost: BigNumber;
+        };
+      }
+    >;
+
+    getShortPosition(
+      trader: string,
+      lendable: string,
+      shortable: string,
+      overrides?: CallOverrides
+    ): Promise<
+      [
+        [
+          BigNumber,
+          BigNumber,
+          BigNumber,
+          BigNumber,
+          BigNumber,
+          BigNumber,
+          BigNumber,
+          BigNumber
+        ] & {
+          amount: BigNumber;
+          value: BigNumber;
+          selfValue: BigNumber;
+          principalDebt: BigNumber;
+          currentDebt: BigNumber;
+          rate: BigNumber;
+          currentCost: BigNumber;
+          liquidationCost: BigNumber;
+        }
+      ] & {
+        position: [
+          BigNumber,
+          BigNumber,
+          BigNumber,
+          BigNumber,
+          BigNumber,
+          BigNumber,
+          BigNumber,
+          BigNumber
+        ] & {
+          amount: BigNumber;
+          value: BigNumber;
+          selfValue: BigNumber;
+          principalDebt: BigNumber;
+          currentDebt: BigNumber;
+          rate: BigNumber;
+          currentCost: BigNumber;
+          liquidationCost: BigNumber;
+        };
+      }
+    >;
+
+    "getShortPosition(address,address,address)"(
+      trader: string,
+      lendable: string,
+      shortable: string,
+      overrides?: CallOverrides
+    ): Promise<
+      [
+        [
+          BigNumber,
+          BigNumber,
+          BigNumber,
+          BigNumber,
+          BigNumber,
+          BigNumber,
+          BigNumber,
+          BigNumber
+        ] & {
+          amount: BigNumber;
+          value: BigNumber;
+          selfValue: BigNumber;
+          principalDebt: BigNumber;
+          currentDebt: BigNumber;
+          rate: BigNumber;
+          currentCost: BigNumber;
+          liquidationCost: BigNumber;
+        }
+      ] & {
+        position: [
+          BigNumber,
+          BigNumber,
+          BigNumber,
+          BigNumber,
+          BigNumber,
+          BigNumber,
+          BigNumber,
+          BigNumber
+        ] & {
+          amount: BigNumber;
+          value: BigNumber;
+          selfValue: BigNumber;
+          principalDebt: BigNumber;
+          currentDebt: BigNumber;
+          rate: BigNumber;
+          currentCost: BigNumber;
+          liquidationCost: BigNumber;
+        };
+      }
+    >;
+
+    incentivize(
+      token: string,
+      amount: BigNumberish,
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
+
+    "incentivize(address,uint256)"(
+      token: string,
+      amount: BigNumberish,
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
+
     initialize(
       _reserveFactory: string,
       _pairFactory: string,
       _swapRouter: string,
       _WETH: string,
+      _xWOW: string,
+      _referralProgram: string,
       overrides?: Overrides
     ): Promise<ContractTransaction>;
 
-    "initialize(address,address,address,address)"(
+    "initialize(address,address,address,address,address,address)"(
       _reserveFactory: string,
       _pairFactory: string,
       _swapRouter: string,
       _WETH: string,
-      overrides?: Overrides
-    ): Promise<ContractTransaction>;
-
-    liquidatePosition(
-      lendable: string,
-      tradable: string,
-      trader: string,
-      overrides?: Overrides
-    ): Promise<ContractTransaction>;
-
-    "liquidatePosition(address,address,address)"(
-      lendable: string,
-      tradable: string,
-      trader: string,
-      overrides?: Overrides
-    ): Promise<ContractTransaction>;
-
-    liquidateProxyPosition(
-      lendable: string,
-      proxyLendable: string,
-      tradable: string,
-      trader: string,
-      overrides?: Overrides
-    ): Promise<ContractTransaction>;
-
-    "liquidateProxyPosition(address,address,address,address)"(
-      lendable: string,
-      proxyLendable: string,
-      tradable: string,
-      trader: string,
+      _xWOW: string,
+      _referralProgram: string,
       overrides?: Overrides
     ): Promise<ContractTransaction>;
 
@@ -840,6 +1681,50 @@ export class Router extends Contract {
       overrides?: PayableOverrides
     ): Promise<ContractTransaction>;
 
+    openPositionETHWithReferrer(
+      leverageFactor: BigNumberish,
+      amountOutMin: BigNumberish,
+      tradable: string,
+      trader: string,
+      deadline: BigNumberish,
+      referrer: string,
+      overrides?: PayableOverrides
+    ): Promise<ContractTransaction>;
+
+    "openPositionETHWithReferrer(uint256,uint256,address,address,uint256,address)"(
+      leverageFactor: BigNumberish,
+      amountOutMin: BigNumberish,
+      tradable: string,
+      trader: string,
+      deadline: BigNumberish,
+      referrer: string,
+      overrides?: PayableOverrides
+    ): Promise<ContractTransaction>;
+
+    openPositionWithReferrer(
+      amountIn: BigNumberish,
+      leverageFactor: BigNumberish,
+      amountOutMin: BigNumberish,
+      lendable: string,
+      tradable: string,
+      trader: string,
+      deadline: BigNumberish,
+      referrer: string,
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
+
+    "openPositionWithReferrer(uint256,uint256,uint256,address,address,address,uint256,address)"(
+      amountIn: BigNumberish,
+      leverageFactor: BigNumberish,
+      amountOutMin: BigNumberish,
+      lendable: string,
+      tradable: string,
+      trader: string,
+      deadline: BigNumberish,
+      referrer: string,
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
+
     openProxyPosition(
       amountIn: BigNumberish,
       leverageFactor: BigNumberish,
@@ -864,6 +1749,170 @@ export class Router extends Contract {
       overrides?: Overrides
     ): Promise<ContractTransaction>;
 
+    openProxyPositionETH(
+      leverageFactor: BigNumberish,
+      amountOutMin: BigNumberish,
+      proxyLendable: string,
+      tradable: string,
+      trader: string,
+      deadline: BigNumberish,
+      overrides?: PayableOverrides
+    ): Promise<ContractTransaction>;
+
+    "openProxyPositionETH(uint256,uint256,address,address,address,uint256)"(
+      leverageFactor: BigNumberish,
+      amountOutMin: BigNumberish,
+      proxyLendable: string,
+      tradable: string,
+      trader: string,
+      deadline: BigNumberish,
+      overrides?: PayableOverrides
+    ): Promise<ContractTransaction>;
+
+    openProxyPositionETHWithReferrer(
+      leverageFactor: BigNumberish,
+      amountOutMin: BigNumberish,
+      proxyLendable: string,
+      tradable: string,
+      trader: string,
+      deadline: BigNumberish,
+      referrer: string,
+      overrides?: PayableOverrides
+    ): Promise<ContractTransaction>;
+
+    "openProxyPositionETHWithReferrer(uint256,uint256,address,address,address,uint256,address)"(
+      leverageFactor: BigNumberish,
+      amountOutMin: BigNumberish,
+      proxyLendable: string,
+      tradable: string,
+      trader: string,
+      deadline: BigNumberish,
+      referrer: string,
+      overrides?: PayableOverrides
+    ): Promise<ContractTransaction>;
+
+    openProxyPositionWithReferrer(
+      amountIn: BigNumberish,
+      leverageFactor: BigNumberish,
+      amountOutMin: BigNumberish,
+      lendable: string,
+      proxyLendable: string,
+      tradable: string,
+      trader: string,
+      deadline: BigNumberish,
+      referrer: string,
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
+
+    "openProxyPositionWithReferrer(uint256,uint256,uint256,address,address,address,address,uint256,address)"(
+      amountIn: BigNumberish,
+      leverageFactor: BigNumberish,
+      amountOutMin: BigNumberish,
+      lendable: string,
+      proxyLendable: string,
+      tradable: string,
+      trader: string,
+      deadline: BigNumberish,
+      referrer: string,
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
+
+    openProxyShortPosition(
+      amountIn: BigNumberish,
+      leverageFactor: BigNumberish,
+      amountOutMin: BigNumberish,
+      lendable: string,
+      proxyLendable: string,
+      shortable: string,
+      trader: string,
+      deadline: BigNumberish,
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
+
+    "openProxyShortPosition(uint256,uint256,uint256,address,address,address,address,uint256)"(
+      amountIn: BigNumberish,
+      leverageFactor: BigNumberish,
+      amountOutMin: BigNumberish,
+      lendable: string,
+      proxyLendable: string,
+      shortable: string,
+      trader: string,
+      deadline: BigNumberish,
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
+
+    openProxyShortPositionWithReferrer(
+      amountIn: BigNumberish,
+      leverageFactor: BigNumberish,
+      amountOutMin: BigNumberish,
+      lendable: string,
+      proxyLendable: string,
+      shortable: string,
+      trader: string,
+      deadline: BigNumberish,
+      referrer: string,
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
+
+    "openProxyShortPositionWithReferrer(uint256,uint256,uint256,address,address,address,address,uint256,address)"(
+      amountIn: BigNumberish,
+      leverageFactor: BigNumberish,
+      amountOutMin: BigNumberish,
+      lendable: string,
+      proxyLendable: string,
+      shortable: string,
+      trader: string,
+      deadline: BigNumberish,
+      referrer: string,
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
+
+    openShortPosition(
+      amountIn: BigNumberish,
+      leverageFactor: BigNumberish,
+      amountOutMin: BigNumberish,
+      lendable: string,
+      shortable: string,
+      trader: string,
+      deadline: BigNumberish,
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
+
+    "openShortPosition(uint256,uint256,uint256,address,address,address,uint256)"(
+      amountIn: BigNumberish,
+      leverageFactor: BigNumberish,
+      amountOutMin: BigNumberish,
+      lendable: string,
+      shortable: string,
+      trader: string,
+      deadline: BigNumberish,
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
+
+    openShortPositionWithReferrer(
+      amountIn: BigNumberish,
+      leverageFactor: BigNumberish,
+      amountOutMin: BigNumberish,
+      lendable: string,
+      shortable: string,
+      trader: string,
+      deadline: BigNumberish,
+      referrer: string,
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
+
+    "openShortPositionWithReferrer(uint256,uint256,uint256,address,address,address,uint256,address)"(
+      amountIn: BigNumberish,
+      leverageFactor: BigNumberish,
+      amountOutMin: BigNumberish,
+      lendable: string,
+      shortable: string,
+      trader: string,
+      deadline: BigNumberish,
+      referrer: string,
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
+
     pairFactory(overrides?: CallOverrides): Promise<[string]>;
 
     "pairFactory()"(overrides?: CallOverrides): Promise<[string]>;
@@ -871,6 +1920,22 @@ export class Router extends Contract {
     reserveFactory(overrides?: CallOverrides): Promise<[string]>;
 
     "reserveFactory()"(overrides?: CallOverrides): Promise<[string]>;
+
+    stake(
+      token: string,
+      amount: BigNumberish,
+      period: BigNumberish,
+      to: string,
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
+
+    "stake(address,uint256,uint16,address)"(
+      token: string,
+      amount: BigNumberish,
+      period: BigNumberish,
+      to: string,
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
 
     swapFactory(overrides?: CallOverrides): Promise<[string]>;
 
@@ -880,14 +1945,34 @@ export class Router extends Contract {
 
     "swapRouter()"(overrides?: CallOverrides): Promise<[string]>;
 
-    sweepFee(
+    sweepReserveFee(
       lendable: string,
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
+
+    "sweepReserveFee(address)"(
+      lendable: string,
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
+
+    sweepShortingReserveFee(
+      shortable: string,
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
+
+    "sweepShortingReserveFee(address)"(
+      shortable: string,
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
+
+    unstake(
+      token: string,
       to: string,
       overrides?: Overrides
     ): Promise<ContractTransaction>;
 
-    "sweepFee(address,address)"(
-      lendable: string,
+    "unstake(address,address)"(
+      token: string,
       to: string,
       overrides?: Overrides
     ): Promise<ContractTransaction>;
@@ -917,43 +2002,29 @@ export class Router extends Contract {
       to: string,
       overrides?: Overrides
     ): Promise<ContractTransaction>;
+
+    withdrawShortable(
+      shortable: string,
+      amount: BigNumberish,
+      to: string,
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
+
+    "withdrawShortable(address,uint256,address)"(
+      shortable: string,
+      amount: BigNumberish,
+      to: string,
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
   };
+
+  REVISION(overrides?: CallOverrides): Promise<BigNumber>;
+
+  "REVISION()"(overrides?: CallOverrides): Promise<BigNumber>;
 
   WETH(overrides?: CallOverrides): Promise<string>;
 
   "WETH()"(overrides?: CallOverrides): Promise<string>;
-
-  __Router_init(
-    _reserveFactory: string,
-    _pairFactory: string,
-    _swapRouter: string,
-    _WETH: string,
-    overrides?: Overrides
-  ): Promise<ContractTransaction>;
-
-  "__Router_init(address,address,address,address)"(
-    _reserveFactory: string,
-    _pairFactory: string,
-    _swapRouter: string,
-    _WETH: string,
-    overrides?: Overrides
-  ): Promise<ContractTransaction>;
-
-  __Router_init_unchained(
-    _reserveFactory: string,
-    _pairFactory: string,
-    _swapRouter: string,
-    _WETH: string,
-    overrides?: Overrides
-  ): Promise<ContractTransaction>;
-
-  "__Router_init_unchained(address,address,address,address)"(
-    _reserveFactory: string,
-    _pairFactory: string,
-    _swapRouter: string,
-    _WETH: string,
-    overrides?: Overrides
-  ): Promise<ContractTransaction>;
 
   calculateBalance(
     lendable: string,
@@ -962,7 +2033,8 @@ export class Router extends Contract {
     amountIn: BigNumberish,
     overrides?: CallOverrides
   ): Promise<
-    [BigNumber, BigNumber, BigNumber] & {
+    [BigNumber, BigNumber, BigNumber, BigNumber] & {
+      amountOut: BigNumber;
       profit: BigNumber;
       debtPayable: BigNumber;
       protocolFee: BigNumber;
@@ -976,7 +2048,8 @@ export class Router extends Contract {
     amountIn: BigNumberish,
     overrides?: CallOverrides
   ): Promise<
-    [BigNumber, BigNumber, BigNumber] & {
+    [BigNumber, BigNumber, BigNumber, BigNumber] & {
+      amountOut: BigNumber;
       profit: BigNumber;
       debtPayable: BigNumber;
       protocolFee: BigNumber;
@@ -1045,6 +2118,68 @@ export class Router extends Contract {
     }
   >;
 
+  calculateOpenProxyShortPosition(
+    lendable: string,
+    proxyLendable: string,
+    shortable: string,
+    amount: BigNumberish,
+    leverageFactor: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<
+    [BigNumber, BigNumber, BigNumber, BigNumber] & {
+      maxAmountIn: BigNumber;
+      borrowAmount: BigNumber;
+      borrowRate: BigNumber;
+      liquidationCost: BigNumber;
+    }
+  >;
+
+  "calculateOpenProxyShortPosition(address,address,address,uint256,uint256)"(
+    lendable: string,
+    proxyLendable: string,
+    shortable: string,
+    amount: BigNumberish,
+    leverageFactor: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<
+    [BigNumber, BigNumber, BigNumber, BigNumber] & {
+      maxAmountIn: BigNumber;
+      borrowAmount: BigNumber;
+      borrowRate: BigNumber;
+      liquidationCost: BigNumber;
+    }
+  >;
+
+  calculateOpenShortPosition(
+    lendable: string,
+    shortable: string,
+    amount: BigNumberish,
+    leverageFactor: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<
+    [BigNumber, BigNumber, BigNumber, BigNumber] & {
+      maxAmountIn: BigNumber;
+      borrowAmount: BigNumber;
+      borrowRate: BigNumber;
+      liquidationCost: BigNumber;
+    }
+  >;
+
+  "calculateOpenShortPosition(address,address,uint256,uint256)"(
+    lendable: string,
+    shortable: string,
+    amount: BigNumberish,
+    leverageFactor: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<
+    [BigNumber, BigNumber, BigNumber, BigNumber] & {
+      maxAmountIn: BigNumber;
+      borrowAmount: BigNumber;
+      borrowRate: BigNumber;
+      liquidationCost: BigNumber;
+    }
+  >;
+
   calculateProxyBalance(
     lendable: string,
     proxyLendable: string,
@@ -1053,7 +2188,8 @@ export class Router extends Contract {
     amountIn: BigNumberish,
     overrides?: CallOverrides
   ): Promise<
-    [BigNumber, BigNumber, BigNumber] & {
+    [BigNumber, BigNumber, BigNumber, BigNumber] & {
+      amountOut: BigNumber;
       profit: BigNumber;
       debtPayable: BigNumber;
       protocolFee: BigNumber;
@@ -1068,7 +2204,70 @@ export class Router extends Contract {
     amountIn: BigNumberish,
     overrides?: CallOverrides
   ): Promise<
-    [BigNumber, BigNumber, BigNumber] & {
+    [BigNumber, BigNumber, BigNumber, BigNumber] & {
+      amountOut: BigNumber;
+      profit: BigNumber;
+      debtPayable: BigNumber;
+      protocolFee: BigNumber;
+    }
+  >;
+
+  calculateProxyShortBalance(
+    lendable: string,
+    proxyLendable: string,
+    shortable: string,
+    trader: string,
+    amountIn: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<
+    [BigNumber, BigNumber, BigNumber, BigNumber] & {
+      amountOut: BigNumber;
+      profit: BigNumber;
+      debtPayable: BigNumber;
+      protocolFee: BigNumber;
+    }
+  >;
+
+  "calculateProxyShortBalance(address,address,address,address,uint256)"(
+    lendable: string,
+    proxyLendable: string,
+    shortable: string,
+    trader: string,
+    amountIn: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<
+    [BigNumber, BigNumber, BigNumber, BigNumber] & {
+      amountOut: BigNumber;
+      profit: BigNumber;
+      debtPayable: BigNumber;
+      protocolFee: BigNumber;
+    }
+  >;
+
+  calculateShortBalance(
+    lendable: string,
+    shortable: string,
+    trader: string,
+    amountIn: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<
+    [BigNumber, BigNumber, BigNumber, BigNumber] & {
+      amountOut: BigNumber;
+      profit: BigNumber;
+      debtPayable: BigNumber;
+      protocolFee: BigNumber;
+    }
+  >;
+
+  "calculateShortBalance(address,address,address,uint256)"(
+    lendable: string,
+    shortable: string,
+    trader: string,
+    amountIn: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<
+    [BigNumber, BigNumber, BigNumber, BigNumber] & {
+      amountOut: BigNumber;
       profit: BigNumber;
       debtPayable: BigNumber;
       protocolFee: BigNumber;
@@ -1113,6 +2312,48 @@ export class Router extends Contract {
     overrides?: Overrides
   ): Promise<ContractTransaction>;
 
+  closePositionETHWithReferrer(
+    amountIn: BigNumberish,
+    amountOutMin: BigNumberish,
+    tradable: string,
+    trader: string,
+    deadline: BigNumberish,
+    referrer: string,
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
+
+  "closePositionETHWithReferrer(uint256,uint256,address,address,uint256,address)"(
+    amountIn: BigNumberish,
+    amountOutMin: BigNumberish,
+    tradable: string,
+    trader: string,
+    deadline: BigNumberish,
+    referrer: string,
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
+
+  closePositionWithReferrer(
+    amountIn: BigNumberish,
+    amountOutMin: BigNumberish,
+    lendable: string,
+    tradable: string,
+    trader: string,
+    deadline: BigNumberish,
+    referrer: string,
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
+
+  "closePositionWithReferrer(uint256,uint256,address,address,address,uint256,address)"(
+    amountIn: BigNumberish,
+    amountOutMin: BigNumberish,
+    lendable: string,
+    tradable: string,
+    trader: string,
+    deadline: BigNumberish,
+    referrer: string,
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
+
   closeProxyPosition(
     amountIn: BigNumberish,
     amountOutMin: BigNumberish,
@@ -1132,6 +2373,160 @@ export class Router extends Contract {
     tradable: string,
     trader: string,
     deadline: BigNumberish,
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
+
+  closeProxyPositionETH(
+    amountIn: BigNumberish,
+    amountOutMin: BigNumberish,
+    proxyLendable: string,
+    tradable: string,
+    trader: string,
+    deadline: BigNumberish,
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
+
+  "closeProxyPositionETH(uint256,uint256,address,address,address,uint256)"(
+    amountIn: BigNumberish,
+    amountOutMin: BigNumberish,
+    proxyLendable: string,
+    tradable: string,
+    trader: string,
+    deadline: BigNumberish,
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
+
+  closeProxyPositionETHWithReferrer(
+    amountIn: BigNumberish,
+    amountOutMin: BigNumberish,
+    proxyLendable: string,
+    tradable: string,
+    trader: string,
+    deadline: BigNumberish,
+    referrer: string,
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
+
+  "closeProxyPositionETHWithReferrer(uint256,uint256,address,address,address,uint256,address)"(
+    amountIn: BigNumberish,
+    amountOutMin: BigNumberish,
+    proxyLendable: string,
+    tradable: string,
+    trader: string,
+    deadline: BigNumberish,
+    referrer: string,
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
+
+  closeProxyPositionWithReferrer(
+    amountIn: BigNumberish,
+    amountOutMin: BigNumberish,
+    lendable: string,
+    proxyLendable: string,
+    tradable: string,
+    trader: string,
+    deadline: BigNumberish,
+    referrer: string,
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
+
+  "closeProxyPositionWithReferrer(uint256,uint256,address,address,address,address,uint256,address)"(
+    amountIn: BigNumberish,
+    amountOutMin: BigNumberish,
+    lendable: string,
+    proxyLendable: string,
+    tradable: string,
+    trader: string,
+    deadline: BigNumberish,
+    referrer: string,
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
+
+  closeProxyShortPosition(
+    amountIn: BigNumberish,
+    amountOutMin: BigNumberish,
+    lendable: string,
+    proxyLendable: string,
+    shortable: string,
+    trader: string,
+    deadline: BigNumberish,
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
+
+  "closeProxyShortPosition(uint256,uint256,address,address,address,address,uint256)"(
+    amountIn: BigNumberish,
+    amountOutMin: BigNumberish,
+    lendable: string,
+    proxyLendable: string,
+    shortable: string,
+    trader: string,
+    deadline: BigNumberish,
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
+
+  closeProxyShortPositionWithReferrer(
+    amountIn: BigNumberish,
+    amountOutMin: BigNumberish,
+    lendable: string,
+    proxyLendable: string,
+    shortable: string,
+    trader: string,
+    deadline: BigNumberish,
+    referrer: string,
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
+
+  "closeProxyShortPositionWithReferrer(uint256,uint256,address,address,address,address,uint256,address)"(
+    amountIn: BigNumberish,
+    amountOutMin: BigNumberish,
+    lendable: string,
+    proxyLendable: string,
+    shortable: string,
+    trader: string,
+    deadline: BigNumberish,
+    referrer: string,
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
+
+  closeShortPosition(
+    amountIn: BigNumberish,
+    amountOutMin: BigNumberish,
+    lendable: string,
+    shortable: string,
+    trader: string,
+    deadline: BigNumberish,
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
+
+  "closeShortPosition(uint256,uint256,address,address,address,uint256)"(
+    amountIn: BigNumberish,
+    amountOutMin: BigNumberish,
+    lendable: string,
+    shortable: string,
+    trader: string,
+    deadline: BigNumberish,
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
+
+  closeShortPositionWithReferrer(
+    amountIn: BigNumberish,
+    amountOutMin: BigNumberish,
+    lendable: string,
+    shortable: string,
+    trader: string,
+    deadline: BigNumberish,
+    referrer: string,
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
+
+  "closeShortPositionWithReferrer(uint256,uint256,address,address,address,uint256,address)"(
+    amountIn: BigNumberish,
+    amountOutMin: BigNumberish,
+    lendable: string,
+    shortable: string,
+    trader: string,
+    deadline: BigNumberish,
+    referrer: string,
     overrides?: Overrides
   ): Promise<ContractTransaction>;
 
@@ -1157,6 +2552,20 @@ export class Router extends Contract {
   "depositETH(address)"(
     to: string,
     overrides?: PayableOverrides
+  ): Promise<ContractTransaction>;
+
+  depositShortable(
+    shortable: string,
+    amount: BigNumberish,
+    to: string,
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
+
+  "depositShortable(address,uint256,address)"(
+    shortable: string,
+    amount: BigNumberish,
+    to: string,
+    overrides?: Overrides
   ): Promise<ContractTransaction>;
 
   getPosition(
@@ -1269,49 +2678,145 @@ export class Router extends Contract {
     }
   >;
 
+  getProxyShortPosition(
+    trader: string,
+    lendable: string,
+    proxyLendable: string,
+    shortable: string,
+    overrides?: CallOverrides
+  ): Promise<
+    [
+      BigNumber,
+      BigNumber,
+      BigNumber,
+      BigNumber,
+      BigNumber,
+      BigNumber,
+      BigNumber,
+      BigNumber
+    ] & {
+      amount: BigNumber;
+      value: BigNumber;
+      selfValue: BigNumber;
+      principalDebt: BigNumber;
+      currentDebt: BigNumber;
+      rate: BigNumber;
+      currentCost: BigNumber;
+      liquidationCost: BigNumber;
+    }
+  >;
+
+  "getProxyShortPosition(address,address,address,address)"(
+    trader: string,
+    lendable: string,
+    proxyLendable: string,
+    shortable: string,
+    overrides?: CallOverrides
+  ): Promise<
+    [
+      BigNumber,
+      BigNumber,
+      BigNumber,
+      BigNumber,
+      BigNumber,
+      BigNumber,
+      BigNumber,
+      BigNumber
+    ] & {
+      amount: BigNumber;
+      value: BigNumber;
+      selfValue: BigNumber;
+      principalDebt: BigNumber;
+      currentDebt: BigNumber;
+      rate: BigNumber;
+      currentCost: BigNumber;
+      liquidationCost: BigNumber;
+    }
+  >;
+
+  getShortPosition(
+    trader: string,
+    lendable: string,
+    shortable: string,
+    overrides?: CallOverrides
+  ): Promise<
+    [
+      BigNumber,
+      BigNumber,
+      BigNumber,
+      BigNumber,
+      BigNumber,
+      BigNumber,
+      BigNumber,
+      BigNumber
+    ] & {
+      amount: BigNumber;
+      value: BigNumber;
+      selfValue: BigNumber;
+      principalDebt: BigNumber;
+      currentDebt: BigNumber;
+      rate: BigNumber;
+      currentCost: BigNumber;
+      liquidationCost: BigNumber;
+    }
+  >;
+
+  "getShortPosition(address,address,address)"(
+    trader: string,
+    lendable: string,
+    shortable: string,
+    overrides?: CallOverrides
+  ): Promise<
+    [
+      BigNumber,
+      BigNumber,
+      BigNumber,
+      BigNumber,
+      BigNumber,
+      BigNumber,
+      BigNumber,
+      BigNumber
+    ] & {
+      amount: BigNumber;
+      value: BigNumber;
+      selfValue: BigNumber;
+      principalDebt: BigNumber;
+      currentDebt: BigNumber;
+      rate: BigNumber;
+      currentCost: BigNumber;
+      liquidationCost: BigNumber;
+    }
+  >;
+
+  incentivize(
+    token: string,
+    amount: BigNumberish,
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
+
+  "incentivize(address,uint256)"(
+    token: string,
+    amount: BigNumberish,
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
+
   initialize(
     _reserveFactory: string,
     _pairFactory: string,
     _swapRouter: string,
     _WETH: string,
+    _xWOW: string,
+    _referralProgram: string,
     overrides?: Overrides
   ): Promise<ContractTransaction>;
 
-  "initialize(address,address,address,address)"(
+  "initialize(address,address,address,address,address,address)"(
     _reserveFactory: string,
     _pairFactory: string,
     _swapRouter: string,
     _WETH: string,
-    overrides?: Overrides
-  ): Promise<ContractTransaction>;
-
-  liquidatePosition(
-    lendable: string,
-    tradable: string,
-    trader: string,
-    overrides?: Overrides
-  ): Promise<ContractTransaction>;
-
-  "liquidatePosition(address,address,address)"(
-    lendable: string,
-    tradable: string,
-    trader: string,
-    overrides?: Overrides
-  ): Promise<ContractTransaction>;
-
-  liquidateProxyPosition(
-    lendable: string,
-    proxyLendable: string,
-    tradable: string,
-    trader: string,
-    overrides?: Overrides
-  ): Promise<ContractTransaction>;
-
-  "liquidateProxyPosition(address,address,address,address)"(
-    lendable: string,
-    proxyLendable: string,
-    tradable: string,
-    trader: string,
+    _xWOW: string,
+    _referralProgram: string,
     overrides?: Overrides
   ): Promise<ContractTransaction>;
 
@@ -1355,6 +2860,50 @@ export class Router extends Contract {
     overrides?: PayableOverrides
   ): Promise<ContractTransaction>;
 
+  openPositionETHWithReferrer(
+    leverageFactor: BigNumberish,
+    amountOutMin: BigNumberish,
+    tradable: string,
+    trader: string,
+    deadline: BigNumberish,
+    referrer: string,
+    overrides?: PayableOverrides
+  ): Promise<ContractTransaction>;
+
+  "openPositionETHWithReferrer(uint256,uint256,address,address,uint256,address)"(
+    leverageFactor: BigNumberish,
+    amountOutMin: BigNumberish,
+    tradable: string,
+    trader: string,
+    deadline: BigNumberish,
+    referrer: string,
+    overrides?: PayableOverrides
+  ): Promise<ContractTransaction>;
+
+  openPositionWithReferrer(
+    amountIn: BigNumberish,
+    leverageFactor: BigNumberish,
+    amountOutMin: BigNumberish,
+    lendable: string,
+    tradable: string,
+    trader: string,
+    deadline: BigNumberish,
+    referrer: string,
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
+
+  "openPositionWithReferrer(uint256,uint256,uint256,address,address,address,uint256,address)"(
+    amountIn: BigNumberish,
+    leverageFactor: BigNumberish,
+    amountOutMin: BigNumberish,
+    lendable: string,
+    tradable: string,
+    trader: string,
+    deadline: BigNumberish,
+    referrer: string,
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
+
   openProxyPosition(
     amountIn: BigNumberish,
     leverageFactor: BigNumberish,
@@ -1379,6 +2928,170 @@ export class Router extends Contract {
     overrides?: Overrides
   ): Promise<ContractTransaction>;
 
+  openProxyPositionETH(
+    leverageFactor: BigNumberish,
+    amountOutMin: BigNumberish,
+    proxyLendable: string,
+    tradable: string,
+    trader: string,
+    deadline: BigNumberish,
+    overrides?: PayableOverrides
+  ): Promise<ContractTransaction>;
+
+  "openProxyPositionETH(uint256,uint256,address,address,address,uint256)"(
+    leverageFactor: BigNumberish,
+    amountOutMin: BigNumberish,
+    proxyLendable: string,
+    tradable: string,
+    trader: string,
+    deadline: BigNumberish,
+    overrides?: PayableOverrides
+  ): Promise<ContractTransaction>;
+
+  openProxyPositionETHWithReferrer(
+    leverageFactor: BigNumberish,
+    amountOutMin: BigNumberish,
+    proxyLendable: string,
+    tradable: string,
+    trader: string,
+    deadline: BigNumberish,
+    referrer: string,
+    overrides?: PayableOverrides
+  ): Promise<ContractTransaction>;
+
+  "openProxyPositionETHWithReferrer(uint256,uint256,address,address,address,uint256,address)"(
+    leverageFactor: BigNumberish,
+    amountOutMin: BigNumberish,
+    proxyLendable: string,
+    tradable: string,
+    trader: string,
+    deadline: BigNumberish,
+    referrer: string,
+    overrides?: PayableOverrides
+  ): Promise<ContractTransaction>;
+
+  openProxyPositionWithReferrer(
+    amountIn: BigNumberish,
+    leverageFactor: BigNumberish,
+    amountOutMin: BigNumberish,
+    lendable: string,
+    proxyLendable: string,
+    tradable: string,
+    trader: string,
+    deadline: BigNumberish,
+    referrer: string,
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
+
+  "openProxyPositionWithReferrer(uint256,uint256,uint256,address,address,address,address,uint256,address)"(
+    amountIn: BigNumberish,
+    leverageFactor: BigNumberish,
+    amountOutMin: BigNumberish,
+    lendable: string,
+    proxyLendable: string,
+    tradable: string,
+    trader: string,
+    deadline: BigNumberish,
+    referrer: string,
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
+
+  openProxyShortPosition(
+    amountIn: BigNumberish,
+    leverageFactor: BigNumberish,
+    amountOutMin: BigNumberish,
+    lendable: string,
+    proxyLendable: string,
+    shortable: string,
+    trader: string,
+    deadline: BigNumberish,
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
+
+  "openProxyShortPosition(uint256,uint256,uint256,address,address,address,address,uint256)"(
+    amountIn: BigNumberish,
+    leverageFactor: BigNumberish,
+    amountOutMin: BigNumberish,
+    lendable: string,
+    proxyLendable: string,
+    shortable: string,
+    trader: string,
+    deadline: BigNumberish,
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
+
+  openProxyShortPositionWithReferrer(
+    amountIn: BigNumberish,
+    leverageFactor: BigNumberish,
+    amountOutMin: BigNumberish,
+    lendable: string,
+    proxyLendable: string,
+    shortable: string,
+    trader: string,
+    deadline: BigNumberish,
+    referrer: string,
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
+
+  "openProxyShortPositionWithReferrer(uint256,uint256,uint256,address,address,address,address,uint256,address)"(
+    amountIn: BigNumberish,
+    leverageFactor: BigNumberish,
+    amountOutMin: BigNumberish,
+    lendable: string,
+    proxyLendable: string,
+    shortable: string,
+    trader: string,
+    deadline: BigNumberish,
+    referrer: string,
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
+
+  openShortPosition(
+    amountIn: BigNumberish,
+    leverageFactor: BigNumberish,
+    amountOutMin: BigNumberish,
+    lendable: string,
+    shortable: string,
+    trader: string,
+    deadline: BigNumberish,
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
+
+  "openShortPosition(uint256,uint256,uint256,address,address,address,uint256)"(
+    amountIn: BigNumberish,
+    leverageFactor: BigNumberish,
+    amountOutMin: BigNumberish,
+    lendable: string,
+    shortable: string,
+    trader: string,
+    deadline: BigNumberish,
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
+
+  openShortPositionWithReferrer(
+    amountIn: BigNumberish,
+    leverageFactor: BigNumberish,
+    amountOutMin: BigNumberish,
+    lendable: string,
+    shortable: string,
+    trader: string,
+    deadline: BigNumberish,
+    referrer: string,
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
+
+  "openShortPositionWithReferrer(uint256,uint256,uint256,address,address,address,uint256,address)"(
+    amountIn: BigNumberish,
+    leverageFactor: BigNumberish,
+    amountOutMin: BigNumberish,
+    lendable: string,
+    shortable: string,
+    trader: string,
+    deadline: BigNumberish,
+    referrer: string,
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
+
   pairFactory(overrides?: CallOverrides): Promise<string>;
 
   "pairFactory()"(overrides?: CallOverrides): Promise<string>;
@@ -1386,6 +3099,22 @@ export class Router extends Contract {
   reserveFactory(overrides?: CallOverrides): Promise<string>;
 
   "reserveFactory()"(overrides?: CallOverrides): Promise<string>;
+
+  stake(
+    token: string,
+    amount: BigNumberish,
+    period: BigNumberish,
+    to: string,
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
+
+  "stake(address,uint256,uint16,address)"(
+    token: string,
+    amount: BigNumberish,
+    period: BigNumberish,
+    to: string,
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
 
   swapFactory(overrides?: CallOverrides): Promise<string>;
 
@@ -1395,14 +3124,34 @@ export class Router extends Contract {
 
   "swapRouter()"(overrides?: CallOverrides): Promise<string>;
 
-  sweepFee(
+  sweepReserveFee(
     lendable: string,
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
+
+  "sweepReserveFee(address)"(
+    lendable: string,
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
+
+  sweepShortingReserveFee(
+    shortable: string,
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
+
+  "sweepShortingReserveFee(address)"(
+    shortable: string,
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
+
+  unstake(
+    token: string,
     to: string,
     overrides?: Overrides
   ): Promise<ContractTransaction>;
 
-  "sweepFee(address,address)"(
-    lendable: string,
+  "unstake(address,address)"(
+    token: string,
     to: string,
     overrides?: Overrides
   ): Promise<ContractTransaction>;
@@ -1433,42 +3182,28 @@ export class Router extends Contract {
     overrides?: Overrides
   ): Promise<ContractTransaction>;
 
+  withdrawShortable(
+    shortable: string,
+    amount: BigNumberish,
+    to: string,
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
+
+  "withdrawShortable(address,uint256,address)"(
+    shortable: string,
+    amount: BigNumberish,
+    to: string,
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
+
   callStatic: {
+    REVISION(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "REVISION()"(overrides?: CallOverrides): Promise<BigNumber>;
+
     WETH(overrides?: CallOverrides): Promise<string>;
 
     "WETH()"(overrides?: CallOverrides): Promise<string>;
-
-    __Router_init(
-      _reserveFactory: string,
-      _pairFactory: string,
-      _swapRouter: string,
-      _WETH: string,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    "__Router_init(address,address,address,address)"(
-      _reserveFactory: string,
-      _pairFactory: string,
-      _swapRouter: string,
-      _WETH: string,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    __Router_init_unchained(
-      _reserveFactory: string,
-      _pairFactory: string,
-      _swapRouter: string,
-      _WETH: string,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    "__Router_init_unchained(address,address,address,address)"(
-      _reserveFactory: string,
-      _pairFactory: string,
-      _swapRouter: string,
-      _WETH: string,
-      overrides?: CallOverrides
-    ): Promise<void>;
 
     calculateBalance(
       lendable: string,
@@ -1477,7 +3212,8 @@ export class Router extends Contract {
       amountIn: BigNumberish,
       overrides?: CallOverrides
     ): Promise<
-      [BigNumber, BigNumber, BigNumber] & {
+      [BigNumber, BigNumber, BigNumber, BigNumber] & {
+        amountOut: BigNumber;
         profit: BigNumber;
         debtPayable: BigNumber;
         protocolFee: BigNumber;
@@ -1491,7 +3227,8 @@ export class Router extends Contract {
       amountIn: BigNumberish,
       overrides?: CallOverrides
     ): Promise<
-      [BigNumber, BigNumber, BigNumber] & {
+      [BigNumber, BigNumber, BigNumber, BigNumber] & {
+        amountOut: BigNumber;
         profit: BigNumber;
         debtPayable: BigNumber;
         protocolFee: BigNumber;
@@ -1560,6 +3297,68 @@ export class Router extends Contract {
       }
     >;
 
+    calculateOpenProxyShortPosition(
+      lendable: string,
+      proxyLendable: string,
+      shortable: string,
+      amount: BigNumberish,
+      leverageFactor: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<
+      [BigNumber, BigNumber, BigNumber, BigNumber] & {
+        maxAmountIn: BigNumber;
+        borrowAmount: BigNumber;
+        borrowRate: BigNumber;
+        liquidationCost: BigNumber;
+      }
+    >;
+
+    "calculateOpenProxyShortPosition(address,address,address,uint256,uint256)"(
+      lendable: string,
+      proxyLendable: string,
+      shortable: string,
+      amount: BigNumberish,
+      leverageFactor: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<
+      [BigNumber, BigNumber, BigNumber, BigNumber] & {
+        maxAmountIn: BigNumber;
+        borrowAmount: BigNumber;
+        borrowRate: BigNumber;
+        liquidationCost: BigNumber;
+      }
+    >;
+
+    calculateOpenShortPosition(
+      lendable: string,
+      shortable: string,
+      amount: BigNumberish,
+      leverageFactor: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<
+      [BigNumber, BigNumber, BigNumber, BigNumber] & {
+        maxAmountIn: BigNumber;
+        borrowAmount: BigNumber;
+        borrowRate: BigNumber;
+        liquidationCost: BigNumber;
+      }
+    >;
+
+    "calculateOpenShortPosition(address,address,uint256,uint256)"(
+      lendable: string,
+      shortable: string,
+      amount: BigNumberish,
+      leverageFactor: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<
+      [BigNumber, BigNumber, BigNumber, BigNumber] & {
+        maxAmountIn: BigNumber;
+        borrowAmount: BigNumber;
+        borrowRate: BigNumber;
+        liquidationCost: BigNumber;
+      }
+    >;
+
     calculateProxyBalance(
       lendable: string,
       proxyLendable: string,
@@ -1568,7 +3367,8 @@ export class Router extends Contract {
       amountIn: BigNumberish,
       overrides?: CallOverrides
     ): Promise<
-      [BigNumber, BigNumber, BigNumber] & {
+      [BigNumber, BigNumber, BigNumber, BigNumber] & {
+        amountOut: BigNumber;
         profit: BigNumber;
         debtPayable: BigNumber;
         protocolFee: BigNumber;
@@ -1583,7 +3383,70 @@ export class Router extends Contract {
       amountIn: BigNumberish,
       overrides?: CallOverrides
     ): Promise<
-      [BigNumber, BigNumber, BigNumber] & {
+      [BigNumber, BigNumber, BigNumber, BigNumber] & {
+        amountOut: BigNumber;
+        profit: BigNumber;
+        debtPayable: BigNumber;
+        protocolFee: BigNumber;
+      }
+    >;
+
+    calculateProxyShortBalance(
+      lendable: string,
+      proxyLendable: string,
+      shortable: string,
+      trader: string,
+      amountIn: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<
+      [BigNumber, BigNumber, BigNumber, BigNumber] & {
+        amountOut: BigNumber;
+        profit: BigNumber;
+        debtPayable: BigNumber;
+        protocolFee: BigNumber;
+      }
+    >;
+
+    "calculateProxyShortBalance(address,address,address,address,uint256)"(
+      lendable: string,
+      proxyLendable: string,
+      shortable: string,
+      trader: string,
+      amountIn: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<
+      [BigNumber, BigNumber, BigNumber, BigNumber] & {
+        amountOut: BigNumber;
+        profit: BigNumber;
+        debtPayable: BigNumber;
+        protocolFee: BigNumber;
+      }
+    >;
+
+    calculateShortBalance(
+      lendable: string,
+      shortable: string,
+      trader: string,
+      amountIn: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<
+      [BigNumber, BigNumber, BigNumber, BigNumber] & {
+        amountOut: BigNumber;
+        profit: BigNumber;
+        debtPayable: BigNumber;
+        protocolFee: BigNumber;
+      }
+    >;
+
+    "calculateShortBalance(address,address,address,uint256)"(
+      lendable: string,
+      shortable: string,
+      trader: string,
+      amountIn: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<
+      [BigNumber, BigNumber, BigNumber, BigNumber] & {
+        amountOut: BigNumber;
         profit: BigNumber;
         debtPayable: BigNumber;
         protocolFee: BigNumber;
@@ -1628,6 +3491,48 @@ export class Router extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
+    closePositionETHWithReferrer(
+      amountIn: BigNumberish,
+      amountOutMin: BigNumberish,
+      tradable: string,
+      trader: string,
+      deadline: BigNumberish,
+      referrer: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "closePositionETHWithReferrer(uint256,uint256,address,address,uint256,address)"(
+      amountIn: BigNumberish,
+      amountOutMin: BigNumberish,
+      tradable: string,
+      trader: string,
+      deadline: BigNumberish,
+      referrer: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    closePositionWithReferrer(
+      amountIn: BigNumberish,
+      amountOutMin: BigNumberish,
+      lendable: string,
+      tradable: string,
+      trader: string,
+      deadline: BigNumberish,
+      referrer: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "closePositionWithReferrer(uint256,uint256,address,address,address,uint256,address)"(
+      amountIn: BigNumberish,
+      amountOutMin: BigNumberish,
+      lendable: string,
+      tradable: string,
+      trader: string,
+      deadline: BigNumberish,
+      referrer: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
     closeProxyPosition(
       amountIn: BigNumberish,
       amountOutMin: BigNumberish,
@@ -1650,6 +3555,160 @@ export class Router extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
+    closeProxyPositionETH(
+      amountIn: BigNumberish,
+      amountOutMin: BigNumberish,
+      proxyLendable: string,
+      tradable: string,
+      trader: string,
+      deadline: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "closeProxyPositionETH(uint256,uint256,address,address,address,uint256)"(
+      amountIn: BigNumberish,
+      amountOutMin: BigNumberish,
+      proxyLendable: string,
+      tradable: string,
+      trader: string,
+      deadline: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    closeProxyPositionETHWithReferrer(
+      amountIn: BigNumberish,
+      amountOutMin: BigNumberish,
+      proxyLendable: string,
+      tradable: string,
+      trader: string,
+      deadline: BigNumberish,
+      referrer: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "closeProxyPositionETHWithReferrer(uint256,uint256,address,address,address,uint256,address)"(
+      amountIn: BigNumberish,
+      amountOutMin: BigNumberish,
+      proxyLendable: string,
+      tradable: string,
+      trader: string,
+      deadline: BigNumberish,
+      referrer: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    closeProxyPositionWithReferrer(
+      amountIn: BigNumberish,
+      amountOutMin: BigNumberish,
+      lendable: string,
+      proxyLendable: string,
+      tradable: string,
+      trader: string,
+      deadline: BigNumberish,
+      referrer: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "closeProxyPositionWithReferrer(uint256,uint256,address,address,address,address,uint256,address)"(
+      amountIn: BigNumberish,
+      amountOutMin: BigNumberish,
+      lendable: string,
+      proxyLendable: string,
+      tradable: string,
+      trader: string,
+      deadline: BigNumberish,
+      referrer: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    closeProxyShortPosition(
+      amountIn: BigNumberish,
+      amountOutMin: BigNumberish,
+      lendable: string,
+      proxyLendable: string,
+      shortable: string,
+      trader: string,
+      deadline: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "closeProxyShortPosition(uint256,uint256,address,address,address,address,uint256)"(
+      amountIn: BigNumberish,
+      amountOutMin: BigNumberish,
+      lendable: string,
+      proxyLendable: string,
+      shortable: string,
+      trader: string,
+      deadline: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    closeProxyShortPositionWithReferrer(
+      amountIn: BigNumberish,
+      amountOutMin: BigNumberish,
+      lendable: string,
+      proxyLendable: string,
+      shortable: string,
+      trader: string,
+      deadline: BigNumberish,
+      referrer: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "closeProxyShortPositionWithReferrer(uint256,uint256,address,address,address,address,uint256,address)"(
+      amountIn: BigNumberish,
+      amountOutMin: BigNumberish,
+      lendable: string,
+      proxyLendable: string,
+      shortable: string,
+      trader: string,
+      deadline: BigNumberish,
+      referrer: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    closeShortPosition(
+      amountIn: BigNumberish,
+      amountOutMin: BigNumberish,
+      lendable: string,
+      shortable: string,
+      trader: string,
+      deadline: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "closeShortPosition(uint256,uint256,address,address,address,uint256)"(
+      amountIn: BigNumberish,
+      amountOutMin: BigNumberish,
+      lendable: string,
+      shortable: string,
+      trader: string,
+      deadline: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    closeShortPositionWithReferrer(
+      amountIn: BigNumberish,
+      amountOutMin: BigNumberish,
+      lendable: string,
+      shortable: string,
+      trader: string,
+      deadline: BigNumberish,
+      referrer: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "closeShortPositionWithReferrer(uint256,uint256,address,address,address,uint256,address)"(
+      amountIn: BigNumberish,
+      amountOutMin: BigNumberish,
+      lendable: string,
+      shortable: string,
+      trader: string,
+      deadline: BigNumberish,
+      referrer: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
     deposit(
       lendable: string,
       amount: BigNumberish,
@@ -1667,6 +3726,20 @@ export class Router extends Contract {
     depositETH(to: string, overrides?: CallOverrides): Promise<void>;
 
     "depositETH(address)"(to: string, overrides?: CallOverrides): Promise<void>;
+
+    depositShortable(
+      shortable: string,
+      amount: BigNumberish,
+      to: string,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    "depositShortable(address,uint256,address)"(
+      shortable: string,
+      amount: BigNumberish,
+      to: string,
+      overrides?: CallOverrides
+    ): Promise<void>;
 
     getPosition(
       trader: string,
@@ -1778,49 +3851,145 @@ export class Router extends Contract {
       }
     >;
 
+    getProxyShortPosition(
+      trader: string,
+      lendable: string,
+      proxyLendable: string,
+      shortable: string,
+      overrides?: CallOverrides
+    ): Promise<
+      [
+        BigNumber,
+        BigNumber,
+        BigNumber,
+        BigNumber,
+        BigNumber,
+        BigNumber,
+        BigNumber,
+        BigNumber
+      ] & {
+        amount: BigNumber;
+        value: BigNumber;
+        selfValue: BigNumber;
+        principalDebt: BigNumber;
+        currentDebt: BigNumber;
+        rate: BigNumber;
+        currentCost: BigNumber;
+        liquidationCost: BigNumber;
+      }
+    >;
+
+    "getProxyShortPosition(address,address,address,address)"(
+      trader: string,
+      lendable: string,
+      proxyLendable: string,
+      shortable: string,
+      overrides?: CallOverrides
+    ): Promise<
+      [
+        BigNumber,
+        BigNumber,
+        BigNumber,
+        BigNumber,
+        BigNumber,
+        BigNumber,
+        BigNumber,
+        BigNumber
+      ] & {
+        amount: BigNumber;
+        value: BigNumber;
+        selfValue: BigNumber;
+        principalDebt: BigNumber;
+        currentDebt: BigNumber;
+        rate: BigNumber;
+        currentCost: BigNumber;
+        liquidationCost: BigNumber;
+      }
+    >;
+
+    getShortPosition(
+      trader: string,
+      lendable: string,
+      shortable: string,
+      overrides?: CallOverrides
+    ): Promise<
+      [
+        BigNumber,
+        BigNumber,
+        BigNumber,
+        BigNumber,
+        BigNumber,
+        BigNumber,
+        BigNumber,
+        BigNumber
+      ] & {
+        amount: BigNumber;
+        value: BigNumber;
+        selfValue: BigNumber;
+        principalDebt: BigNumber;
+        currentDebt: BigNumber;
+        rate: BigNumber;
+        currentCost: BigNumber;
+        liquidationCost: BigNumber;
+      }
+    >;
+
+    "getShortPosition(address,address,address)"(
+      trader: string,
+      lendable: string,
+      shortable: string,
+      overrides?: CallOverrides
+    ): Promise<
+      [
+        BigNumber,
+        BigNumber,
+        BigNumber,
+        BigNumber,
+        BigNumber,
+        BigNumber,
+        BigNumber,
+        BigNumber
+      ] & {
+        amount: BigNumber;
+        value: BigNumber;
+        selfValue: BigNumber;
+        principalDebt: BigNumber;
+        currentDebt: BigNumber;
+        rate: BigNumber;
+        currentCost: BigNumber;
+        liquidationCost: BigNumber;
+      }
+    >;
+
+    incentivize(
+      token: string,
+      amount: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    "incentivize(address,uint256)"(
+      token: string,
+      amount: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
     initialize(
       _reserveFactory: string,
       _pairFactory: string,
       _swapRouter: string,
       _WETH: string,
+      _xWOW: string,
+      _referralProgram: string,
       overrides?: CallOverrides
     ): Promise<void>;
 
-    "initialize(address,address,address,address)"(
+    "initialize(address,address,address,address,address,address)"(
       _reserveFactory: string,
       _pairFactory: string,
       _swapRouter: string,
       _WETH: string,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    liquidatePosition(
-      lendable: string,
-      tradable: string,
-      trader: string,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    "liquidatePosition(address,address,address)"(
-      lendable: string,
-      tradable: string,
-      trader: string,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    liquidateProxyPosition(
-      lendable: string,
-      proxyLendable: string,
-      tradable: string,
-      trader: string,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    "liquidateProxyPosition(address,address,address,address)"(
-      lendable: string,
-      proxyLendable: string,
-      tradable: string,
-      trader: string,
+      _xWOW: string,
+      _referralProgram: string,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -1864,6 +4033,50 @@ export class Router extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
+    openPositionETHWithReferrer(
+      leverageFactor: BigNumberish,
+      amountOutMin: BigNumberish,
+      tradable: string,
+      trader: string,
+      deadline: BigNumberish,
+      referrer: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "openPositionETHWithReferrer(uint256,uint256,address,address,uint256,address)"(
+      leverageFactor: BigNumberish,
+      amountOutMin: BigNumberish,
+      tradable: string,
+      trader: string,
+      deadline: BigNumberish,
+      referrer: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    openPositionWithReferrer(
+      amountIn: BigNumberish,
+      leverageFactor: BigNumberish,
+      amountOutMin: BigNumberish,
+      lendable: string,
+      tradable: string,
+      trader: string,
+      deadline: BigNumberish,
+      referrer: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "openPositionWithReferrer(uint256,uint256,uint256,address,address,address,uint256,address)"(
+      amountIn: BigNumberish,
+      leverageFactor: BigNumberish,
+      amountOutMin: BigNumberish,
+      lendable: string,
+      tradable: string,
+      trader: string,
+      deadline: BigNumberish,
+      referrer: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
     openProxyPosition(
       amountIn: BigNumberish,
       leverageFactor: BigNumberish,
@@ -1888,6 +4101,170 @@ export class Router extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
+    openProxyPositionETH(
+      leverageFactor: BigNumberish,
+      amountOutMin: BigNumberish,
+      proxyLendable: string,
+      tradable: string,
+      trader: string,
+      deadline: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "openProxyPositionETH(uint256,uint256,address,address,address,uint256)"(
+      leverageFactor: BigNumberish,
+      amountOutMin: BigNumberish,
+      proxyLendable: string,
+      tradable: string,
+      trader: string,
+      deadline: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    openProxyPositionETHWithReferrer(
+      leverageFactor: BigNumberish,
+      amountOutMin: BigNumberish,
+      proxyLendable: string,
+      tradable: string,
+      trader: string,
+      deadline: BigNumberish,
+      referrer: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "openProxyPositionETHWithReferrer(uint256,uint256,address,address,address,uint256,address)"(
+      leverageFactor: BigNumberish,
+      amountOutMin: BigNumberish,
+      proxyLendable: string,
+      tradable: string,
+      trader: string,
+      deadline: BigNumberish,
+      referrer: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    openProxyPositionWithReferrer(
+      amountIn: BigNumberish,
+      leverageFactor: BigNumberish,
+      amountOutMin: BigNumberish,
+      lendable: string,
+      proxyLendable: string,
+      tradable: string,
+      trader: string,
+      deadline: BigNumberish,
+      referrer: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "openProxyPositionWithReferrer(uint256,uint256,uint256,address,address,address,address,uint256,address)"(
+      amountIn: BigNumberish,
+      leverageFactor: BigNumberish,
+      amountOutMin: BigNumberish,
+      lendable: string,
+      proxyLendable: string,
+      tradable: string,
+      trader: string,
+      deadline: BigNumberish,
+      referrer: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    openProxyShortPosition(
+      amountIn: BigNumberish,
+      leverageFactor: BigNumberish,
+      amountOutMin: BigNumberish,
+      lendable: string,
+      proxyLendable: string,
+      shortable: string,
+      trader: string,
+      deadline: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "openProxyShortPosition(uint256,uint256,uint256,address,address,address,address,uint256)"(
+      amountIn: BigNumberish,
+      leverageFactor: BigNumberish,
+      amountOutMin: BigNumberish,
+      lendable: string,
+      proxyLendable: string,
+      shortable: string,
+      trader: string,
+      deadline: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    openProxyShortPositionWithReferrer(
+      amountIn: BigNumberish,
+      leverageFactor: BigNumberish,
+      amountOutMin: BigNumberish,
+      lendable: string,
+      proxyLendable: string,
+      shortable: string,
+      trader: string,
+      deadline: BigNumberish,
+      referrer: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "openProxyShortPositionWithReferrer(uint256,uint256,uint256,address,address,address,address,uint256,address)"(
+      amountIn: BigNumberish,
+      leverageFactor: BigNumberish,
+      amountOutMin: BigNumberish,
+      lendable: string,
+      proxyLendable: string,
+      shortable: string,
+      trader: string,
+      deadline: BigNumberish,
+      referrer: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    openShortPosition(
+      amountIn: BigNumberish,
+      leverageFactor: BigNumberish,
+      amountOutMin: BigNumberish,
+      lendable: string,
+      shortable: string,
+      trader: string,
+      deadline: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "openShortPosition(uint256,uint256,uint256,address,address,address,uint256)"(
+      amountIn: BigNumberish,
+      leverageFactor: BigNumberish,
+      amountOutMin: BigNumberish,
+      lendable: string,
+      shortable: string,
+      trader: string,
+      deadline: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    openShortPositionWithReferrer(
+      amountIn: BigNumberish,
+      leverageFactor: BigNumberish,
+      amountOutMin: BigNumberish,
+      lendable: string,
+      shortable: string,
+      trader: string,
+      deadline: BigNumberish,
+      referrer: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "openShortPositionWithReferrer(uint256,uint256,uint256,address,address,address,uint256,address)"(
+      amountIn: BigNumberish,
+      leverageFactor: BigNumberish,
+      amountOutMin: BigNumberish,
+      lendable: string,
+      shortable: string,
+      trader: string,
+      deadline: BigNumberish,
+      referrer: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
     pairFactory(overrides?: CallOverrides): Promise<string>;
 
     "pairFactory()"(overrides?: CallOverrides): Promise<string>;
@@ -1895,6 +4272,22 @@ export class Router extends Contract {
     reserveFactory(overrides?: CallOverrides): Promise<string>;
 
     "reserveFactory()"(overrides?: CallOverrides): Promise<string>;
+
+    stake(
+      token: string,
+      amount: BigNumberish,
+      period: BigNumberish,
+      to: string,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    "stake(address,uint256,uint16,address)"(
+      token: string,
+      amount: BigNumberish,
+      period: BigNumberish,
+      to: string,
+      overrides?: CallOverrides
+    ): Promise<void>;
 
     swapFactory(overrides?: CallOverrides): Promise<string>;
 
@@ -1904,14 +4297,31 @@ export class Router extends Contract {
 
     "swapRouter()"(overrides?: CallOverrides): Promise<string>;
 
-    sweepFee(
+    sweepReserveFee(lendable: string, overrides?: CallOverrides): Promise<void>;
+
+    "sweepReserveFee(address)"(
       lendable: string,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    sweepShortingReserveFee(
+      shortable: string,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    "sweepShortingReserveFee(address)"(
+      shortable: string,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    unstake(
+      token: string,
       to: string,
       overrides?: CallOverrides
     ): Promise<void>;
 
-    "sweepFee(address,address)"(
-      lendable: string,
+    "unstake(address,address)"(
+      token: string,
       to: string,
       overrides?: CallOverrides
     ): Promise<void>;
@@ -1941,46 +4351,32 @@ export class Router extends Contract {
       to: string,
       overrides?: CallOverrides
     ): Promise<void>;
+
+    withdrawShortable(
+      shortable: string,
+      amount: BigNumberish,
+      to: string,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    "withdrawShortable(address,uint256,address)"(
+      shortable: string,
+      amount: BigNumberish,
+      to: string,
+      overrides?: CallOverrides
+    ): Promise<void>;
   };
 
   filters: {};
 
   estimateGas: {
+    REVISION(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "REVISION()"(overrides?: CallOverrides): Promise<BigNumber>;
+
     WETH(overrides?: CallOverrides): Promise<BigNumber>;
 
     "WETH()"(overrides?: CallOverrides): Promise<BigNumber>;
-
-    __Router_init(
-      _reserveFactory: string,
-      _pairFactory: string,
-      _swapRouter: string,
-      _WETH: string,
-      overrides?: Overrides
-    ): Promise<BigNumber>;
-
-    "__Router_init(address,address,address,address)"(
-      _reserveFactory: string,
-      _pairFactory: string,
-      _swapRouter: string,
-      _WETH: string,
-      overrides?: Overrides
-    ): Promise<BigNumber>;
-
-    __Router_init_unchained(
-      _reserveFactory: string,
-      _pairFactory: string,
-      _swapRouter: string,
-      _WETH: string,
-      overrides?: Overrides
-    ): Promise<BigNumber>;
-
-    "__Router_init_unchained(address,address,address,address)"(
-      _reserveFactory: string,
-      _pairFactory: string,
-      _swapRouter: string,
-      _WETH: string,
-      overrides?: Overrides
-    ): Promise<BigNumber>;
 
     calculateBalance(
       lendable: string,
@@ -2032,6 +4428,40 @@ export class Router extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
+    calculateOpenProxyShortPosition(
+      lendable: string,
+      proxyLendable: string,
+      shortable: string,
+      amount: BigNumberish,
+      leverageFactor: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "calculateOpenProxyShortPosition(address,address,address,uint256,uint256)"(
+      lendable: string,
+      proxyLendable: string,
+      shortable: string,
+      amount: BigNumberish,
+      leverageFactor: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    calculateOpenShortPosition(
+      lendable: string,
+      shortable: string,
+      amount: BigNumberish,
+      leverageFactor: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "calculateOpenShortPosition(address,address,uint256,uint256)"(
+      lendable: string,
+      shortable: string,
+      amount: BigNumberish,
+      leverageFactor: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
     calculateProxyBalance(
       lendable: string,
       proxyLendable: string,
@@ -2045,6 +4475,40 @@ export class Router extends Contract {
       lendable: string,
       proxyLendable: string,
       tradable: string,
+      trader: string,
+      amountIn: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    calculateProxyShortBalance(
+      lendable: string,
+      proxyLendable: string,
+      shortable: string,
+      trader: string,
+      amountIn: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "calculateProxyShortBalance(address,address,address,address,uint256)"(
+      lendable: string,
+      proxyLendable: string,
+      shortable: string,
+      trader: string,
+      amountIn: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    calculateShortBalance(
+      lendable: string,
+      shortable: string,
+      trader: string,
+      amountIn: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "calculateShortBalance(address,address,address,uint256)"(
+      lendable: string,
+      shortable: string,
       trader: string,
       amountIn: BigNumberish,
       overrides?: CallOverrides
@@ -2088,6 +4552,48 @@ export class Router extends Contract {
       overrides?: Overrides
     ): Promise<BigNumber>;
 
+    closePositionETHWithReferrer(
+      amountIn: BigNumberish,
+      amountOutMin: BigNumberish,
+      tradable: string,
+      trader: string,
+      deadline: BigNumberish,
+      referrer: string,
+      overrides?: Overrides
+    ): Promise<BigNumber>;
+
+    "closePositionETHWithReferrer(uint256,uint256,address,address,uint256,address)"(
+      amountIn: BigNumberish,
+      amountOutMin: BigNumberish,
+      tradable: string,
+      trader: string,
+      deadline: BigNumberish,
+      referrer: string,
+      overrides?: Overrides
+    ): Promise<BigNumber>;
+
+    closePositionWithReferrer(
+      amountIn: BigNumberish,
+      amountOutMin: BigNumberish,
+      lendable: string,
+      tradable: string,
+      trader: string,
+      deadline: BigNumberish,
+      referrer: string,
+      overrides?: Overrides
+    ): Promise<BigNumber>;
+
+    "closePositionWithReferrer(uint256,uint256,address,address,address,uint256,address)"(
+      amountIn: BigNumberish,
+      amountOutMin: BigNumberish,
+      lendable: string,
+      tradable: string,
+      trader: string,
+      deadline: BigNumberish,
+      referrer: string,
+      overrides?: Overrides
+    ): Promise<BigNumber>;
+
     closeProxyPosition(
       amountIn: BigNumberish,
       amountOutMin: BigNumberish,
@@ -2107,6 +4613,160 @@ export class Router extends Contract {
       tradable: string,
       trader: string,
       deadline: BigNumberish,
+      overrides?: Overrides
+    ): Promise<BigNumber>;
+
+    closeProxyPositionETH(
+      amountIn: BigNumberish,
+      amountOutMin: BigNumberish,
+      proxyLendable: string,
+      tradable: string,
+      trader: string,
+      deadline: BigNumberish,
+      overrides?: Overrides
+    ): Promise<BigNumber>;
+
+    "closeProxyPositionETH(uint256,uint256,address,address,address,uint256)"(
+      amountIn: BigNumberish,
+      amountOutMin: BigNumberish,
+      proxyLendable: string,
+      tradable: string,
+      trader: string,
+      deadline: BigNumberish,
+      overrides?: Overrides
+    ): Promise<BigNumber>;
+
+    closeProxyPositionETHWithReferrer(
+      amountIn: BigNumberish,
+      amountOutMin: BigNumberish,
+      proxyLendable: string,
+      tradable: string,
+      trader: string,
+      deadline: BigNumberish,
+      referrer: string,
+      overrides?: Overrides
+    ): Promise<BigNumber>;
+
+    "closeProxyPositionETHWithReferrer(uint256,uint256,address,address,address,uint256,address)"(
+      amountIn: BigNumberish,
+      amountOutMin: BigNumberish,
+      proxyLendable: string,
+      tradable: string,
+      trader: string,
+      deadline: BigNumberish,
+      referrer: string,
+      overrides?: Overrides
+    ): Promise<BigNumber>;
+
+    closeProxyPositionWithReferrer(
+      amountIn: BigNumberish,
+      amountOutMin: BigNumberish,
+      lendable: string,
+      proxyLendable: string,
+      tradable: string,
+      trader: string,
+      deadline: BigNumberish,
+      referrer: string,
+      overrides?: Overrides
+    ): Promise<BigNumber>;
+
+    "closeProxyPositionWithReferrer(uint256,uint256,address,address,address,address,uint256,address)"(
+      amountIn: BigNumberish,
+      amountOutMin: BigNumberish,
+      lendable: string,
+      proxyLendable: string,
+      tradable: string,
+      trader: string,
+      deadline: BigNumberish,
+      referrer: string,
+      overrides?: Overrides
+    ): Promise<BigNumber>;
+
+    closeProxyShortPosition(
+      amountIn: BigNumberish,
+      amountOutMin: BigNumberish,
+      lendable: string,
+      proxyLendable: string,
+      shortable: string,
+      trader: string,
+      deadline: BigNumberish,
+      overrides?: Overrides
+    ): Promise<BigNumber>;
+
+    "closeProxyShortPosition(uint256,uint256,address,address,address,address,uint256)"(
+      amountIn: BigNumberish,
+      amountOutMin: BigNumberish,
+      lendable: string,
+      proxyLendable: string,
+      shortable: string,
+      trader: string,
+      deadline: BigNumberish,
+      overrides?: Overrides
+    ): Promise<BigNumber>;
+
+    closeProxyShortPositionWithReferrer(
+      amountIn: BigNumberish,
+      amountOutMin: BigNumberish,
+      lendable: string,
+      proxyLendable: string,
+      shortable: string,
+      trader: string,
+      deadline: BigNumberish,
+      referrer: string,
+      overrides?: Overrides
+    ): Promise<BigNumber>;
+
+    "closeProxyShortPositionWithReferrer(uint256,uint256,address,address,address,address,uint256,address)"(
+      amountIn: BigNumberish,
+      amountOutMin: BigNumberish,
+      lendable: string,
+      proxyLendable: string,
+      shortable: string,
+      trader: string,
+      deadline: BigNumberish,
+      referrer: string,
+      overrides?: Overrides
+    ): Promise<BigNumber>;
+
+    closeShortPosition(
+      amountIn: BigNumberish,
+      amountOutMin: BigNumberish,
+      lendable: string,
+      shortable: string,
+      trader: string,
+      deadline: BigNumberish,
+      overrides?: Overrides
+    ): Promise<BigNumber>;
+
+    "closeShortPosition(uint256,uint256,address,address,address,uint256)"(
+      amountIn: BigNumberish,
+      amountOutMin: BigNumberish,
+      lendable: string,
+      shortable: string,
+      trader: string,
+      deadline: BigNumberish,
+      overrides?: Overrides
+    ): Promise<BigNumber>;
+
+    closeShortPositionWithReferrer(
+      amountIn: BigNumberish,
+      amountOutMin: BigNumberish,
+      lendable: string,
+      shortable: string,
+      trader: string,
+      deadline: BigNumberish,
+      referrer: string,
+      overrides?: Overrides
+    ): Promise<BigNumber>;
+
+    "closeShortPositionWithReferrer(uint256,uint256,address,address,address,uint256,address)"(
+      amountIn: BigNumberish,
+      amountOutMin: BigNumberish,
+      lendable: string,
+      shortable: string,
+      trader: string,
+      deadline: BigNumberish,
+      referrer: string,
       overrides?: Overrides
     ): Promise<BigNumber>;
 
@@ -2131,6 +4791,20 @@ export class Router extends Contract {
       overrides?: PayableOverrides
     ): Promise<BigNumber>;
 
+    depositShortable(
+      shortable: string,
+      amount: BigNumberish,
+      to: string,
+      overrides?: Overrides
+    ): Promise<BigNumber>;
+
+    "depositShortable(address,uint256,address)"(
+      shortable: string,
+      amount: BigNumberish,
+      to: string,
+      overrides?: Overrides
+    ): Promise<BigNumber>;
+
     getPosition(
       trader: string,
       lendable: string,
@@ -2161,49 +4835,65 @@ export class Router extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
+    getProxyShortPosition(
+      trader: string,
+      lendable: string,
+      proxyLendable: string,
+      shortable: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "getProxyShortPosition(address,address,address,address)"(
+      trader: string,
+      lendable: string,
+      proxyLendable: string,
+      shortable: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    getShortPosition(
+      trader: string,
+      lendable: string,
+      shortable: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "getShortPosition(address,address,address)"(
+      trader: string,
+      lendable: string,
+      shortable: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    incentivize(
+      token: string,
+      amount: BigNumberish,
+      overrides?: Overrides
+    ): Promise<BigNumber>;
+
+    "incentivize(address,uint256)"(
+      token: string,
+      amount: BigNumberish,
+      overrides?: Overrides
+    ): Promise<BigNumber>;
+
     initialize(
       _reserveFactory: string,
       _pairFactory: string,
       _swapRouter: string,
       _WETH: string,
+      _xWOW: string,
+      _referralProgram: string,
       overrides?: Overrides
     ): Promise<BigNumber>;
 
-    "initialize(address,address,address,address)"(
+    "initialize(address,address,address,address,address,address)"(
       _reserveFactory: string,
       _pairFactory: string,
       _swapRouter: string,
       _WETH: string,
-      overrides?: Overrides
-    ): Promise<BigNumber>;
-
-    liquidatePosition(
-      lendable: string,
-      tradable: string,
-      trader: string,
-      overrides?: Overrides
-    ): Promise<BigNumber>;
-
-    "liquidatePosition(address,address,address)"(
-      lendable: string,
-      tradable: string,
-      trader: string,
-      overrides?: Overrides
-    ): Promise<BigNumber>;
-
-    liquidateProxyPosition(
-      lendable: string,
-      proxyLendable: string,
-      tradable: string,
-      trader: string,
-      overrides?: Overrides
-    ): Promise<BigNumber>;
-
-    "liquidateProxyPosition(address,address,address,address)"(
-      lendable: string,
-      proxyLendable: string,
-      tradable: string,
-      trader: string,
+      _xWOW: string,
+      _referralProgram: string,
       overrides?: Overrides
     ): Promise<BigNumber>;
 
@@ -2247,6 +4937,50 @@ export class Router extends Contract {
       overrides?: PayableOverrides
     ): Promise<BigNumber>;
 
+    openPositionETHWithReferrer(
+      leverageFactor: BigNumberish,
+      amountOutMin: BigNumberish,
+      tradable: string,
+      trader: string,
+      deadline: BigNumberish,
+      referrer: string,
+      overrides?: PayableOverrides
+    ): Promise<BigNumber>;
+
+    "openPositionETHWithReferrer(uint256,uint256,address,address,uint256,address)"(
+      leverageFactor: BigNumberish,
+      amountOutMin: BigNumberish,
+      tradable: string,
+      trader: string,
+      deadline: BigNumberish,
+      referrer: string,
+      overrides?: PayableOverrides
+    ): Promise<BigNumber>;
+
+    openPositionWithReferrer(
+      amountIn: BigNumberish,
+      leverageFactor: BigNumberish,
+      amountOutMin: BigNumberish,
+      lendable: string,
+      tradable: string,
+      trader: string,
+      deadline: BigNumberish,
+      referrer: string,
+      overrides?: Overrides
+    ): Promise<BigNumber>;
+
+    "openPositionWithReferrer(uint256,uint256,uint256,address,address,address,uint256,address)"(
+      amountIn: BigNumberish,
+      leverageFactor: BigNumberish,
+      amountOutMin: BigNumberish,
+      lendable: string,
+      tradable: string,
+      trader: string,
+      deadline: BigNumberish,
+      referrer: string,
+      overrides?: Overrides
+    ): Promise<BigNumber>;
+
     openProxyPosition(
       amountIn: BigNumberish,
       leverageFactor: BigNumberish,
@@ -2271,6 +5005,170 @@ export class Router extends Contract {
       overrides?: Overrides
     ): Promise<BigNumber>;
 
+    openProxyPositionETH(
+      leverageFactor: BigNumberish,
+      amountOutMin: BigNumberish,
+      proxyLendable: string,
+      tradable: string,
+      trader: string,
+      deadline: BigNumberish,
+      overrides?: PayableOverrides
+    ): Promise<BigNumber>;
+
+    "openProxyPositionETH(uint256,uint256,address,address,address,uint256)"(
+      leverageFactor: BigNumberish,
+      amountOutMin: BigNumberish,
+      proxyLendable: string,
+      tradable: string,
+      trader: string,
+      deadline: BigNumberish,
+      overrides?: PayableOverrides
+    ): Promise<BigNumber>;
+
+    openProxyPositionETHWithReferrer(
+      leverageFactor: BigNumberish,
+      amountOutMin: BigNumberish,
+      proxyLendable: string,
+      tradable: string,
+      trader: string,
+      deadline: BigNumberish,
+      referrer: string,
+      overrides?: PayableOverrides
+    ): Promise<BigNumber>;
+
+    "openProxyPositionETHWithReferrer(uint256,uint256,address,address,address,uint256,address)"(
+      leverageFactor: BigNumberish,
+      amountOutMin: BigNumberish,
+      proxyLendable: string,
+      tradable: string,
+      trader: string,
+      deadline: BigNumberish,
+      referrer: string,
+      overrides?: PayableOverrides
+    ): Promise<BigNumber>;
+
+    openProxyPositionWithReferrer(
+      amountIn: BigNumberish,
+      leverageFactor: BigNumberish,
+      amountOutMin: BigNumberish,
+      lendable: string,
+      proxyLendable: string,
+      tradable: string,
+      trader: string,
+      deadline: BigNumberish,
+      referrer: string,
+      overrides?: Overrides
+    ): Promise<BigNumber>;
+
+    "openProxyPositionWithReferrer(uint256,uint256,uint256,address,address,address,address,uint256,address)"(
+      amountIn: BigNumberish,
+      leverageFactor: BigNumberish,
+      amountOutMin: BigNumberish,
+      lendable: string,
+      proxyLendable: string,
+      tradable: string,
+      trader: string,
+      deadline: BigNumberish,
+      referrer: string,
+      overrides?: Overrides
+    ): Promise<BigNumber>;
+
+    openProxyShortPosition(
+      amountIn: BigNumberish,
+      leverageFactor: BigNumberish,
+      amountOutMin: BigNumberish,
+      lendable: string,
+      proxyLendable: string,
+      shortable: string,
+      trader: string,
+      deadline: BigNumberish,
+      overrides?: Overrides
+    ): Promise<BigNumber>;
+
+    "openProxyShortPosition(uint256,uint256,uint256,address,address,address,address,uint256)"(
+      amountIn: BigNumberish,
+      leverageFactor: BigNumberish,
+      amountOutMin: BigNumberish,
+      lendable: string,
+      proxyLendable: string,
+      shortable: string,
+      trader: string,
+      deadline: BigNumberish,
+      overrides?: Overrides
+    ): Promise<BigNumber>;
+
+    openProxyShortPositionWithReferrer(
+      amountIn: BigNumberish,
+      leverageFactor: BigNumberish,
+      amountOutMin: BigNumberish,
+      lendable: string,
+      proxyLendable: string,
+      shortable: string,
+      trader: string,
+      deadline: BigNumberish,
+      referrer: string,
+      overrides?: Overrides
+    ): Promise<BigNumber>;
+
+    "openProxyShortPositionWithReferrer(uint256,uint256,uint256,address,address,address,address,uint256,address)"(
+      amountIn: BigNumberish,
+      leverageFactor: BigNumberish,
+      amountOutMin: BigNumberish,
+      lendable: string,
+      proxyLendable: string,
+      shortable: string,
+      trader: string,
+      deadline: BigNumberish,
+      referrer: string,
+      overrides?: Overrides
+    ): Promise<BigNumber>;
+
+    openShortPosition(
+      amountIn: BigNumberish,
+      leverageFactor: BigNumberish,
+      amountOutMin: BigNumberish,
+      lendable: string,
+      shortable: string,
+      trader: string,
+      deadline: BigNumberish,
+      overrides?: Overrides
+    ): Promise<BigNumber>;
+
+    "openShortPosition(uint256,uint256,uint256,address,address,address,uint256)"(
+      amountIn: BigNumberish,
+      leverageFactor: BigNumberish,
+      amountOutMin: BigNumberish,
+      lendable: string,
+      shortable: string,
+      trader: string,
+      deadline: BigNumberish,
+      overrides?: Overrides
+    ): Promise<BigNumber>;
+
+    openShortPositionWithReferrer(
+      amountIn: BigNumberish,
+      leverageFactor: BigNumberish,
+      amountOutMin: BigNumberish,
+      lendable: string,
+      shortable: string,
+      trader: string,
+      deadline: BigNumberish,
+      referrer: string,
+      overrides?: Overrides
+    ): Promise<BigNumber>;
+
+    "openShortPositionWithReferrer(uint256,uint256,uint256,address,address,address,uint256,address)"(
+      amountIn: BigNumberish,
+      leverageFactor: BigNumberish,
+      amountOutMin: BigNumberish,
+      lendable: string,
+      shortable: string,
+      trader: string,
+      deadline: BigNumberish,
+      referrer: string,
+      overrides?: Overrides
+    ): Promise<BigNumber>;
+
     pairFactory(overrides?: CallOverrides): Promise<BigNumber>;
 
     "pairFactory()"(overrides?: CallOverrides): Promise<BigNumber>;
@@ -2278,6 +5176,22 @@ export class Router extends Contract {
     reserveFactory(overrides?: CallOverrides): Promise<BigNumber>;
 
     "reserveFactory()"(overrides?: CallOverrides): Promise<BigNumber>;
+
+    stake(
+      token: string,
+      amount: BigNumberish,
+      period: BigNumberish,
+      to: string,
+      overrides?: Overrides
+    ): Promise<BigNumber>;
+
+    "stake(address,uint256,uint16,address)"(
+      token: string,
+      amount: BigNumberish,
+      period: BigNumberish,
+      to: string,
+      overrides?: Overrides
+    ): Promise<BigNumber>;
 
     swapFactory(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -2287,14 +5201,34 @@ export class Router extends Contract {
 
     "swapRouter()"(overrides?: CallOverrides): Promise<BigNumber>;
 
-    sweepFee(
+    sweepReserveFee(
       lendable: string,
+      overrides?: Overrides
+    ): Promise<BigNumber>;
+
+    "sweepReserveFee(address)"(
+      lendable: string,
+      overrides?: Overrides
+    ): Promise<BigNumber>;
+
+    sweepShortingReserveFee(
+      shortable: string,
+      overrides?: Overrides
+    ): Promise<BigNumber>;
+
+    "sweepShortingReserveFee(address)"(
+      shortable: string,
+      overrides?: Overrides
+    ): Promise<BigNumber>;
+
+    unstake(
+      token: string,
       to: string,
       overrides?: Overrides
     ): Promise<BigNumber>;
 
-    "sweepFee(address,address)"(
-      lendable: string,
+    "unstake(address,address)"(
+      token: string,
       to: string,
       overrides?: Overrides
     ): Promise<BigNumber>;
@@ -2324,44 +5258,30 @@ export class Router extends Contract {
       to: string,
       overrides?: Overrides
     ): Promise<BigNumber>;
+
+    withdrawShortable(
+      shortable: string,
+      amount: BigNumberish,
+      to: string,
+      overrides?: Overrides
+    ): Promise<BigNumber>;
+
+    "withdrawShortable(address,uint256,address)"(
+      shortable: string,
+      amount: BigNumberish,
+      to: string,
+      overrides?: Overrides
+    ): Promise<BigNumber>;
   };
 
   populateTransaction: {
+    REVISION(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    "REVISION()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
     WETH(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     "WETH()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    __Router_init(
-      _reserveFactory: string,
-      _pairFactory: string,
-      _swapRouter: string,
-      _WETH: string,
-      overrides?: Overrides
-    ): Promise<PopulatedTransaction>;
-
-    "__Router_init(address,address,address,address)"(
-      _reserveFactory: string,
-      _pairFactory: string,
-      _swapRouter: string,
-      _WETH: string,
-      overrides?: Overrides
-    ): Promise<PopulatedTransaction>;
-
-    __Router_init_unchained(
-      _reserveFactory: string,
-      _pairFactory: string,
-      _swapRouter: string,
-      _WETH: string,
-      overrides?: Overrides
-    ): Promise<PopulatedTransaction>;
-
-    "__Router_init_unchained(address,address,address,address)"(
-      _reserveFactory: string,
-      _pairFactory: string,
-      _swapRouter: string,
-      _WETH: string,
-      overrides?: Overrides
-    ): Promise<PopulatedTransaction>;
 
     calculateBalance(
       lendable: string,
@@ -2413,6 +5333,40 @@ export class Router extends Contract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
+    calculateOpenProxyShortPosition(
+      lendable: string,
+      proxyLendable: string,
+      shortable: string,
+      amount: BigNumberish,
+      leverageFactor: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    "calculateOpenProxyShortPosition(address,address,address,uint256,uint256)"(
+      lendable: string,
+      proxyLendable: string,
+      shortable: string,
+      amount: BigNumberish,
+      leverageFactor: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    calculateOpenShortPosition(
+      lendable: string,
+      shortable: string,
+      amount: BigNumberish,
+      leverageFactor: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    "calculateOpenShortPosition(address,address,uint256,uint256)"(
+      lendable: string,
+      shortable: string,
+      amount: BigNumberish,
+      leverageFactor: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
     calculateProxyBalance(
       lendable: string,
       proxyLendable: string,
@@ -2426,6 +5380,40 @@ export class Router extends Contract {
       lendable: string,
       proxyLendable: string,
       tradable: string,
+      trader: string,
+      amountIn: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    calculateProxyShortBalance(
+      lendable: string,
+      proxyLendable: string,
+      shortable: string,
+      trader: string,
+      amountIn: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    "calculateProxyShortBalance(address,address,address,address,uint256)"(
+      lendable: string,
+      proxyLendable: string,
+      shortable: string,
+      trader: string,
+      amountIn: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    calculateShortBalance(
+      lendable: string,
+      shortable: string,
+      trader: string,
+      amountIn: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    "calculateShortBalance(address,address,address,uint256)"(
+      lendable: string,
+      shortable: string,
       trader: string,
       amountIn: BigNumberish,
       overrides?: CallOverrides
@@ -2469,6 +5457,48 @@ export class Router extends Contract {
       overrides?: Overrides
     ): Promise<PopulatedTransaction>;
 
+    closePositionETHWithReferrer(
+      amountIn: BigNumberish,
+      amountOutMin: BigNumberish,
+      tradable: string,
+      trader: string,
+      deadline: BigNumberish,
+      referrer: string,
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
+
+    "closePositionETHWithReferrer(uint256,uint256,address,address,uint256,address)"(
+      amountIn: BigNumberish,
+      amountOutMin: BigNumberish,
+      tradable: string,
+      trader: string,
+      deadline: BigNumberish,
+      referrer: string,
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
+
+    closePositionWithReferrer(
+      amountIn: BigNumberish,
+      amountOutMin: BigNumberish,
+      lendable: string,
+      tradable: string,
+      trader: string,
+      deadline: BigNumberish,
+      referrer: string,
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
+
+    "closePositionWithReferrer(uint256,uint256,address,address,address,uint256,address)"(
+      amountIn: BigNumberish,
+      amountOutMin: BigNumberish,
+      lendable: string,
+      tradable: string,
+      trader: string,
+      deadline: BigNumberish,
+      referrer: string,
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
+
     closeProxyPosition(
       amountIn: BigNumberish,
       amountOutMin: BigNumberish,
@@ -2488,6 +5518,160 @@ export class Router extends Contract {
       tradable: string,
       trader: string,
       deadline: BigNumberish,
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
+
+    closeProxyPositionETH(
+      amountIn: BigNumberish,
+      amountOutMin: BigNumberish,
+      proxyLendable: string,
+      tradable: string,
+      trader: string,
+      deadline: BigNumberish,
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
+
+    "closeProxyPositionETH(uint256,uint256,address,address,address,uint256)"(
+      amountIn: BigNumberish,
+      amountOutMin: BigNumberish,
+      proxyLendable: string,
+      tradable: string,
+      trader: string,
+      deadline: BigNumberish,
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
+
+    closeProxyPositionETHWithReferrer(
+      amountIn: BigNumberish,
+      amountOutMin: BigNumberish,
+      proxyLendable: string,
+      tradable: string,
+      trader: string,
+      deadline: BigNumberish,
+      referrer: string,
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
+
+    "closeProxyPositionETHWithReferrer(uint256,uint256,address,address,address,uint256,address)"(
+      amountIn: BigNumberish,
+      amountOutMin: BigNumberish,
+      proxyLendable: string,
+      tradable: string,
+      trader: string,
+      deadline: BigNumberish,
+      referrer: string,
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
+
+    closeProxyPositionWithReferrer(
+      amountIn: BigNumberish,
+      amountOutMin: BigNumberish,
+      lendable: string,
+      proxyLendable: string,
+      tradable: string,
+      trader: string,
+      deadline: BigNumberish,
+      referrer: string,
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
+
+    "closeProxyPositionWithReferrer(uint256,uint256,address,address,address,address,uint256,address)"(
+      amountIn: BigNumberish,
+      amountOutMin: BigNumberish,
+      lendable: string,
+      proxyLendable: string,
+      tradable: string,
+      trader: string,
+      deadline: BigNumberish,
+      referrer: string,
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
+
+    closeProxyShortPosition(
+      amountIn: BigNumberish,
+      amountOutMin: BigNumberish,
+      lendable: string,
+      proxyLendable: string,
+      shortable: string,
+      trader: string,
+      deadline: BigNumberish,
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
+
+    "closeProxyShortPosition(uint256,uint256,address,address,address,address,uint256)"(
+      amountIn: BigNumberish,
+      amountOutMin: BigNumberish,
+      lendable: string,
+      proxyLendable: string,
+      shortable: string,
+      trader: string,
+      deadline: BigNumberish,
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
+
+    closeProxyShortPositionWithReferrer(
+      amountIn: BigNumberish,
+      amountOutMin: BigNumberish,
+      lendable: string,
+      proxyLendable: string,
+      shortable: string,
+      trader: string,
+      deadline: BigNumberish,
+      referrer: string,
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
+
+    "closeProxyShortPositionWithReferrer(uint256,uint256,address,address,address,address,uint256,address)"(
+      amountIn: BigNumberish,
+      amountOutMin: BigNumberish,
+      lendable: string,
+      proxyLendable: string,
+      shortable: string,
+      trader: string,
+      deadline: BigNumberish,
+      referrer: string,
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
+
+    closeShortPosition(
+      amountIn: BigNumberish,
+      amountOutMin: BigNumberish,
+      lendable: string,
+      shortable: string,
+      trader: string,
+      deadline: BigNumberish,
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
+
+    "closeShortPosition(uint256,uint256,address,address,address,uint256)"(
+      amountIn: BigNumberish,
+      amountOutMin: BigNumberish,
+      lendable: string,
+      shortable: string,
+      trader: string,
+      deadline: BigNumberish,
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
+
+    closeShortPositionWithReferrer(
+      amountIn: BigNumberish,
+      amountOutMin: BigNumberish,
+      lendable: string,
+      shortable: string,
+      trader: string,
+      deadline: BigNumberish,
+      referrer: string,
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
+
+    "closeShortPositionWithReferrer(uint256,uint256,address,address,address,uint256,address)"(
+      amountIn: BigNumberish,
+      amountOutMin: BigNumberish,
+      lendable: string,
+      shortable: string,
+      trader: string,
+      deadline: BigNumberish,
+      referrer: string,
       overrides?: Overrides
     ): Promise<PopulatedTransaction>;
 
@@ -2515,6 +5699,20 @@ export class Router extends Contract {
       overrides?: PayableOverrides
     ): Promise<PopulatedTransaction>;
 
+    depositShortable(
+      shortable: string,
+      amount: BigNumberish,
+      to: string,
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
+
+    "depositShortable(address,uint256,address)"(
+      shortable: string,
+      amount: BigNumberish,
+      to: string,
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
+
     getPosition(
       trader: string,
       lendable: string,
@@ -2545,49 +5743,65 @@ export class Router extends Contract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
+    getProxyShortPosition(
+      trader: string,
+      lendable: string,
+      proxyLendable: string,
+      shortable: string,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    "getProxyShortPosition(address,address,address,address)"(
+      trader: string,
+      lendable: string,
+      proxyLendable: string,
+      shortable: string,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    getShortPosition(
+      trader: string,
+      lendable: string,
+      shortable: string,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    "getShortPosition(address,address,address)"(
+      trader: string,
+      lendable: string,
+      shortable: string,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    incentivize(
+      token: string,
+      amount: BigNumberish,
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
+
+    "incentivize(address,uint256)"(
+      token: string,
+      amount: BigNumberish,
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
+
     initialize(
       _reserveFactory: string,
       _pairFactory: string,
       _swapRouter: string,
       _WETH: string,
+      _xWOW: string,
+      _referralProgram: string,
       overrides?: Overrides
     ): Promise<PopulatedTransaction>;
 
-    "initialize(address,address,address,address)"(
+    "initialize(address,address,address,address,address,address)"(
       _reserveFactory: string,
       _pairFactory: string,
       _swapRouter: string,
       _WETH: string,
-      overrides?: Overrides
-    ): Promise<PopulatedTransaction>;
-
-    liquidatePosition(
-      lendable: string,
-      tradable: string,
-      trader: string,
-      overrides?: Overrides
-    ): Promise<PopulatedTransaction>;
-
-    "liquidatePosition(address,address,address)"(
-      lendable: string,
-      tradable: string,
-      trader: string,
-      overrides?: Overrides
-    ): Promise<PopulatedTransaction>;
-
-    liquidateProxyPosition(
-      lendable: string,
-      proxyLendable: string,
-      tradable: string,
-      trader: string,
-      overrides?: Overrides
-    ): Promise<PopulatedTransaction>;
-
-    "liquidateProxyPosition(address,address,address,address)"(
-      lendable: string,
-      proxyLendable: string,
-      tradable: string,
-      trader: string,
+      _xWOW: string,
+      _referralProgram: string,
       overrides?: Overrides
     ): Promise<PopulatedTransaction>;
 
@@ -2631,6 +5845,50 @@ export class Router extends Contract {
       overrides?: PayableOverrides
     ): Promise<PopulatedTransaction>;
 
+    openPositionETHWithReferrer(
+      leverageFactor: BigNumberish,
+      amountOutMin: BigNumberish,
+      tradable: string,
+      trader: string,
+      deadline: BigNumberish,
+      referrer: string,
+      overrides?: PayableOverrides
+    ): Promise<PopulatedTransaction>;
+
+    "openPositionETHWithReferrer(uint256,uint256,address,address,uint256,address)"(
+      leverageFactor: BigNumberish,
+      amountOutMin: BigNumberish,
+      tradable: string,
+      trader: string,
+      deadline: BigNumberish,
+      referrer: string,
+      overrides?: PayableOverrides
+    ): Promise<PopulatedTransaction>;
+
+    openPositionWithReferrer(
+      amountIn: BigNumberish,
+      leverageFactor: BigNumberish,
+      amountOutMin: BigNumberish,
+      lendable: string,
+      tradable: string,
+      trader: string,
+      deadline: BigNumberish,
+      referrer: string,
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
+
+    "openPositionWithReferrer(uint256,uint256,uint256,address,address,address,uint256,address)"(
+      amountIn: BigNumberish,
+      leverageFactor: BigNumberish,
+      amountOutMin: BigNumberish,
+      lendable: string,
+      tradable: string,
+      trader: string,
+      deadline: BigNumberish,
+      referrer: string,
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
+
     openProxyPosition(
       amountIn: BigNumberish,
       leverageFactor: BigNumberish,
@@ -2655,6 +5913,170 @@ export class Router extends Contract {
       overrides?: Overrides
     ): Promise<PopulatedTransaction>;
 
+    openProxyPositionETH(
+      leverageFactor: BigNumberish,
+      amountOutMin: BigNumberish,
+      proxyLendable: string,
+      tradable: string,
+      trader: string,
+      deadline: BigNumberish,
+      overrides?: PayableOverrides
+    ): Promise<PopulatedTransaction>;
+
+    "openProxyPositionETH(uint256,uint256,address,address,address,uint256)"(
+      leverageFactor: BigNumberish,
+      amountOutMin: BigNumberish,
+      proxyLendable: string,
+      tradable: string,
+      trader: string,
+      deadline: BigNumberish,
+      overrides?: PayableOverrides
+    ): Promise<PopulatedTransaction>;
+
+    openProxyPositionETHWithReferrer(
+      leverageFactor: BigNumberish,
+      amountOutMin: BigNumberish,
+      proxyLendable: string,
+      tradable: string,
+      trader: string,
+      deadline: BigNumberish,
+      referrer: string,
+      overrides?: PayableOverrides
+    ): Promise<PopulatedTransaction>;
+
+    "openProxyPositionETHWithReferrer(uint256,uint256,address,address,address,uint256,address)"(
+      leverageFactor: BigNumberish,
+      amountOutMin: BigNumberish,
+      proxyLendable: string,
+      tradable: string,
+      trader: string,
+      deadline: BigNumberish,
+      referrer: string,
+      overrides?: PayableOverrides
+    ): Promise<PopulatedTransaction>;
+
+    openProxyPositionWithReferrer(
+      amountIn: BigNumberish,
+      leverageFactor: BigNumberish,
+      amountOutMin: BigNumberish,
+      lendable: string,
+      proxyLendable: string,
+      tradable: string,
+      trader: string,
+      deadline: BigNumberish,
+      referrer: string,
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
+
+    "openProxyPositionWithReferrer(uint256,uint256,uint256,address,address,address,address,uint256,address)"(
+      amountIn: BigNumberish,
+      leverageFactor: BigNumberish,
+      amountOutMin: BigNumberish,
+      lendable: string,
+      proxyLendable: string,
+      tradable: string,
+      trader: string,
+      deadline: BigNumberish,
+      referrer: string,
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
+
+    openProxyShortPosition(
+      amountIn: BigNumberish,
+      leverageFactor: BigNumberish,
+      amountOutMin: BigNumberish,
+      lendable: string,
+      proxyLendable: string,
+      shortable: string,
+      trader: string,
+      deadline: BigNumberish,
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
+
+    "openProxyShortPosition(uint256,uint256,uint256,address,address,address,address,uint256)"(
+      amountIn: BigNumberish,
+      leverageFactor: BigNumberish,
+      amountOutMin: BigNumberish,
+      lendable: string,
+      proxyLendable: string,
+      shortable: string,
+      trader: string,
+      deadline: BigNumberish,
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
+
+    openProxyShortPositionWithReferrer(
+      amountIn: BigNumberish,
+      leverageFactor: BigNumberish,
+      amountOutMin: BigNumberish,
+      lendable: string,
+      proxyLendable: string,
+      shortable: string,
+      trader: string,
+      deadline: BigNumberish,
+      referrer: string,
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
+
+    "openProxyShortPositionWithReferrer(uint256,uint256,uint256,address,address,address,address,uint256,address)"(
+      amountIn: BigNumberish,
+      leverageFactor: BigNumberish,
+      amountOutMin: BigNumberish,
+      lendable: string,
+      proxyLendable: string,
+      shortable: string,
+      trader: string,
+      deadline: BigNumberish,
+      referrer: string,
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
+
+    openShortPosition(
+      amountIn: BigNumberish,
+      leverageFactor: BigNumberish,
+      amountOutMin: BigNumberish,
+      lendable: string,
+      shortable: string,
+      trader: string,
+      deadline: BigNumberish,
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
+
+    "openShortPosition(uint256,uint256,uint256,address,address,address,uint256)"(
+      amountIn: BigNumberish,
+      leverageFactor: BigNumberish,
+      amountOutMin: BigNumberish,
+      lendable: string,
+      shortable: string,
+      trader: string,
+      deadline: BigNumberish,
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
+
+    openShortPositionWithReferrer(
+      amountIn: BigNumberish,
+      leverageFactor: BigNumberish,
+      amountOutMin: BigNumberish,
+      lendable: string,
+      shortable: string,
+      trader: string,
+      deadline: BigNumberish,
+      referrer: string,
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
+
+    "openShortPositionWithReferrer(uint256,uint256,uint256,address,address,address,uint256,address)"(
+      amountIn: BigNumberish,
+      leverageFactor: BigNumberish,
+      amountOutMin: BigNumberish,
+      lendable: string,
+      shortable: string,
+      trader: string,
+      deadline: BigNumberish,
+      referrer: string,
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
+
     pairFactory(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     "pairFactory()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
@@ -2665,6 +6087,22 @@ export class Router extends Contract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
+    stake(
+      token: string,
+      amount: BigNumberish,
+      period: BigNumberish,
+      to: string,
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
+
+    "stake(address,uint256,uint16,address)"(
+      token: string,
+      amount: BigNumberish,
+      period: BigNumberish,
+      to: string,
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
+
     swapFactory(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     "swapFactory()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
@@ -2673,14 +6111,34 @@ export class Router extends Contract {
 
     "swapRouter()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    sweepFee(
+    sweepReserveFee(
       lendable: string,
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
+
+    "sweepReserveFee(address)"(
+      lendable: string,
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
+
+    sweepShortingReserveFee(
+      shortable: string,
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
+
+    "sweepShortingReserveFee(address)"(
+      shortable: string,
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
+
+    unstake(
+      token: string,
       to: string,
       overrides?: Overrides
     ): Promise<PopulatedTransaction>;
 
-    "sweepFee(address,address)"(
-      lendable: string,
+    "unstake(address,address)"(
+      token: string,
       to: string,
       overrides?: Overrides
     ): Promise<PopulatedTransaction>;
@@ -2706,6 +6164,20 @@ export class Router extends Contract {
     ): Promise<PopulatedTransaction>;
 
     "withdrawETH(uint256,address)"(
+      amount: BigNumberish,
+      to: string,
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
+
+    withdrawShortable(
+      shortable: string,
+      amount: BigNumberish,
+      to: string,
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
+
+    "withdrawShortable(address,uint256,address)"(
+      shortable: string,
       amount: BigNumberish,
       to: string,
       overrides?: Overrides
