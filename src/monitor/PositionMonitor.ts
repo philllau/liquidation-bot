@@ -56,8 +56,7 @@ export class PositionMonitor extends AbstractMonitor<Position> {
         .dividedBy(bn(10).pow(tradableToken!.decimals));
 
       console.log(
-        `Liquidate position: ${path} ${p.trader} - ${amount.toString()} ${
-          tradableToken?.symbol
+        `Liquidate position: ${path} ${p.trader} - ${amount.toString()} ${tradableToken?.symbol
         }`
       );
 
@@ -98,7 +97,7 @@ export class PositionMonitor extends AbstractMonitor<Position> {
     const height = this.lastHeight;
     console.log("update holders at height", height);
 
-    const pairs = await this.pairRepository.find("updateAt", { $lt: height });
+    const pairs = await this.pairRepository.all();//.find("updateAt", { $lt: height });
     for (let pair of pairs) {
       const lendableToken = await this.context.db
         .getRepository(Token)
@@ -109,12 +108,10 @@ export class PositionMonitor extends AbstractMonitor<Position> {
       const proxyToken = pair.proxy
         ? await this.context.db.getRepository(Token).get(pair.proxy)
         : undefined;
-
       const path = [lendableToken, proxyToken, tradableToken]
         .map((t) => t?.symbol)
         .filter(defined)
         .join("/");
-      console.log(`Getting holders of ${path}`);
 
       const holders = await infRetry(() =>
         axios
@@ -134,16 +131,18 @@ export class PositionMonitor extends AbstractMonitor<Position> {
             throw e;
           })
       );
+      console.log(`Got holders of ${pair.short ? 'short' : 'long'} ${path} ${pair.address} ${holders.length} ${holders.reduce((total, holder) => total.add(bn(holder.balance)), bn(0)).str()}`);
 
-      await sleep(this.context.sleep);
+      // await sleep(this.context.sleep);
 
       const known = await this.repository.find("pair", pair.address);
       const unknown = holders.filter(
-        (h) => !known.some((k) => k.trader === h.address)
+        (h) => !known.some((k) => k.trader === h.address && k.short === pair.short)
       );
 
       await Promise.all(
         unknown.map(({ address }) => {
+          console.log(`Create position ${pair.short} ${path}`)
           const position = new Position();
           position.lendable = pair.lendable;
           position.tradable = pair.tradable;
@@ -160,6 +159,7 @@ export class PositionMonitor extends AbstractMonitor<Position> {
           position.liquidationCost = bn(0);
           position.updateAt = 0;
           position.appearAt = height;
+          position.short = pair.short;
 
           return this.repository.put(position);
         })
@@ -203,8 +203,7 @@ export class PositionMonitor extends AbstractMonitor<Position> {
 
     inputs.push(position.tradable);
 
-    const method = position.proxy ? "getProxyPosition" : "getPosition";
-
+    const method = position.short ? position.proxy ? "getProxyShortPosition" : "getShortPosition" : position.proxy ? "getProxyPosition" : "getPosition"
     const [
       amount,
       value,
@@ -240,11 +239,11 @@ export class PositionMonitor extends AbstractMonitor<Position> {
     position.updateAt = updateAt.toNumber();
 
     console.log(
-      `Update position:  ${path} ${position.trader} (heath: ${position.health
+      `Update ${position.short ? 'short' : 'long' } position:  ${path} ${position.trader} (heath: ${position.health
         .decimalPlaces(27)
         .dividedBy(oneRay)}, value: ${position.value
-        .decimalPlaces(18)
-        .dividedBy(oneEther)})`
+          .decimalPlaces(18)
+          .dividedBy(oneEther)})`
     );
 
     await this.repository.put(position).catch((e) => {

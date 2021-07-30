@@ -111,6 +111,8 @@ export class Token extends DatastoreDocument<Token> {
   @BooleanIndex()
   proxy!: boolean;
   @BooleanIndex()
+  shortable!: boolean;
+  @BooleanIndex()
   tradable!: boolean;
   decimals!: number;
 }
@@ -124,6 +126,8 @@ export class Pair extends DatastoreDocument<Pair> {
   tradable!: string;
   @AddressIndex()
   proxy?: string;
+  @BooleanIndex()
+  short!: boolean;
 
   @Index()
   updateAt!: number;
@@ -176,6 +180,8 @@ export class Position extends DatastoreDocument<Position> {
   @BigNumberIndex()
   @BigNumberTransform()
   liquidationCost!: BigNumber;
+  @BooleanIndex()
+  short!: boolean;
 
   @Expose()
   @BigNumberIndex()
