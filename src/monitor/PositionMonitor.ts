@@ -121,9 +121,9 @@ export class PositionMonitor extends AbstractMonitor<Position> {
       const contract = new Pair__factory(this.context.signer).attach(
         pair.address
       );
-      const transfers = contract.filters.Transfer(null, null, null);
-
+      
       try {
+        const transfers = contract.filters.Transfer(null, null, null);
         const transferEvents = await contract.queryFilter(transfers, from, to);
 
         const holders = transferEvents.reduce((map, ev) => {
