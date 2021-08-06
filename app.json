@@ -23,13 +23,13 @@
     },
     "ROUTER_ADDRESS": {
       "description": "Address of the router",
-      "value": "0x5f5fD73CF951a3f03F885Fa742A26903C02AdAb1"
+      "value": "0x8428B4b785DF678bCFe5CBB660D2cd555904901A"
     },
     "SLEEP_TIME": {
       "value": "250"
     },
     "START_BLOCK": {
-      "value": "1"
+      "value": "4693500"
     }
   }
 }

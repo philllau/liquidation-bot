@@ -1,4 +1,4 @@
-import axios from "axios";
+import { ethers } from "ethers";
 import { Observable } from "observable-fns";
 import { DatastoreRepository } from "../db/repository";
 import { amount, bn, oneEther, oneRay, toBN } from "../math";
@@ -25,7 +25,7 @@ export class PositionMonitor extends AbstractMonitor<Position> {
       this.lastHeight = height;
     });
 
-    this.updateHolders();
+    this.updateHolders(this.lastHeight);
     this.updatePositions();
     return this.channel;
   }
@@ -94,8 +94,7 @@ export class PositionMonitor extends AbstractMonitor<Position> {
     this.updatePositions();
   }
 
-  private async updateHolders() {
-    const height = this.lastHeight;
+  private async updateHolders(height: number) {
     console.log("update holders at height", height);
 
     const pairs = await this.pairRepository.find("updateAt", { $lt: height });
@@ -114,62 +113,71 @@ export class PositionMonitor extends AbstractMonitor<Position> {
         .map((t) => t?.symbol)
         .filter(defined)
         .join("/");
-      console.log(`Getting holders of ${path}`);
 
-      const holders = await infRetry(() =>
-        axios
-          .get<{
-            data: { items: Array<{ address: string; balance: string }> };
-          }>(
-            `https://api.covalenthq.com/v1/${this.context.chainId}/tokens/${pair.address}/token_holders/`,
-            {
-              params: {
-                key: this.context.covalentAPI,
-              },
-            }
-          )
-          .then((r) => r.data.data.items)
-          .catch((e) => {
-            console.error(`Failed get holders for ${path}: \n${e}`);
-            throw e;
+      const from = Math.max(pair.updateAt, this.context.startBlock);
+      const to = Math.min(height, from + 3000);
+      console.log(`Getting holders of ${path} (${from} to ${to})`);
+
+      const contract = new Pair__factory(this.context.signer).attach(
+        pair.address
+      );
+      
+      try {
+        const transfers = contract.filters.Transfer(null, null, null);
+        const transferEvents = await contract.queryFilter(transfers, from, to);
+
+        const holders = transferEvents.reduce((map, ev) => {
+          [ev.args.to, ev.args.from]
+            .filter(
+              (address) =>
+                address !== pair.address &&
+                address !== ethers.constants.AddressZero
+            )
+            .forEach((address) => map.push({ address }));
+
+          return map;
+        }, [] as Array<{ address: string }>);
+
+        pair.updateAt = to;
+        await this.pairRepository.put(pair);
+
+        const known = await this.repository.find("pair", pair.address);
+        const unknown = holders.filter(
+          (h) => !known.some((k) => k.trader === h.address)
+        );
+
+        await Promise.all(
+          unknown.map(({ address }) => {
+            const position = new Position();
+            position.lendable = pair.lendable;
+            position.tradable = pair.tradable;
+            position.proxy = pair.proxy;
+            position.pair = pair.address;
+            position.trader = address;
+            position.amount = bn(0);
+            position.value = bn(0);
+            position.selfValue = bn(0);
+            position.principalDebt = bn(0);
+            position.currentDebt = bn(0);
+            position.rate = bn(0);
+            position.currentCost = bn(0);
+            position.liquidationCost = bn(0);
+            position.updateAt = 0;
+            position.appearAt = height;
+
+            return this.repository.put(position);
           })
-      );
-
-      await sleep(this.context.sleep);
-
-      const known = await this.repository.find("pair", pair.address);
-      const unknown = holders.filter(
-        (h) => !known.some((k) => k.trader === h.address)
-      );
-
-      await Promise.all(
-        unknown.map(({ address }) => {
-          const position = new Position();
-          position.lendable = pair.lendable;
-          position.tradable = pair.tradable;
-          position.proxy = pair.proxy;
-          position.pair = pair.address;
-          position.trader = address;
-          position.amount = bn(0);
-          position.value = bn(0);
-          position.selfValue = bn(0);
-          position.principalDebt = bn(0);
-          position.currentDebt = bn(0);
-          position.rate = bn(0);
-          position.currentCost = bn(0);
-          position.liquidationCost = bn(0);
-          position.updateAt = 0;
-          position.appearAt = height;
-
-          return this.repository.put(position);
-        })
-      );
+        );
+      } catch (e) {
+        console.error(e);
+      }
     }
 
     while (height === this.lastHeight) {
       await sleep(this.context.sleep);
     }
-    this.updateHolders();
+
+    this.updateHolders(this.lastHeight);
   }
 
   async updatePosition(position: Position) {
