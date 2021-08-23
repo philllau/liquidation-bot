@@ -158,6 +158,7 @@ export class PositionMonitor extends AbstractMonitor<Position> {
           position.currentCost = bn(0);
           position.liquidationCost = bn(0);
           position.updateAt = 0;
+          position.lastUpdatedAt = 0;
           position.appearAt = height;
           position.short = pair.short;
 
@@ -237,6 +238,7 @@ export class PositionMonitor extends AbstractMonitor<Position> {
     position.currentCost = currentCost;
     position.liquidationCost = liquidationCost;
     position.updateAt = updateAt.toNumber();
+    position.lastUpdatedAt = Date.now();
 
     console.log(
       `Update ${position.short ? 'short' : 'long' } position:  ${path} ${position.trader} (heath: ${position.health
