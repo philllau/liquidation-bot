@@ -156,6 +156,8 @@ export class Position extends DatastoreDocument<Position> {
   @Index()
   appearAt!: number;
 
+  lastUpdatedAt?: number;
+
   @BigNumberIndex()
   @BigNumberTransform()
   amount!: BigNumber;
