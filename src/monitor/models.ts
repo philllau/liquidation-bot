@@ -133,12 +133,12 @@ export class Pair extends DatastoreDocument<Pair> {
   updateAt!: number;
 }
 
-export class Transfer extends DatastoreDocument<Transfer> {}
+export class Transfer extends DatastoreDocument<Transfer> { }
 
 export class Position extends DatastoreDocument<Position> {
-  @HexKey(40)
+  @HexKey(42)
   get id() {
-    return Position.toId(this.pair, this.trader);
+    return Position.toId(this.short, this.pair, this.trader);
   }
 
   @AddressIndex()
@@ -194,10 +194,11 @@ export class Position extends DatastoreDocument<Position> {
     );
   }
 
-  static toId(pair: string, trader: string) {
+  static toId(short: boolean, pair: string, trader: string) {
     pair = pair.startsWith("0x") ? pair.substr(2) : pair;
     trader = trader.startsWith("0x") ? trader.substr(2) : trader;
-    return [pair, trader].join("");
+    const prefix = short ? "10" : '00'
+    return [prefix, pair, trader].join("");
   }
 }
 

@@ -15,7 +15,7 @@ type ops<TDoc extends DatastoreDocument<TDoc>, TKey extends keyof TDoc> = {
 type FieldComparator<
   TDoc extends DatastoreDocument<TDoc>,
   TKey extends keyof TDoc
-> = { [key in keyof ops<TDoc, TKey>]?: ops<TDoc, TKey>[key] } | TDoc[TKey];
+  > = { [key in keyof ops<TDoc, TKey>]?: ops<TDoc, TKey>[key] } | TDoc[TKey];
 
 export const printBuffer = (buf: Buffer) => {
   const result: string[] = [];
@@ -78,6 +78,18 @@ export class DatastoreRepository<T extends DatastoreDocument<T>> {
     });
   }
 
+  async clear(): Promise<void> {
+    await this.db.clear();
+  }
+
+  async del(key: string | Buffer): Promise<void> {
+    if (typeof key === "string") {
+      key = this.referenceInstance.getKey(undefined, key);
+    }
+
+    return this.db.del(key)
+  }
+
   get(key: string | Buffer): Promise<T | undefined> {
     if (typeof key === "string") {
       key = this.referenceInstance.getKey(undefined, key);
@@ -130,7 +142,7 @@ export class DatastoreRepository<T extends DatastoreDocument<T>> {
         .on("error", (error) => {
           reject(error);
         })
-        .on("close", () => {})
+        .on("close", () => { })
         .on("end", () => {
           resolve(values);
         });
@@ -204,7 +216,7 @@ export class DatastoreRepository<T extends DatastoreDocument<T>> {
         .on("error", (error) => {
           reject(error);
         })
-        .on("close", () => {})
+        .on("close", () => { })
         .on("end", () => {
           Promise.all(keys.map(this.get.bind(this)))
             .then((items) =>

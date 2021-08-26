@@ -3,7 +3,7 @@ import { Observable } from "observable-fns";
 import { DatastoreRepository } from "../db/repository";
 import { amount, bn, oneEther, oneRay, toBN } from "../math";
 import { Pair__factory } from "../types";
-import { defined, infRetry, sleep } from "../utils";
+import { defined, fewRetry, infRetry, sleep } from "../utils";
 import { AbstractMonitor } from "./AbstractMonitor";
 import { HeightMonitor } from "./HeightMonitor";
 import { Pair, Position, Token } from "./models";
@@ -20,6 +20,8 @@ export class PositionMonitor extends AbstractMonitor<Position> {
   async run(): Promise<Observable<Position>> {
     this.repository = this.context.db.getRepository(Position);
     this.pairRepository = this.context.db.getRepository(Pair);
+
+    await this.repository.clear();
 
     (await this.context.getChannel(HeightMonitor)).subscribe((height) => {
       this.lastHeight = height;
@@ -64,9 +66,8 @@ export class PositionMonitor extends AbstractMonitor<Position> {
         .attach(p.pair)
         .liquidatePosition(p.trader, this.context.signer.address)
         .then((tx) => tx.wait())
-        .catch((e) => {
+        .catch(() => {
           console.error(`Failed liquidate position of ${path} ${p.trader}`);
-          console.error(e.message);
         });
     }
   }
@@ -113,7 +114,7 @@ export class PositionMonitor extends AbstractMonitor<Position> {
         .filter(defined)
         .join("/");
 
-      const holders = await infRetry(() =>
+      const holders = await fewRetry(() =>
         axios
           .get<{
             data: { items: Array<{ address: string; balance: string }> };
@@ -130,7 +131,7 @@ export class PositionMonitor extends AbstractMonitor<Position> {
             console.error(`Failed get holders for ${path}: \n${e}`);
             throw e;
           })
-      );
+      ).catch(() => [] as Array<{ address: string; balance: string }>);
       console.log(`Got holders of ${pair.short ? 'short' : 'long'} ${path} ${pair.address} ${holders.length} ${holders.reduce((total, holder) => total.add(bn(holder.balance)), bn(0)).str()}`);
 
       // await sleep(this.context.sleep);
