@@ -25,7 +25,7 @@ const router = new Router__factory()
 run({
   provider,
   providerUrl: NODE_ENDPOINT,
-  covalentAPI: "ckey_44edb98eba8941749fba9b9b9eb",
+  covalentAPI: "ckey_d725aa6c37614f21a2e9c09ac16",
   signer,
   router,
   multicall: MULTICALL_ADDRESS,

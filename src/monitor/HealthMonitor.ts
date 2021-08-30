@@ -27,29 +27,12 @@ export class HealthMonitor extends AbstractMonitor<boolean> {
   }
 
   private async checkPairs() {
-    // Temporarily disabled
-    // return;
 
     const height = this.lastHeight
     await sleep(this.context.sleep)
 
     let pairs = await this.pairs.all()
     let positions = await this.positions.all()
-    // {
-    //   const lendableToken = await this.context.db
-    //     .getRepository(Token)
-    //     .get(p.lendable);
-    //   const tradableToken = await this.context.db
-    //     .getRepository(Token)
-    //     .get(p.tradable);
-    //   const proxyToken = p.proxy
-    //     ? await this.context.db.getRepository(Token).get(p.proxy)
-    //     : undefined;
-
-    //   const path = [lendableToken, proxyToken, tradableToken]
-    //     .map((t) => t?.symbol)
-    //     .filter(defined)
-    //     .join("/");
 
     const pairsWithTokens = await Promise.all(
       pairs.map(async (pair) => ({
@@ -98,8 +81,8 @@ export class HealthMonitor extends AbstractMonitor<boolean> {
       })),
     )
 
-    pairWithPositionsTotal.forEach((pair) =>
-      console.log(
+    pairWithPositionsTotal.filter(pair => !pair.total.eq(pair.positionTotal)).forEach((pair) =>
+      console.error(
         `[${pair.address} ${pair.short ? 'SHORT' : 'LONG'} ${pair.path}]: totalSupply: ${pair.total.human(
           pair.lendable?.decimals,
         )} totalPositions: ${pair.positionTotal.human(
