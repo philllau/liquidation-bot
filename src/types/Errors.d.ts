@@ -29,13 +29,20 @@ interface ErrorsInterface extends ethers.utils.Interface {
     "F_NOT_LENDABLE_TOKEN()": FunctionFragment;
     "F_NOT_REGISTERED_PAIR()": FunctionFragment;
     "F_NOT_REGISTERED_TOKEN()": FunctionFragment;
+    "F_NOT_SHORTABLE_TOKEN()": FunctionFragment;
     "F_NOT_TRADABLE_TOKEN()": FunctionFragment;
     "F_UNINITIALIZED_RESERVE()": FunctionFragment;
     "MATH_ADDITION_OVERFLOW()": FunctionFragment;
     "MATH_DIVISION_BY_ZERO()": FunctionFragment;
     "MATH_MULTIPLICATION_OVERFLOW()": FunctionFragment;
+    "NON_REENTRANT_METHOD()": FunctionFragment;
+    "PG_INVALID_FEED()": FunctionFragment;
+    "PG_INVALID_STEPS()": FunctionFragment;
+    "PG_UNKNOWN_FEED_TYPE()": FunctionFragment;
+    "PG_UNKNOWN_IDENTITY()": FunctionFragment;
     "P_BORROW_LIMIT_EXCEEDED()": FunctionFragment;
     "P_DEBT_LEFT()": FunctionFragment;
+    "P_FORBIDDEN_LIQUIDATION_CALLER()": FunctionFragment;
     "P_HEALTHY_POSITION_LIQUIDATION()": FunctionFragment;
     "P_INSUFFICIENT_LIQUIDITY()": FunctionFragment;
     "P_INSUFFICIENT_OUTPUT_AMOUNT()": FunctionFragment;
@@ -43,6 +50,7 @@ interface ErrorsInterface extends ethers.utils.Interface {
     "P_INSUFFICIENT_WOW_BALANCE()": FunctionFragment;
     "P_INVALID_LEVERAGE_FACTOR()": FunctionFragment;
     "P_PRICE_THRESHOLD_OVERFLOW()": FunctionFragment;
+    "RF_NOT_LENDABLE()": FunctionFragment;
     "RT_FORBIDDEN_TRANSFER()": FunctionFragment;
     "RT_PAIR_NOT_FOUND()": FunctionFragment;
     "RT_RESERVE_NOT_FOUND()": FunctionFragment;
@@ -82,6 +90,10 @@ interface ErrorsInterface extends ethers.utils.Interface {
     values?: undefined
   ): string;
   encodeFunctionData(
+    functionFragment: "F_NOT_SHORTABLE_TOKEN",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
     functionFragment: "F_NOT_TRADABLE_TOKEN",
     values?: undefined
   ): string;
@@ -102,11 +114,35 @@ interface ErrorsInterface extends ethers.utils.Interface {
     values?: undefined
   ): string;
   encodeFunctionData(
+    functionFragment: "NON_REENTRANT_METHOD",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "PG_INVALID_FEED",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "PG_INVALID_STEPS",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "PG_UNKNOWN_FEED_TYPE",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "PG_UNKNOWN_IDENTITY",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
     functionFragment: "P_BORROW_LIMIT_EXCEEDED",
     values?: undefined
   ): string;
   encodeFunctionData(
     functionFragment: "P_DEBT_LEFT",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "P_FORBIDDEN_LIQUIDATION_CALLER",
     values?: undefined
   ): string;
   encodeFunctionData(
@@ -135,6 +171,10 @@ interface ErrorsInterface extends ethers.utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "P_PRICE_THRESHOLD_OVERFLOW",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "RF_NOT_LENDABLE",
     values?: undefined
   ): string;
   encodeFunctionData(
@@ -199,6 +239,10 @@ interface ErrorsInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
+    functionFragment: "F_NOT_SHORTABLE_TOKEN",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "F_NOT_TRADABLE_TOKEN",
     data: BytesLike
   ): Result;
@@ -219,11 +263,35 @@ interface ErrorsInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
+    functionFragment: "NON_REENTRANT_METHOD",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "PG_INVALID_FEED",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "PG_INVALID_STEPS",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "PG_UNKNOWN_FEED_TYPE",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "PG_UNKNOWN_IDENTITY",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "P_BORROW_LIMIT_EXCEEDED",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
     functionFragment: "P_DEBT_LEFT",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "P_FORBIDDEN_LIQUIDATION_CALLER",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -252,6 +320,10 @@ interface ErrorsInterface extends ethers.utils.Interface {
   ): Result;
   decodeFunctionResult(
     functionFragment: "P_PRICE_THRESHOLD_OVERFLOW",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "RF_NOT_LENDABLE",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -366,6 +438,10 @@ export class Errors extends Contract {
 
     "F_NOT_REGISTERED_TOKEN()"(overrides?: CallOverrides): Promise<[string]>;
 
+    F_NOT_SHORTABLE_TOKEN(overrides?: CallOverrides): Promise<[string]>;
+
+    "F_NOT_SHORTABLE_TOKEN()"(overrides?: CallOverrides): Promise<[string]>;
+
     F_NOT_TRADABLE_TOKEN(overrides?: CallOverrides): Promise<[string]>;
 
     "F_NOT_TRADABLE_TOKEN()"(overrides?: CallOverrides): Promise<[string]>;
@@ -388,6 +464,26 @@ export class Errors extends Contract {
       overrides?: CallOverrides
     ): Promise<[string]>;
 
+    NON_REENTRANT_METHOD(overrides?: CallOverrides): Promise<[string]>;
+
+    "NON_REENTRANT_METHOD()"(overrides?: CallOverrides): Promise<[string]>;
+
+    PG_INVALID_FEED(overrides?: CallOverrides): Promise<[string]>;
+
+    "PG_INVALID_FEED()"(overrides?: CallOverrides): Promise<[string]>;
+
+    PG_INVALID_STEPS(overrides?: CallOverrides): Promise<[string]>;
+
+    "PG_INVALID_STEPS()"(overrides?: CallOverrides): Promise<[string]>;
+
+    PG_UNKNOWN_FEED_TYPE(overrides?: CallOverrides): Promise<[string]>;
+
+    "PG_UNKNOWN_FEED_TYPE()"(overrides?: CallOverrides): Promise<[string]>;
+
+    PG_UNKNOWN_IDENTITY(overrides?: CallOverrides): Promise<[string]>;
+
+    "PG_UNKNOWN_IDENTITY()"(overrides?: CallOverrides): Promise<[string]>;
+
     P_BORROW_LIMIT_EXCEEDED(overrides?: CallOverrides): Promise<[string]>;
 
     "P_BORROW_LIMIT_EXCEEDED()"(overrides?: CallOverrides): Promise<[string]>;
@@ -395,6 +491,14 @@ export class Errors extends Contract {
     P_DEBT_LEFT(overrides?: CallOverrides): Promise<[string]>;
 
     "P_DEBT_LEFT()"(overrides?: CallOverrides): Promise<[string]>;
+
+    P_FORBIDDEN_LIQUIDATION_CALLER(
+      overrides?: CallOverrides
+    ): Promise<[string]>;
+
+    "P_FORBIDDEN_LIQUIDATION_CALLER()"(
+      overrides?: CallOverrides
+    ): Promise<[string]>;
 
     P_HEALTHY_POSITION_LIQUIDATION(
       overrides?: CallOverrides
@@ -437,6 +541,10 @@ export class Errors extends Contract {
     "P_PRICE_THRESHOLD_OVERFLOW()"(
       overrides?: CallOverrides
     ): Promise<[string]>;
+
+    RF_NOT_LENDABLE(overrides?: CallOverrides): Promise<[string]>;
+
+    "RF_NOT_LENDABLE()"(overrides?: CallOverrides): Promise<[string]>;
 
     RT_FORBIDDEN_TRANSFER(overrides?: CallOverrides): Promise<[string]>;
 
@@ -499,6 +607,10 @@ export class Errors extends Contract {
 
   "F_NOT_REGISTERED_TOKEN()"(overrides?: CallOverrides): Promise<string>;
 
+  F_NOT_SHORTABLE_TOKEN(overrides?: CallOverrides): Promise<string>;
+
+  "F_NOT_SHORTABLE_TOKEN()"(overrides?: CallOverrides): Promise<string>;
+
   F_NOT_TRADABLE_TOKEN(overrides?: CallOverrides): Promise<string>;
 
   "F_NOT_TRADABLE_TOKEN()"(overrides?: CallOverrides): Promise<string>;
@@ -519,6 +631,26 @@ export class Errors extends Contract {
 
   "MATH_MULTIPLICATION_OVERFLOW()"(overrides?: CallOverrides): Promise<string>;
 
+  NON_REENTRANT_METHOD(overrides?: CallOverrides): Promise<string>;
+
+  "NON_REENTRANT_METHOD()"(overrides?: CallOverrides): Promise<string>;
+
+  PG_INVALID_FEED(overrides?: CallOverrides): Promise<string>;
+
+  "PG_INVALID_FEED()"(overrides?: CallOverrides): Promise<string>;
+
+  PG_INVALID_STEPS(overrides?: CallOverrides): Promise<string>;
+
+  "PG_INVALID_STEPS()"(overrides?: CallOverrides): Promise<string>;
+
+  PG_UNKNOWN_FEED_TYPE(overrides?: CallOverrides): Promise<string>;
+
+  "PG_UNKNOWN_FEED_TYPE()"(overrides?: CallOverrides): Promise<string>;
+
+  PG_UNKNOWN_IDENTITY(overrides?: CallOverrides): Promise<string>;
+
+  "PG_UNKNOWN_IDENTITY()"(overrides?: CallOverrides): Promise<string>;
+
   P_BORROW_LIMIT_EXCEEDED(overrides?: CallOverrides): Promise<string>;
 
   "P_BORROW_LIMIT_EXCEEDED()"(overrides?: CallOverrides): Promise<string>;
@@ -526,6 +658,12 @@ export class Errors extends Contract {
   P_DEBT_LEFT(overrides?: CallOverrides): Promise<string>;
 
   "P_DEBT_LEFT()"(overrides?: CallOverrides): Promise<string>;
+
+  P_FORBIDDEN_LIQUIDATION_CALLER(overrides?: CallOverrides): Promise<string>;
+
+  "P_FORBIDDEN_LIQUIDATION_CALLER()"(
+    overrides?: CallOverrides
+  ): Promise<string>;
 
   P_HEALTHY_POSITION_LIQUIDATION(overrides?: CallOverrides): Promise<string>;
 
@@ -558,6 +696,10 @@ export class Errors extends Contract {
   P_PRICE_THRESHOLD_OVERFLOW(overrides?: CallOverrides): Promise<string>;
 
   "P_PRICE_THRESHOLD_OVERFLOW()"(overrides?: CallOverrides): Promise<string>;
+
+  RF_NOT_LENDABLE(overrides?: CallOverrides): Promise<string>;
+
+  "RF_NOT_LENDABLE()"(overrides?: CallOverrides): Promise<string>;
 
   RT_FORBIDDEN_TRANSFER(overrides?: CallOverrides): Promise<string>;
 
@@ -624,6 +766,10 @@ export class Errors extends Contract {
 
     "F_NOT_REGISTERED_TOKEN()"(overrides?: CallOverrides): Promise<string>;
 
+    F_NOT_SHORTABLE_TOKEN(overrides?: CallOverrides): Promise<string>;
+
+    "F_NOT_SHORTABLE_TOKEN()"(overrides?: CallOverrides): Promise<string>;
+
     F_NOT_TRADABLE_TOKEN(overrides?: CallOverrides): Promise<string>;
 
     "F_NOT_TRADABLE_TOKEN()"(overrides?: CallOverrides): Promise<string>;
@@ -646,6 +792,26 @@ export class Errors extends Contract {
       overrides?: CallOverrides
     ): Promise<string>;
 
+    NON_REENTRANT_METHOD(overrides?: CallOverrides): Promise<string>;
+
+    "NON_REENTRANT_METHOD()"(overrides?: CallOverrides): Promise<string>;
+
+    PG_INVALID_FEED(overrides?: CallOverrides): Promise<string>;
+
+    "PG_INVALID_FEED()"(overrides?: CallOverrides): Promise<string>;
+
+    PG_INVALID_STEPS(overrides?: CallOverrides): Promise<string>;
+
+    "PG_INVALID_STEPS()"(overrides?: CallOverrides): Promise<string>;
+
+    PG_UNKNOWN_FEED_TYPE(overrides?: CallOverrides): Promise<string>;
+
+    "PG_UNKNOWN_FEED_TYPE()"(overrides?: CallOverrides): Promise<string>;
+
+    PG_UNKNOWN_IDENTITY(overrides?: CallOverrides): Promise<string>;
+
+    "PG_UNKNOWN_IDENTITY()"(overrides?: CallOverrides): Promise<string>;
+
     P_BORROW_LIMIT_EXCEEDED(overrides?: CallOverrides): Promise<string>;
 
     "P_BORROW_LIMIT_EXCEEDED()"(overrides?: CallOverrides): Promise<string>;
@@ -653,6 +819,12 @@ export class Errors extends Contract {
     P_DEBT_LEFT(overrides?: CallOverrides): Promise<string>;
 
     "P_DEBT_LEFT()"(overrides?: CallOverrides): Promise<string>;
+
+    P_FORBIDDEN_LIQUIDATION_CALLER(overrides?: CallOverrides): Promise<string>;
+
+    "P_FORBIDDEN_LIQUIDATION_CALLER()"(
+      overrides?: CallOverrides
+    ): Promise<string>;
 
     P_HEALTHY_POSITION_LIQUIDATION(overrides?: CallOverrides): Promise<string>;
 
@@ -687,6 +859,10 @@ export class Errors extends Contract {
     P_PRICE_THRESHOLD_OVERFLOW(overrides?: CallOverrides): Promise<string>;
 
     "P_PRICE_THRESHOLD_OVERFLOW()"(overrides?: CallOverrides): Promise<string>;
+
+    RF_NOT_LENDABLE(overrides?: CallOverrides): Promise<string>;
+
+    "RF_NOT_LENDABLE()"(overrides?: CallOverrides): Promise<string>;
 
     RT_FORBIDDEN_TRANSFER(overrides?: CallOverrides): Promise<string>;
 
@@ -760,6 +936,10 @@ export class Errors extends Contract {
 
     "F_NOT_REGISTERED_TOKEN()"(overrides?: CallOverrides): Promise<BigNumber>;
 
+    F_NOT_SHORTABLE_TOKEN(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "F_NOT_SHORTABLE_TOKEN()"(overrides?: CallOverrides): Promise<BigNumber>;
+
     F_NOT_TRADABLE_TOKEN(overrides?: CallOverrides): Promise<BigNumber>;
 
     "F_NOT_TRADABLE_TOKEN()"(overrides?: CallOverrides): Promise<BigNumber>;
@@ -782,6 +962,26 @@ export class Errors extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
+    NON_REENTRANT_METHOD(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "NON_REENTRANT_METHOD()"(overrides?: CallOverrides): Promise<BigNumber>;
+
+    PG_INVALID_FEED(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "PG_INVALID_FEED()"(overrides?: CallOverrides): Promise<BigNumber>;
+
+    PG_INVALID_STEPS(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "PG_INVALID_STEPS()"(overrides?: CallOverrides): Promise<BigNumber>;
+
+    PG_UNKNOWN_FEED_TYPE(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "PG_UNKNOWN_FEED_TYPE()"(overrides?: CallOverrides): Promise<BigNumber>;
+
+    PG_UNKNOWN_IDENTITY(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "PG_UNKNOWN_IDENTITY()"(overrides?: CallOverrides): Promise<BigNumber>;
+
     P_BORROW_LIMIT_EXCEEDED(overrides?: CallOverrides): Promise<BigNumber>;
 
     "P_BORROW_LIMIT_EXCEEDED()"(overrides?: CallOverrides): Promise<BigNumber>;
@@ -789,6 +989,14 @@ export class Errors extends Contract {
     P_DEBT_LEFT(overrides?: CallOverrides): Promise<BigNumber>;
 
     "P_DEBT_LEFT()"(overrides?: CallOverrides): Promise<BigNumber>;
+
+    P_FORBIDDEN_LIQUIDATION_CALLER(
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "P_FORBIDDEN_LIQUIDATION_CALLER()"(
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
 
     P_HEALTHY_POSITION_LIQUIDATION(
       overrides?: CallOverrides
@@ -833,6 +1041,10 @@ export class Errors extends Contract {
     "P_PRICE_THRESHOLD_OVERFLOW()"(
       overrides?: CallOverrides
     ): Promise<BigNumber>;
+
+    RF_NOT_LENDABLE(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "RF_NOT_LENDABLE()"(overrides?: CallOverrides): Promise<BigNumber>;
 
     RT_FORBIDDEN_TRANSFER(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -924,6 +1136,14 @@ export class Errors extends Contract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
+    F_NOT_SHORTABLE_TOKEN(
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    "F_NOT_SHORTABLE_TOKEN()"(
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
     F_NOT_TRADABLE_TOKEN(
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
@@ -964,6 +1184,42 @@ export class Errors extends Contract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
+    NON_REENTRANT_METHOD(
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    "NON_REENTRANT_METHOD()"(
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    PG_INVALID_FEED(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    "PG_INVALID_FEED()"(
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    PG_INVALID_STEPS(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    "PG_INVALID_STEPS()"(
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    PG_UNKNOWN_FEED_TYPE(
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    "PG_UNKNOWN_FEED_TYPE()"(
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    PG_UNKNOWN_IDENTITY(
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    "PG_UNKNOWN_IDENTITY()"(
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
     P_BORROW_LIMIT_EXCEEDED(
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
@@ -975,6 +1231,14 @@ export class Errors extends Contract {
     P_DEBT_LEFT(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     "P_DEBT_LEFT()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    P_FORBIDDEN_LIQUIDATION_CALLER(
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    "P_FORBIDDEN_LIQUIDATION_CALLER()"(
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
 
     P_HEALTHY_POSITION_LIQUIDATION(
       overrides?: CallOverrides
@@ -1029,6 +1293,12 @@ export class Errors extends Contract {
     ): Promise<PopulatedTransaction>;
 
     "P_PRICE_THRESHOLD_OVERFLOW()"(
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    RF_NOT_LENDABLE(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    "RF_NOT_LENDABLE()"(
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 

@@ -10,6 +10,7 @@ export class TokenMonitor extends AbstractMonitor<Token> {
   public lendables: string[] = [];
   public tradables: string[] = [];
   public proxies: string[] = [];
+  public shortables: string[] = [];
 
   get lendableTokens(): Promise<Token[]> {
     return this.context.db.getRepository(Token).find("lendable", true);
@@ -21,6 +22,11 @@ export class TokenMonitor extends AbstractMonitor<Token> {
 
   get proxyTokens(): Promise<Token[]> {
     return this.context.db.getRepository(Token).find("proxy", true);
+  }
+
+  get shortableTokens(): Promise<Token[]> {
+    return this.context.db.getRepository(Token).find("shortable", true);
+
   }
 
   async run(): Promise<Observable<Token>> {
@@ -77,6 +83,24 @@ export class TokenMonitor extends AbstractMonitor<Token> {
         })
     );
 
+    this.context.getChannel(HeightMonitor).then((channel) =>
+      channel
+        .pipe(
+          map(() =>
+            this.context.sender
+              .call(this.context.pairFactory, "getAllShortables")
+              .then(mapAll(byteToAddress))
+          )
+        )
+        .subscribe((values) => {
+          const difference = diff(this.shortables, values);
+          if (difference) {
+            this.shortables = values;
+            this.parseDifference(difference as any);
+          }
+        })
+    );
+
     return this.channel;
   }
 
@@ -94,18 +118,21 @@ export class TokenMonitor extends AbstractMonitor<Token> {
         const lendable = this.lendables.includes(address);
         const proxy = this.proxies.includes(address);
         const tradable = this.tradables.includes(address);
+        const shortable = this.shortables.includes(address);
 
         let instance = await repository.get(address);
         if (
           !instance ||
           instance.lendable !== lendable ||
           instance.tradable !== tradable ||
-          instance.proxy !== proxy
+          instance.proxy !== proxy ||
+          instance.shortable !== shortable
         ) {
           instance = new Token();
-          instance.lendable = this.lendables.includes(address);
-          instance.proxy = this.proxies.includes(address);
-          instance.tradable = this.tradables.includes(address);
+          instance.lendable = lendable
+          instance.proxy = proxy
+          instance.tradable = tradable
+          instance.shortable = shortable
           instance.address = address;
 
           const contract = IERC20Detailed__factory.connect(

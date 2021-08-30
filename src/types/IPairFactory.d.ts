@@ -24,20 +24,32 @@ import { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
 interface IPairFactoryInterface extends ethers.utils.Interface {
   functions: {
     "getAllProxyLendables()": FunctionFragment;
+    "getAllShortables()": FunctionFragment;
     "getAllTradables()": FunctionFragment;
     "getOrCreatePair(address,address)": FunctionFragment;
     "getOrCreateRoutablePair(address,address,address)": FunctionFragment;
+    "getOrCreateRoutableShortingPair(address,address,address)": FunctionFragment;
+    "getOrCreateShortingPair(address,address)": FunctionFragment;
     "getPair(address,address)": FunctionFragment;
     "getRoutablePair(address,address,address)": FunctionFragment;
+    "getRoutableShortingPair(address,address,address)": FunctionFragment;
+    "getShortingPair(address,address)": FunctionFragment;
     "isPair(address)": FunctionFragment;
+    "isRegisteredShortable(address)": FunctionFragment;
     "registerProxyLendable(address)": FunctionFragment;
     "registerProxyLendables(address[])": FunctionFragment;
+    "registerShortable(address)": FunctionFragment;
+    "registerShortables(address[])": FunctionFragment;
     "registerTradable(address)": FunctionFragment;
     "registerTradables(address[])": FunctionFragment;
   };
 
   encodeFunctionData(
     functionFragment: "getAllProxyLendables",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "getAllShortables",
     values?: undefined
   ): string;
   encodeFunctionData(
@@ -53,6 +65,14 @@ interface IPairFactoryInterface extends ethers.utils.Interface {
     values: [string, string, string]
   ): string;
   encodeFunctionData(
+    functionFragment: "getOrCreateRoutableShortingPair",
+    values: [string, string, string]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "getOrCreateShortingPair",
+    values: [string, string]
+  ): string;
+  encodeFunctionData(
     functionFragment: "getPair",
     values: [string, string]
   ): string;
@@ -60,13 +80,33 @@ interface IPairFactoryInterface extends ethers.utils.Interface {
     functionFragment: "getRoutablePair",
     values: [string, string, string]
   ): string;
+  encodeFunctionData(
+    functionFragment: "getRoutableShortingPair",
+    values: [string, string, string]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "getShortingPair",
+    values: [string, string]
+  ): string;
   encodeFunctionData(functionFragment: "isPair", values: [string]): string;
+  encodeFunctionData(
+    functionFragment: "isRegisteredShortable",
+    values: [string]
+  ): string;
   encodeFunctionData(
     functionFragment: "registerProxyLendable",
     values: [string]
   ): string;
   encodeFunctionData(
     functionFragment: "registerProxyLendables",
+    values: [string[]]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "registerShortable",
+    values: [string]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "registerShortables",
     values: [string[]]
   ): string;
   encodeFunctionData(
@@ -83,6 +123,10 @@ interface IPairFactoryInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
+    functionFragment: "getAllShortables",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "getAllTradables",
     data: BytesLike
   ): Result;
@@ -94,18 +138,46 @@ interface IPairFactoryInterface extends ethers.utils.Interface {
     functionFragment: "getOrCreateRoutablePair",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(
+    functionFragment: "getOrCreateRoutableShortingPair",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "getOrCreateShortingPair",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "getPair", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "getRoutablePair",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(
+    functionFragment: "getRoutableShortingPair",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "getShortingPair",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "isPair", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "isRegisteredShortable",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(
     functionFragment: "registerProxyLendable",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
     functionFragment: "registerProxyLendables",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "registerShortable",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "registerShortables",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -170,6 +242,10 @@ export class IPairFactory extends Contract {
       overrides?: Overrides
     ): Promise<ContractTransaction>;
 
+    getAllShortables(overrides?: Overrides): Promise<ContractTransaction>;
+
+    "getAllShortables()"(overrides?: Overrides): Promise<ContractTransaction>;
+
     getAllTradables(overrides?: Overrides): Promise<ContractTransaction>;
 
     "getAllTradables()"(overrides?: Overrides): Promise<ContractTransaction>;
@@ -200,6 +276,32 @@ export class IPairFactory extends Contract {
       overrides?: Overrides
     ): Promise<ContractTransaction>;
 
+    getOrCreateRoutableShortingPair(
+      lendable: string,
+      proxyLendable: string,
+      tradable: string,
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
+
+    "getOrCreateRoutableShortingPair(address,address,address)"(
+      lendable: string,
+      proxyLendable: string,
+      tradable: string,
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
+
+    getOrCreateShortingPair(
+      lendable: string,
+      tradable: string,
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
+
+    "getOrCreateShortingPair(address,address)"(
+      lendable: string,
+      tradable: string,
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
+
     getPair(
       lendable: string,
       tradable: string,
@@ -226,10 +328,46 @@ export class IPairFactory extends Contract {
       overrides?: CallOverrides
     ): Promise<[string]>;
 
+    getRoutableShortingPair(
+      lendable: string,
+      proxyLendable: string,
+      tradable: string,
+      overrides?: CallOverrides
+    ): Promise<[string]>;
+
+    "getRoutableShortingPair(address,address,address)"(
+      lendable: string,
+      proxyLendable: string,
+      tradable: string,
+      overrides?: CallOverrides
+    ): Promise<[string]>;
+
+    getShortingPair(
+      lendable: string,
+      tradable: string,
+      overrides?: CallOverrides
+    ): Promise<[string]>;
+
+    "getShortingPair(address,address)"(
+      lendable: string,
+      tradable: string,
+      overrides?: CallOverrides
+    ): Promise<[string]>;
+
     isPair(pair: string, overrides?: CallOverrides): Promise<[boolean]>;
 
     "isPair(address)"(
       pair: string,
+      overrides?: CallOverrides
+    ): Promise<[boolean]>;
+
+    isRegisteredShortable(
+      token: string,
+      overrides?: CallOverrides
+    ): Promise<[boolean]>;
+
+    "isRegisteredShortable(address)"(
+      token: string,
       overrides?: CallOverrides
     ): Promise<[boolean]>;
 
@@ -249,6 +387,26 @@ export class IPairFactory extends Contract {
     ): Promise<ContractTransaction>;
 
     "registerProxyLendables(address[])"(
+      tokens: string[],
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
+
+    registerShortable(
+      token: string,
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
+
+    "registerShortable(address)"(
+      token: string,
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
+
+    registerShortables(
+      tokens: string[],
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
+
+    "registerShortables(address[])"(
       tokens: string[],
       overrides?: Overrides
     ): Promise<ContractTransaction>;
@@ -277,6 +435,10 @@ export class IPairFactory extends Contract {
   getAllProxyLendables(overrides?: Overrides): Promise<ContractTransaction>;
 
   "getAllProxyLendables()"(overrides?: Overrides): Promise<ContractTransaction>;
+
+  getAllShortables(overrides?: Overrides): Promise<ContractTransaction>;
+
+  "getAllShortables()"(overrides?: Overrides): Promise<ContractTransaction>;
 
   getAllTradables(overrides?: Overrides): Promise<ContractTransaction>;
 
@@ -308,6 +470,32 @@ export class IPairFactory extends Contract {
     overrides?: Overrides
   ): Promise<ContractTransaction>;
 
+  getOrCreateRoutableShortingPair(
+    lendable: string,
+    proxyLendable: string,
+    tradable: string,
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
+
+  "getOrCreateRoutableShortingPair(address,address,address)"(
+    lendable: string,
+    proxyLendable: string,
+    tradable: string,
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
+
+  getOrCreateShortingPair(
+    lendable: string,
+    tradable: string,
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
+
+  "getOrCreateShortingPair(address,address)"(
+    lendable: string,
+    tradable: string,
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
+
   getPair(
     lendable: string,
     tradable: string,
@@ -334,9 +522,45 @@ export class IPairFactory extends Contract {
     overrides?: CallOverrides
   ): Promise<string>;
 
+  getRoutableShortingPair(
+    lendable: string,
+    proxyLendable: string,
+    tradable: string,
+    overrides?: CallOverrides
+  ): Promise<string>;
+
+  "getRoutableShortingPair(address,address,address)"(
+    lendable: string,
+    proxyLendable: string,
+    tradable: string,
+    overrides?: CallOverrides
+  ): Promise<string>;
+
+  getShortingPair(
+    lendable: string,
+    tradable: string,
+    overrides?: CallOverrides
+  ): Promise<string>;
+
+  "getShortingPair(address,address)"(
+    lendable: string,
+    tradable: string,
+    overrides?: CallOverrides
+  ): Promise<string>;
+
   isPair(pair: string, overrides?: CallOverrides): Promise<boolean>;
 
   "isPair(address)"(pair: string, overrides?: CallOverrides): Promise<boolean>;
+
+  isRegisteredShortable(
+    token: string,
+    overrides?: CallOverrides
+  ): Promise<boolean>;
+
+  "isRegisteredShortable(address)"(
+    token: string,
+    overrides?: CallOverrides
+  ): Promise<boolean>;
 
   registerProxyLendable(
     token: string,
@@ -354,6 +578,26 @@ export class IPairFactory extends Contract {
   ): Promise<ContractTransaction>;
 
   "registerProxyLendables(address[])"(
+    tokens: string[],
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
+
+  registerShortable(
+    token: string,
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
+
+  "registerShortable(address)"(
+    token: string,
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
+
+  registerShortables(
+    tokens: string[],
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
+
+  "registerShortables(address[])"(
     tokens: string[],
     overrides?: Overrides
   ): Promise<ContractTransaction>;
@@ -382,6 +626,10 @@ export class IPairFactory extends Contract {
     getAllProxyLendables(overrides?: CallOverrides): Promise<string[]>;
 
     "getAllProxyLendables()"(overrides?: CallOverrides): Promise<string[]>;
+
+    getAllShortables(overrides?: CallOverrides): Promise<string[]>;
+
+    "getAllShortables()"(overrides?: CallOverrides): Promise<string[]>;
 
     getAllTradables(overrides?: CallOverrides): Promise<string[]>;
 
@@ -413,6 +661,32 @@ export class IPairFactory extends Contract {
       overrides?: CallOverrides
     ): Promise<string>;
 
+    getOrCreateRoutableShortingPair(
+      lendable: string,
+      proxyLendable: string,
+      tradable: string,
+      overrides?: CallOverrides
+    ): Promise<string>;
+
+    "getOrCreateRoutableShortingPair(address,address,address)"(
+      lendable: string,
+      proxyLendable: string,
+      tradable: string,
+      overrides?: CallOverrides
+    ): Promise<string>;
+
+    getOrCreateShortingPair(
+      lendable: string,
+      tradable: string,
+      overrides?: CallOverrides
+    ): Promise<string>;
+
+    "getOrCreateShortingPair(address,address)"(
+      lendable: string,
+      tradable: string,
+      overrides?: CallOverrides
+    ): Promise<string>;
+
     getPair(
       lendable: string,
       tradable: string,
@@ -439,10 +713,46 @@ export class IPairFactory extends Contract {
       overrides?: CallOverrides
     ): Promise<string>;
 
+    getRoutableShortingPair(
+      lendable: string,
+      proxyLendable: string,
+      tradable: string,
+      overrides?: CallOverrides
+    ): Promise<string>;
+
+    "getRoutableShortingPair(address,address,address)"(
+      lendable: string,
+      proxyLendable: string,
+      tradable: string,
+      overrides?: CallOverrides
+    ): Promise<string>;
+
+    getShortingPair(
+      lendable: string,
+      tradable: string,
+      overrides?: CallOverrides
+    ): Promise<string>;
+
+    "getShortingPair(address,address)"(
+      lendable: string,
+      tradable: string,
+      overrides?: CallOverrides
+    ): Promise<string>;
+
     isPair(pair: string, overrides?: CallOverrides): Promise<boolean>;
 
     "isPair(address)"(
       pair: string,
+      overrides?: CallOverrides
+    ): Promise<boolean>;
+
+    isRegisteredShortable(
+      token: string,
+      overrides?: CallOverrides
+    ): Promise<boolean>;
+
+    "isRegisteredShortable(address)"(
+      token: string,
       overrides?: CallOverrides
     ): Promise<boolean>;
 
@@ -462,6 +772,23 @@ export class IPairFactory extends Contract {
     ): Promise<void>;
 
     "registerProxyLendables(address[])"(
+      tokens: string[],
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    registerShortable(token: string, overrides?: CallOverrides): Promise<void>;
+
+    "registerShortable(address)"(
+      token: string,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    registerShortables(
+      tokens: string[],
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    "registerShortables(address[])"(
       tokens: string[],
       overrides?: CallOverrides
     ): Promise<void>;
@@ -490,6 +817,10 @@ export class IPairFactory extends Contract {
     getAllProxyLendables(overrides?: Overrides): Promise<BigNumber>;
 
     "getAllProxyLendables()"(overrides?: Overrides): Promise<BigNumber>;
+
+    getAllShortables(overrides?: Overrides): Promise<BigNumber>;
+
+    "getAllShortables()"(overrides?: Overrides): Promise<BigNumber>;
 
     getAllTradables(overrides?: Overrides): Promise<BigNumber>;
 
@@ -521,6 +852,32 @@ export class IPairFactory extends Contract {
       overrides?: Overrides
     ): Promise<BigNumber>;
 
+    getOrCreateRoutableShortingPair(
+      lendable: string,
+      proxyLendable: string,
+      tradable: string,
+      overrides?: Overrides
+    ): Promise<BigNumber>;
+
+    "getOrCreateRoutableShortingPair(address,address,address)"(
+      lendable: string,
+      proxyLendable: string,
+      tradable: string,
+      overrides?: Overrides
+    ): Promise<BigNumber>;
+
+    getOrCreateShortingPair(
+      lendable: string,
+      tradable: string,
+      overrides?: Overrides
+    ): Promise<BigNumber>;
+
+    "getOrCreateShortingPair(address,address)"(
+      lendable: string,
+      tradable: string,
+      overrides?: Overrides
+    ): Promise<BigNumber>;
+
     getPair(
       lendable: string,
       tradable: string,
@@ -547,10 +904,46 @@ export class IPairFactory extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
+    getRoutableShortingPair(
+      lendable: string,
+      proxyLendable: string,
+      tradable: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "getRoutableShortingPair(address,address,address)"(
+      lendable: string,
+      proxyLendable: string,
+      tradable: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    getShortingPair(
+      lendable: string,
+      tradable: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "getShortingPair(address,address)"(
+      lendable: string,
+      tradable: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
     isPair(pair: string, overrides?: CallOverrides): Promise<BigNumber>;
 
     "isPair(address)"(
       pair: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    isRegisteredShortable(
+      token: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "isRegisteredShortable(address)"(
+      token: string,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
@@ -570,6 +963,23 @@ export class IPairFactory extends Contract {
     ): Promise<BigNumber>;
 
     "registerProxyLendables(address[])"(
+      tokens: string[],
+      overrides?: Overrides
+    ): Promise<BigNumber>;
+
+    registerShortable(token: string, overrides?: Overrides): Promise<BigNumber>;
+
+    "registerShortable(address)"(
+      token: string,
+      overrides?: Overrides
+    ): Promise<BigNumber>;
+
+    registerShortables(
+      tokens: string[],
+      overrides?: Overrides
+    ): Promise<BigNumber>;
+
+    "registerShortables(address[])"(
       tokens: string[],
       overrides?: Overrides
     ): Promise<BigNumber>;
@@ -598,6 +1008,10 @@ export class IPairFactory extends Contract {
     "getAllProxyLendables()"(
       overrides?: Overrides
     ): Promise<PopulatedTransaction>;
+
+    getAllShortables(overrides?: Overrides): Promise<PopulatedTransaction>;
+
+    "getAllShortables()"(overrides?: Overrides): Promise<PopulatedTransaction>;
 
     getAllTradables(overrides?: Overrides): Promise<PopulatedTransaction>;
 
@@ -629,6 +1043,32 @@ export class IPairFactory extends Contract {
       overrides?: Overrides
     ): Promise<PopulatedTransaction>;
 
+    getOrCreateRoutableShortingPair(
+      lendable: string,
+      proxyLendable: string,
+      tradable: string,
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
+
+    "getOrCreateRoutableShortingPair(address,address,address)"(
+      lendable: string,
+      proxyLendable: string,
+      tradable: string,
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
+
+    getOrCreateShortingPair(
+      lendable: string,
+      tradable: string,
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
+
+    "getOrCreateShortingPair(address,address)"(
+      lendable: string,
+      tradable: string,
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
+
     getPair(
       lendable: string,
       tradable: string,
@@ -655,6 +1095,32 @@ export class IPairFactory extends Contract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
+    getRoutableShortingPair(
+      lendable: string,
+      proxyLendable: string,
+      tradable: string,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    "getRoutableShortingPair(address,address,address)"(
+      lendable: string,
+      proxyLendable: string,
+      tradable: string,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    getShortingPair(
+      lendable: string,
+      tradable: string,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    "getShortingPair(address,address)"(
+      lendable: string,
+      tradable: string,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
     isPair(
       pair: string,
       overrides?: CallOverrides
@@ -662,6 +1128,16 @@ export class IPairFactory extends Contract {
 
     "isPair(address)"(
       pair: string,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    isRegisteredShortable(
+      token: string,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    "isRegisteredShortable(address)"(
+      token: string,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
@@ -681,6 +1157,26 @@ export class IPairFactory extends Contract {
     ): Promise<PopulatedTransaction>;
 
     "registerProxyLendables(address[])"(
+      tokens: string[],
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
+
+    registerShortable(
+      token: string,
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
+
+    "registerShortable(address)"(
+      token: string,
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
+
+    registerShortables(
+      tokens: string[],
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
+
+    "registerShortables(address[])"(
       tokens: string[],
       overrides?: Overrides
     ): Promise<PopulatedTransaction>;

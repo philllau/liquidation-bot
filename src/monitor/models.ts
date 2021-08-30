@@ -111,6 +111,8 @@ export class Token extends DatastoreDocument<Token> {
   @BooleanIndex()
   proxy!: boolean;
   @BooleanIndex()
+  shortable!: boolean;
+  @BooleanIndex()
   tradable!: boolean;
   decimals!: number;
 }
@@ -124,17 +126,19 @@ export class Pair extends DatastoreDocument<Pair> {
   tradable!: string;
   @AddressIndex()
   proxy?: string;
+  @BooleanIndex()
+  short!: boolean;
 
   @Index()
   updateAt!: number;
 }
 
-export class Transfer extends DatastoreDocument<Transfer> {}
+export class Transfer extends DatastoreDocument<Transfer> { }
 
 export class Position extends DatastoreDocument<Position> {
-  @HexKey(40)
+  @HexKey(42)
   get id() {
-    return Position.toId(this.pair, this.trader);
+    return Position.toId(this.short, this.pair, this.trader);
   }
 
   @AddressIndex()
@@ -151,6 +155,8 @@ export class Position extends DatastoreDocument<Position> {
   updateAt!: number;
   @Index()
   appearAt!: number;
+
+  lastUpdatedAt?: number;
 
   @BigNumberIndex()
   @BigNumberTransform()
@@ -176,6 +182,8 @@ export class Position extends DatastoreDocument<Position> {
   @BigNumberIndex()
   @BigNumberTransform()
   liquidationCost!: BigNumber;
+  @BooleanIndex()
+  short!: boolean;
 
   @Expose()
   @BigNumberIndex()
@@ -188,10 +196,11 @@ export class Position extends DatastoreDocument<Position> {
     );
   }
 
-  static toId(pair: string, trader: string) {
+  static toId(short: boolean, pair: string, trader: string) {
     pair = pair.startsWith("0x") ? pair.substr(2) : pair;
     trader = trader.startsWith("0x") ? trader.substr(2) : trader;
-    return [pair, trader].join("");
+    const prefix = short ? "10" : '00'
+    return [prefix, pair, trader].join("");
   }
 }
 

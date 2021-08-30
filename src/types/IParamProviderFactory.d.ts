@@ -25,12 +25,16 @@ interface IParamProviderFactoryInterface extends ethers.utils.Interface {
   functions: {
     "createPairParamProvider(address[])": FunctionFragment;
     "createReserveParamProvider(address)": FunctionFragment;
+    "createShortingPairParamProvider(address[])": FunctionFragment;
     "getPairParamProvider(address,address)": FunctionFragment;
     "getReserveParamProvider(address)": FunctionFragment;
     "getRoutablePairParamProvider(address,address,address)": FunctionFragment;
+    "getRoutableShortingPairParamProvider(address,address,address)": FunctionFragment;
+    "getShortingPairParamProvider(address,address)": FunctionFragment;
     "setSwapRouter(address)": FunctionFragment;
     "upgradePairParamProvider(address[])": FunctionFragment;
     "upgradeReserveParamProvider(address)": FunctionFragment;
+    "upgradeShortingPairParamProvider(address[])": FunctionFragment;
   };
 
   encodeFunctionData(
@@ -40,6 +44,10 @@ interface IParamProviderFactoryInterface extends ethers.utils.Interface {
   encodeFunctionData(
     functionFragment: "createReserveParamProvider",
     values: [string]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "createShortingPairParamProvider",
+    values: [string[]]
   ): string;
   encodeFunctionData(
     functionFragment: "getPairParamProvider",
@@ -54,6 +62,14 @@ interface IParamProviderFactoryInterface extends ethers.utils.Interface {
     values: [string, string, string]
   ): string;
   encodeFunctionData(
+    functionFragment: "getRoutableShortingPairParamProvider",
+    values: [string, string, string]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "getShortingPairParamProvider",
+    values: [string, string]
+  ): string;
+  encodeFunctionData(
     functionFragment: "setSwapRouter",
     values: [string]
   ): string;
@@ -65,6 +81,10 @@ interface IParamProviderFactoryInterface extends ethers.utils.Interface {
     functionFragment: "upgradeReserveParamProvider",
     values: [string]
   ): string;
+  encodeFunctionData(
+    functionFragment: "upgradeShortingPairParamProvider",
+    values: [string[]]
+  ): string;
 
   decodeFunctionResult(
     functionFragment: "createPairParamProvider",
@@ -72,6 +92,10 @@ interface IParamProviderFactoryInterface extends ethers.utils.Interface {
   ): Result;
   decodeFunctionResult(
     functionFragment: "createReserveParamProvider",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "createShortingPairParamProvider",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -87,6 +111,14 @@ interface IParamProviderFactoryInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
+    functionFragment: "getRoutableShortingPairParamProvider",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "getShortingPairParamProvider",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "setSwapRouter",
     data: BytesLike
   ): Result;
@@ -96,6 +128,10 @@ interface IParamProviderFactoryInterface extends ethers.utils.Interface {
   ): Result;
   decodeFunctionResult(
     functionFragment: "upgradeReserveParamProvider",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "upgradeShortingPairParamProvider",
     data: BytesLike
   ): Result;
 
@@ -166,6 +202,16 @@ export class IParamProviderFactory extends Contract {
       overrides?: Overrides
     ): Promise<ContractTransaction>;
 
+    createShortingPairParamProvider(
+      path: string[],
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
+
+    "createShortingPairParamProvider(address[])"(
+      path: string[],
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
+
     getPairParamProvider(
       lendable: string,
       tradable: string,
@@ -202,6 +248,32 @@ export class IParamProviderFactory extends Contract {
       overrides?: CallOverrides
     ): Promise<[string]>;
 
+    getRoutableShortingPairParamProvider(
+      lendable: string,
+      proxyLendable: string,
+      shortable: string,
+      overrides?: CallOverrides
+    ): Promise<[string]>;
+
+    "getRoutableShortingPairParamProvider(address,address,address)"(
+      lendable: string,
+      proxyLendable: string,
+      shortable: string,
+      overrides?: CallOverrides
+    ): Promise<[string]>;
+
+    getShortingPairParamProvider(
+      lendable: string,
+      shortable: string,
+      overrides?: CallOverrides
+    ): Promise<[string]>;
+
+    "getShortingPairParamProvider(address,address)"(
+      lendable: string,
+      shortable: string,
+      overrides?: CallOverrides
+    ): Promise<[string]>;
+
     setSwapRouter(
       swapRouter: string,
       overrides?: Overrides
@@ -231,6 +303,16 @@ export class IParamProviderFactory extends Contract {
       lendable: string,
       overrides?: Overrides
     ): Promise<ContractTransaction>;
+
+    upgradeShortingPairParamProvider(
+      path: string[],
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
+
+    "upgradeShortingPairParamProvider(address[])"(
+      path: string[],
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
   };
 
   createPairParamProvider(
@@ -250,6 +332,16 @@ export class IParamProviderFactory extends Contract {
 
   "createReserveParamProvider(address)"(
     lendable: string,
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
+
+  createShortingPairParamProvider(
+    path: string[],
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
+
+  "createShortingPairParamProvider(address[])"(
+    path: string[],
     overrides?: Overrides
   ): Promise<ContractTransaction>;
 
@@ -289,6 +381,32 @@ export class IParamProviderFactory extends Contract {
     overrides?: CallOverrides
   ): Promise<string>;
 
+  getRoutableShortingPairParamProvider(
+    lendable: string,
+    proxyLendable: string,
+    shortable: string,
+    overrides?: CallOverrides
+  ): Promise<string>;
+
+  "getRoutableShortingPairParamProvider(address,address,address)"(
+    lendable: string,
+    proxyLendable: string,
+    shortable: string,
+    overrides?: CallOverrides
+  ): Promise<string>;
+
+  getShortingPairParamProvider(
+    lendable: string,
+    shortable: string,
+    overrides?: CallOverrides
+  ): Promise<string>;
+
+  "getShortingPairParamProvider(address,address)"(
+    lendable: string,
+    shortable: string,
+    overrides?: CallOverrides
+  ): Promise<string>;
+
   setSwapRouter(
     swapRouter: string,
     overrides?: Overrides
@@ -319,6 +437,16 @@ export class IParamProviderFactory extends Contract {
     overrides?: Overrides
   ): Promise<ContractTransaction>;
 
+  upgradeShortingPairParamProvider(
+    path: string[],
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
+
+  "upgradeShortingPairParamProvider(address[])"(
+    path: string[],
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
+
   callStatic: {
     createPairParamProvider(
       path: string[],
@@ -337,6 +465,16 @@ export class IParamProviderFactory extends Contract {
 
     "createReserveParamProvider(address)"(
       lendable: string,
+      overrides?: CallOverrides
+    ): Promise<string>;
+
+    createShortingPairParamProvider(
+      path: string[],
+      overrides?: CallOverrides
+    ): Promise<string>;
+
+    "createShortingPairParamProvider(address[])"(
+      path: string[],
       overrides?: CallOverrides
     ): Promise<string>;
 
@@ -373,6 +511,32 @@ export class IParamProviderFactory extends Contract {
       lendable: string,
       proxyLendable: string,
       tradable: string,
+      overrides?: CallOverrides
+    ): Promise<string>;
+
+    getRoutableShortingPairParamProvider(
+      lendable: string,
+      proxyLendable: string,
+      shortable: string,
+      overrides?: CallOverrides
+    ): Promise<string>;
+
+    "getRoutableShortingPairParamProvider(address,address,address)"(
+      lendable: string,
+      proxyLendable: string,
+      shortable: string,
+      overrides?: CallOverrides
+    ): Promise<string>;
+
+    getShortingPairParamProvider(
+      lendable: string,
+      shortable: string,
+      overrides?: CallOverrides
+    ): Promise<string>;
+
+    "getShortingPairParamProvider(address,address)"(
+      lendable: string,
+      shortable: string,
       overrides?: CallOverrides
     ): Promise<string>;
 
@@ -402,6 +566,16 @@ export class IParamProviderFactory extends Contract {
       lendable: string,
       overrides?: CallOverrides
     ): Promise<void>;
+
+    upgradeShortingPairParamProvider(
+      path: string[],
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    "upgradeShortingPairParamProvider(address[])"(
+      path: string[],
+      overrides?: CallOverrides
+    ): Promise<void>;
   };
 
   filters: {};
@@ -427,6 +601,16 @@ export class IParamProviderFactory extends Contract {
       overrides?: Overrides
     ): Promise<BigNumber>;
 
+    createShortingPairParamProvider(
+      path: string[],
+      overrides?: Overrides
+    ): Promise<BigNumber>;
+
+    "createShortingPairParamProvider(address[])"(
+      path: string[],
+      overrides?: Overrides
+    ): Promise<BigNumber>;
+
     getPairParamProvider(
       lendable: string,
       tradable: string,
@@ -463,6 +647,32 @@ export class IParamProviderFactory extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
+    getRoutableShortingPairParamProvider(
+      lendable: string,
+      proxyLendable: string,
+      shortable: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "getRoutableShortingPairParamProvider(address,address,address)"(
+      lendable: string,
+      proxyLendable: string,
+      shortable: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    getShortingPairParamProvider(
+      lendable: string,
+      shortable: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "getShortingPairParamProvider(address,address)"(
+      lendable: string,
+      shortable: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
     setSwapRouter(
       swapRouter: string,
       overrides?: Overrides
@@ -490,6 +700,16 @@ export class IParamProviderFactory extends Contract {
 
     "upgradeReserveParamProvider(address)"(
       lendable: string,
+      overrides?: Overrides
+    ): Promise<BigNumber>;
+
+    upgradeShortingPairParamProvider(
+      path: string[],
+      overrides?: Overrides
+    ): Promise<BigNumber>;
+
+    "upgradeShortingPairParamProvider(address[])"(
+      path: string[],
       overrides?: Overrides
     ): Promise<BigNumber>;
   };
@@ -515,6 +735,16 @@ export class IParamProviderFactory extends Contract {
       overrides?: Overrides
     ): Promise<PopulatedTransaction>;
 
+    createShortingPairParamProvider(
+      path: string[],
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
+
+    "createShortingPairParamProvider(address[])"(
+      path: string[],
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
+
     getPairParamProvider(
       lendable: string,
       tradable: string,
@@ -551,6 +781,32 @@ export class IParamProviderFactory extends Contract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
+    getRoutableShortingPairParamProvider(
+      lendable: string,
+      proxyLendable: string,
+      shortable: string,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    "getRoutableShortingPairParamProvider(address,address,address)"(
+      lendable: string,
+      proxyLendable: string,
+      shortable: string,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    getShortingPairParamProvider(
+      lendable: string,
+      shortable: string,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    "getShortingPairParamProvider(address,address)"(
+      lendable: string,
+      shortable: string,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
     setSwapRouter(
       swapRouter: string,
       overrides?: Overrides
@@ -578,6 +834,16 @@ export class IParamProviderFactory extends Contract {
 
     "upgradeReserveParamProvider(address)"(
       lendable: string,
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
+
+    upgradeShortingPairParamProvider(
+      path: string[],
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
+
+    "upgradeShortingPairParamProvider(address[])"(
+      path: string[],
       overrides?: Overrides
     ): Promise<PopulatedTransaction>;
   };

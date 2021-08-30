@@ -25,16 +25,20 @@ interface IPairInterface extends ethers.utils.Interface {
   functions: {
     "calcProfitFee(uint256,uint256)": FunctionFragment;
     "closePosition(address,uint256)": FunctionFragment;
+    "closePositionWithReferrer(address,uint256,address)": FunctionFragment;
     "getAmountOut(uint256)": FunctionFragment;
     "getBorrowLimit()": FunctionFragment;
     "getDeposit(address)": FunctionFragment;
     "getLiquidationCost(uint256)": FunctionFragment;
     "getLoan(address)": FunctionFragment;
     "getRateMultiplier(uint256)": FunctionFragment;
+    "getReserve()": FunctionFragment;
     "getTotalDeposit()": FunctionFragment;
     "getTotalLoan()": FunctionFragment;
+    "initialize(address,address,address,address[],string,string)": FunctionFragment;
     "liquidatePosition(address,address)": FunctionFragment;
     "openPosition(address,uint256,uint256)": FunctionFragment;
+    "openPositionWithReferrer(address,uint256,uint256,address)": FunctionFragment;
     "positionCosts(address)": FunctionFragment;
   };
 
@@ -45,6 +49,10 @@ interface IPairInterface extends ethers.utils.Interface {
   encodeFunctionData(
     functionFragment: "closePosition",
     values: [string, BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "closePositionWithReferrer",
+    values: [string, BigNumberish, string]
   ): string;
   encodeFunctionData(
     functionFragment: "getAmountOut",
@@ -65,6 +73,10 @@ interface IPairInterface extends ethers.utils.Interface {
     values: [BigNumberish]
   ): string;
   encodeFunctionData(
+    functionFragment: "getReserve",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
     functionFragment: "getTotalDeposit",
     values?: undefined
   ): string;
@@ -73,12 +85,20 @@ interface IPairInterface extends ethers.utils.Interface {
     values?: undefined
   ): string;
   encodeFunctionData(
+    functionFragment: "initialize",
+    values: [string, string, string, string[], string, string]
+  ): string;
+  encodeFunctionData(
     functionFragment: "liquidatePosition",
     values: [string, string]
   ): string;
   encodeFunctionData(
     functionFragment: "openPosition",
     values: [string, BigNumberish, BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "openPositionWithReferrer",
+    values: [string, BigNumberish, BigNumberish, string]
   ): string;
   encodeFunctionData(
     functionFragment: "positionCosts",
@@ -91,6 +111,10 @@ interface IPairInterface extends ethers.utils.Interface {
   ): Result;
   decodeFunctionResult(
     functionFragment: "closePosition",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "closePositionWithReferrer",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -111,6 +135,7 @@ interface IPairInterface extends ethers.utils.Interface {
     functionFragment: "getRateMultiplier",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "getReserve", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "getTotalDeposit",
     data: BytesLike
@@ -119,12 +144,17 @@ interface IPairInterface extends ethers.utils.Interface {
     functionFragment: "getTotalLoan",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "initialize", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "liquidatePosition",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
     functionFragment: "openPosition",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "openPositionWithReferrer",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -209,6 +239,20 @@ export class IPair extends Contract {
       overrides?: Overrides
     ): Promise<ContractTransaction>;
 
+    closePositionWithReferrer(
+      trader: string,
+      amountOutMin: BigNumberish,
+      referrer: string,
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
+
+    "closePositionWithReferrer(address,uint256,address)"(
+      trader: string,
+      amountOutMin: BigNumberish,
+      referrer: string,
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
+
     getAmountOut(
       amountIn: BigNumberish,
       overrides?: CallOverrides
@@ -257,6 +301,10 @@ export class IPair extends Contract {
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
 
+    getReserve(overrides?: CallOverrides): Promise<[string]>;
+
+    "getReserve()"(overrides?: CallOverrides): Promise<[string]>;
+
     getTotalDeposit(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     "getTotalDeposit()"(overrides?: CallOverrides): Promise<[BigNumber]>;
@@ -264,6 +312,26 @@ export class IPair extends Contract {
     getTotalLoan(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     "getTotalLoan()"(overrides?: CallOverrides): Promise<[BigNumber]>;
+
+    initialize(
+      reserve: string,
+      paramProvider: string,
+      wow: string,
+      path: string[],
+      name: string,
+      symbol: string,
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
+
+    "initialize(address,address,address,address[],string,string)"(
+      reserve: string,
+      paramProvider: string,
+      wow: string,
+      path: string[],
+      name: string,
+      symbol: string,
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
 
     liquidatePosition(
       trader: string,
@@ -288,6 +356,22 @@ export class IPair extends Contract {
       trader: string,
       leverageFactor: BigNumberish,
       amountOutMin: BigNumberish,
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
+
+    openPositionWithReferrer(
+      trader: string,
+      leverageFactor: BigNumberish,
+      amountOutMin: BigNumberish,
+      referrer: string,
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
+
+    "openPositionWithReferrer(address,uint256,uint256,address)"(
+      trader: string,
+      leverageFactor: BigNumberish,
+      amountOutMin: BigNumberish,
+      referrer: string,
       overrides?: Overrides
     ): Promise<ContractTransaction>;
 
@@ -333,6 +417,20 @@ export class IPair extends Contract {
   "closePosition(address,uint256)"(
     trader: string,
     amountOutMin: BigNumberish,
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
+
+  closePositionWithReferrer(
+    trader: string,
+    amountOutMin: BigNumberish,
+    referrer: string,
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
+
+  "closePositionWithReferrer(address,uint256,address)"(
+    trader: string,
+    amountOutMin: BigNumberish,
+    referrer: string,
     overrides?: Overrides
   ): Promise<ContractTransaction>;
 
@@ -384,6 +482,10 @@ export class IPair extends Contract {
     overrides?: CallOverrides
   ): Promise<BigNumber>;
 
+  getReserve(overrides?: CallOverrides): Promise<string>;
+
+  "getReserve()"(overrides?: CallOverrides): Promise<string>;
+
   getTotalDeposit(overrides?: CallOverrides): Promise<BigNumber>;
 
   "getTotalDeposit()"(overrides?: CallOverrides): Promise<BigNumber>;
@@ -391,6 +493,26 @@ export class IPair extends Contract {
   getTotalLoan(overrides?: CallOverrides): Promise<BigNumber>;
 
   "getTotalLoan()"(overrides?: CallOverrides): Promise<BigNumber>;
+
+  initialize(
+    reserve: string,
+    paramProvider: string,
+    wow: string,
+    path: string[],
+    name: string,
+    symbol: string,
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
+
+  "initialize(address,address,address,address[],string,string)"(
+    reserve: string,
+    paramProvider: string,
+    wow: string,
+    path: string[],
+    name: string,
+    symbol: string,
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
 
   liquidatePosition(
     trader: string,
@@ -415,6 +537,22 @@ export class IPair extends Contract {
     trader: string,
     leverageFactor: BigNumberish,
     amountOutMin: BigNumberish,
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
+
+  openPositionWithReferrer(
+    trader: string,
+    leverageFactor: BigNumberish,
+    amountOutMin: BigNumberish,
+    referrer: string,
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
+
+  "openPositionWithReferrer(address,uint256,uint256,address)"(
+    trader: string,
+    leverageFactor: BigNumberish,
+    amountOutMin: BigNumberish,
+    referrer: string,
     overrides?: Overrides
   ): Promise<ContractTransaction>;
 
@@ -460,6 +598,20 @@ export class IPair extends Contract {
     "closePosition(address,uint256)"(
       trader: string,
       amountOutMin: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    closePositionWithReferrer(
+      trader: string,
+      amountOutMin: BigNumberish,
+      referrer: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "closePositionWithReferrer(address,uint256,address)"(
+      trader: string,
+      amountOutMin: BigNumberish,
+      referrer: string,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
@@ -511,6 +663,10 @@ export class IPair extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
+    getReserve(overrides?: CallOverrides): Promise<string>;
+
+    "getReserve()"(overrides?: CallOverrides): Promise<string>;
+
     getTotalDeposit(overrides?: CallOverrides): Promise<BigNumber>;
 
     "getTotalDeposit()"(overrides?: CallOverrides): Promise<BigNumber>;
@@ -518,6 +674,26 @@ export class IPair extends Contract {
     getTotalLoan(overrides?: CallOverrides): Promise<BigNumber>;
 
     "getTotalLoan()"(overrides?: CallOverrides): Promise<BigNumber>;
+
+    initialize(
+      reserve: string,
+      paramProvider: string,
+      wow: string,
+      path: string[],
+      name: string,
+      symbol: string,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    "initialize(address,address,address,address[],string,string)"(
+      reserve: string,
+      paramProvider: string,
+      wow: string,
+      path: string[],
+      name: string,
+      symbol: string,
+      overrides?: CallOverrides
+    ): Promise<void>;
 
     liquidatePosition(
       trader: string,
@@ -542,6 +718,22 @@ export class IPair extends Contract {
       trader: string,
       leverageFactor: BigNumberish,
       amountOutMin: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    openPositionWithReferrer(
+      trader: string,
+      leverageFactor: BigNumberish,
+      amountOutMin: BigNumberish,
+      referrer: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "openPositionWithReferrer(address,uint256,uint256,address)"(
+      trader: string,
+      leverageFactor: BigNumberish,
+      amountOutMin: BigNumberish,
+      referrer: string,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
@@ -627,6 +819,20 @@ export class IPair extends Contract {
       overrides?: Overrides
     ): Promise<BigNumber>;
 
+    closePositionWithReferrer(
+      trader: string,
+      amountOutMin: BigNumberish,
+      referrer: string,
+      overrides?: Overrides
+    ): Promise<BigNumber>;
+
+    "closePositionWithReferrer(address,uint256,address)"(
+      trader: string,
+      amountOutMin: BigNumberish,
+      referrer: string,
+      overrides?: Overrides
+    ): Promise<BigNumber>;
+
     getAmountOut(
       amountIn: BigNumberish,
       overrides?: CallOverrides
@@ -675,6 +881,10 @@ export class IPair extends Contract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
+    getReserve(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "getReserve()"(overrides?: CallOverrides): Promise<BigNumber>;
+
     getTotalDeposit(overrides?: CallOverrides): Promise<BigNumber>;
 
     "getTotalDeposit()"(overrides?: CallOverrides): Promise<BigNumber>;
@@ -682,6 +892,26 @@ export class IPair extends Contract {
     getTotalLoan(overrides?: CallOverrides): Promise<BigNumber>;
 
     "getTotalLoan()"(overrides?: CallOverrides): Promise<BigNumber>;
+
+    initialize(
+      reserve: string,
+      paramProvider: string,
+      wow: string,
+      path: string[],
+      name: string,
+      symbol: string,
+      overrides?: Overrides
+    ): Promise<BigNumber>;
+
+    "initialize(address,address,address,address[],string,string)"(
+      reserve: string,
+      paramProvider: string,
+      wow: string,
+      path: string[],
+      name: string,
+      symbol: string,
+      overrides?: Overrides
+    ): Promise<BigNumber>;
 
     liquidatePosition(
       trader: string,
@@ -706,6 +936,22 @@ export class IPair extends Contract {
       trader: string,
       leverageFactor: BigNumberish,
       amountOutMin: BigNumberish,
+      overrides?: Overrides
+    ): Promise<BigNumber>;
+
+    openPositionWithReferrer(
+      trader: string,
+      leverageFactor: BigNumberish,
+      amountOutMin: BigNumberish,
+      referrer: string,
+      overrides?: Overrides
+    ): Promise<BigNumber>;
+
+    "openPositionWithReferrer(address,uint256,uint256,address)"(
+      trader: string,
+      leverageFactor: BigNumberish,
+      amountOutMin: BigNumberish,
+      referrer: string,
       overrides?: Overrides
     ): Promise<BigNumber>;
 
@@ -742,6 +988,20 @@ export class IPair extends Contract {
     "closePosition(address,uint256)"(
       trader: string,
       amountOutMin: BigNumberish,
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
+
+    closePositionWithReferrer(
+      trader: string,
+      amountOutMin: BigNumberish,
+      referrer: string,
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
+
+    "closePositionWithReferrer(address,uint256,address)"(
+      trader: string,
+      amountOutMin: BigNumberish,
+      referrer: string,
       overrides?: Overrides
     ): Promise<PopulatedTransaction>;
 
@@ -801,6 +1061,10 @@ export class IPair extends Contract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
+    getReserve(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    "getReserve()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
     getTotalDeposit(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     "getTotalDeposit()"(
@@ -810,6 +1074,26 @@ export class IPair extends Contract {
     getTotalLoan(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     "getTotalLoan()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    initialize(
+      reserve: string,
+      paramProvider: string,
+      wow: string,
+      path: string[],
+      name: string,
+      symbol: string,
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
+
+    "initialize(address,address,address,address[],string,string)"(
+      reserve: string,
+      paramProvider: string,
+      wow: string,
+      path: string[],
+      name: string,
+      symbol: string,
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
 
     liquidatePosition(
       trader: string,
@@ -834,6 +1118,22 @@ export class IPair extends Contract {
       trader: string,
       leverageFactor: BigNumberish,
       amountOutMin: BigNumberish,
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
+
+    openPositionWithReferrer(
+      trader: string,
+      leverageFactor: BigNumberish,
+      amountOutMin: BigNumberish,
+      referrer: string,
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
+
+    "openPositionWithReferrer(address,uint256,uint256,address)"(
+      trader: string,
+      leverageFactor: BigNumberish,
+      amountOutMin: BigNumberish,
+      referrer: string,
       overrides?: Overrides
     ): Promise<PopulatedTransaction>;
 

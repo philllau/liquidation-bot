@@ -22,16 +22,46 @@ import { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
 
 interface IPriceGuardInterface extends ethers.utils.Interface {
   functions: {
+    "destDecimals()": FunctionFragment;
+    "getAmountOut(uint256)": FunctionFragment;
+    "getPrice()": FunctionFragment;
     "getThreshold(uint256,uint256)": FunctionFragment;
+    "srcDecimals()": FunctionFragment;
   };
 
+  encodeFunctionData(
+    functionFragment: "destDecimals",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "getAmountOut",
+    values: [BigNumberish]
+  ): string;
+  encodeFunctionData(functionFragment: "getPrice", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "getThreshold",
     values: [BigNumberish, BigNumberish]
   ): string;
+  encodeFunctionData(
+    functionFragment: "srcDecimals",
+    values?: undefined
+  ): string;
 
   decodeFunctionResult(
+    functionFragment: "destDecimals",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "getAmountOut",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: "getPrice", data: BytesLike): Result;
+  decodeFunctionResult(
     functionFragment: "getThreshold",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "srcDecimals",
     data: BytesLike
   ): Result;
 
@@ -82,6 +112,24 @@ export class IPriceGuard extends Contract {
   interface: IPriceGuardInterface;
 
   functions: {
+    destDecimals(overrides?: CallOverrides): Promise<[number]>;
+
+    "destDecimals()"(overrides?: CallOverrides): Promise<[number]>;
+
+    getAmountOut(
+      amountIn: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber]>;
+
+    "getAmountOut(uint256)"(
+      amountIn: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber]>;
+
+    getPrice(overrides?: CallOverrides): Promise<[BigNumber]>;
+
+    "getPrice()"(overrides?: CallOverrides): Promise<[BigNumber]>;
+
     getThreshold(
       amountIn: BigNumberish,
       amountOut: BigNumberish,
@@ -93,7 +141,29 @@ export class IPriceGuard extends Contract {
       amountOut: BigNumberish,
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
+
+    srcDecimals(overrides?: CallOverrides): Promise<[number]>;
+
+    "srcDecimals()"(overrides?: CallOverrides): Promise<[number]>;
   };
+
+  destDecimals(overrides?: CallOverrides): Promise<number>;
+
+  "destDecimals()"(overrides?: CallOverrides): Promise<number>;
+
+  getAmountOut(
+    amountIn: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<BigNumber>;
+
+  "getAmountOut(uint256)"(
+    amountIn: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<BigNumber>;
+
+  getPrice(overrides?: CallOverrides): Promise<BigNumber>;
+
+  "getPrice()"(overrides?: CallOverrides): Promise<BigNumber>;
 
   getThreshold(
     amountIn: BigNumberish,
@@ -107,7 +177,29 @@ export class IPriceGuard extends Contract {
     overrides?: CallOverrides
   ): Promise<BigNumber>;
 
+  srcDecimals(overrides?: CallOverrides): Promise<number>;
+
+  "srcDecimals()"(overrides?: CallOverrides): Promise<number>;
+
   callStatic: {
+    destDecimals(overrides?: CallOverrides): Promise<number>;
+
+    "destDecimals()"(overrides?: CallOverrides): Promise<number>;
+
+    getAmountOut(
+      amountIn: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "getAmountOut(uint256)"(
+      amountIn: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    getPrice(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "getPrice()"(overrides?: CallOverrides): Promise<BigNumber>;
+
     getThreshold(
       amountIn: BigNumberish,
       amountOut: BigNumberish,
@@ -119,11 +211,33 @@ export class IPriceGuard extends Contract {
       amountOut: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
+
+    srcDecimals(overrides?: CallOverrides): Promise<number>;
+
+    "srcDecimals()"(overrides?: CallOverrides): Promise<number>;
   };
 
   filters: {};
 
   estimateGas: {
+    destDecimals(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "destDecimals()"(overrides?: CallOverrides): Promise<BigNumber>;
+
+    getAmountOut(
+      amountIn: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "getAmountOut(uint256)"(
+      amountIn: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    getPrice(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "getPrice()"(overrides?: CallOverrides): Promise<BigNumber>;
+
     getThreshold(
       amountIn: BigNumberish,
       amountOut: BigNumberish,
@@ -135,9 +249,31 @@ export class IPriceGuard extends Contract {
       amountOut: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
+
+    srcDecimals(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "srcDecimals()"(overrides?: CallOverrides): Promise<BigNumber>;
   };
 
   populateTransaction: {
+    destDecimals(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    "destDecimals()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    getAmountOut(
+      amountIn: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    "getAmountOut(uint256)"(
+      amountIn: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    getPrice(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    "getPrice()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
     getThreshold(
       amountIn: BigNumberish,
       amountOut: BigNumberish,
@@ -149,5 +285,9 @@ export class IPriceGuard extends Contract {
       amountOut: BigNumberish,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
+
+    srcDecimals(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    "srcDecimals()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
   };
 }

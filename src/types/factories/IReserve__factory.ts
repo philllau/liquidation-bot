@@ -209,11 +209,6 @@ const _abi = [
         name: "amount",
         type: "uint256",
       },
-      {
-        internalType: "address",
-        name: "investor",
-        type: "address",
-      },
     ],
     name: "calculateDeposit",
     outputs: [
@@ -618,13 +613,7 @@ const _abi = [
     type: "function",
   },
   {
-    inputs: [
-      {
-        internalType: "address",
-        name: "to",
-        type: "address",
-      },
-    ],
+    inputs: [],
     name: "sweepFee",
     outputs: [],
     stateMutability: "nonpayable",

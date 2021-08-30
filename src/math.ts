@@ -1,10 +1,12 @@
-import BigNumber from "bignumber.js";
-import { BigNumberish } from "ethers";
-import * as ethers from "ethers";
+import BigNumber from 'bignumber.js';
+import { BigNumberish } from 'ethers';
+import { BigNumber as EtherBN } from 'ethers';
 
-export const PERCENTAGE_FACTOR = "100";
-export const ONE_HUNDRED_PERCENTAGE_FACTOR = "10000";
-export const HALF_PERCENTAGE = "5000";
+export type BN = BigNumber;
+
+export const PERCENTAGE_FACTOR = '100';
+export const ONE_HUNDRED_PERCENTAGE_FACTOR = '10000';
+export const HALF_PERCENTAGE = '5000';
 export const WAD = Math.pow(10, 18).toString();
 export const HALF_WAD = new BigNumber(WAD).multipliedBy(0.5).toString();
 export const RAY = new BigNumber(10).exponentiatedBy(27).toFixed();
@@ -13,25 +15,51 @@ export const WAD_RAY_RATIO = Math.pow(10, 9).toString();
 export const oneEther = new BigNumber(Math.pow(10, 18));
 export const oneRay = new BigNumber(Math.pow(10, 27));
 export const MAX_UINT_AMOUNT =
-  "115792089237316195423570985008687907853269984665640564039457584007913129639935";
-export const ONE_YEAR = "31536000";
-export const ONE_HOUR = "3600";
+  '115792089237316195423570985008687907853269984665640564039457584007913129639935';
+export const ONE_YEAR = '31536000';
+export const ONE_HOUR = '3600';
 
-export const bn = (n: BigNumber.Value, base?: number) => new BigNumber(n, base);
-export const ray = (n: BigNumber.Value, base?: number) =>
-  bn(RAY).multipliedBy(bn(n, base));
-export const percent = (n: BigNumber.Value, base?: number) =>
-  bn(PERCENTAGE_FACTOR).multipliedBy(bn(n, base));
-export const wad = (n: BigNumber.Value, base?: number) =>
-  bn(WAD).multipliedBy(bn(n, base));
-export const amount = (n: BigNumber.Value, decimals = 18, base?: number) =>
-  bn(10).pow(decimals).multipliedBy(bn(n, base));
-export const toBN = (value: BigNumberish) =>
-  bn(ethers.BigNumber.from(value).toString());
+export const bn = (n: BigNumber.Value) => new BigNumber(n);
+export const ray = (n: BigNumber.Value) => bn(RAY).multipliedBy(n);
+export const percent = (n: BigNumber.Value) =>
+  bn(PERCENTAGE_FACTOR).multipliedBy(n);
+export const wad = (n: BigNumber.Value) => bn(WAD).multipliedBy(n);
+export const amount = (n: BigNumber.Value, decimals = 18) =>
+  bn(10).pow(decimals).multipliedBy(n);
+export const toBN = (value: BigNumberish) => bn(EtherBN.from(value).toString());
 
-declare module "bignumber.js" {
+export const binomCompound = (
+  rate: BigNumber,
+  periods: BigNumber.Value,
+  binoms: number = 5
+) => {
+  let exp = bn(periods);
+  if (exp.eq(0)) return ray(0);
+
+  rate = ray(rate);
+  let el = rate.mul(exp);
+  let result = ray(1).add(el);
+
+  for (let i = 1; i < binoms; i++) {
+    if (exp.lte(i)) break;
+
+    el = el
+      .mul(exp.sub(i))
+      .rayMul(rate)
+      .div(i + 1);
+
+    result = result.add(el);
+  }
+
+  return result.fromDecimals(27);
+};
+
+declare module 'bignumber.js' {
   interface BigNumber {
     str: () => string;
+    fromDecimals: (decimals?: number) => BigNumber;
+    toDecimals: (decimals?: number) => BigNumber;
+    human: (decimals?: number, digits?: number, divider?: string) => string;
     ray: () => BigNumber;
     wad: () => BigNumber;
     halfRay: () => BigNumber;
@@ -52,10 +80,6 @@ declare module "bignumber.js" {
   }
 }
 
-BigNumber.prototype.valueOf = function (): string {
-  return this.toFixed();
-};
-
 BigNumber.prototype.add = function (n: BigNumber.Value): BigNumber {
   return this.plus(n);
 };
@@ -68,6 +92,39 @@ BigNumber.prototype.mul = function (n: BigNumber.Value): BigNumber {
 
 BigNumber.prototype.str = function (): string {
   return this.decimalPlaces(0, BigNumber.ROUND_DOWN).toFixed();
+};
+
+BigNumber.prototype.fromDecimals = function (decimals: number = 18): BigNumber {
+  return this.decimalPlaces(decimals, BigNumber.ROUND_DOWN).div(
+    new BigNumber(10).pow(decimals)
+  );
+};
+
+BigNumber.prototype.toDecimals = function (decimals: number = 18): BigNumber {
+  return this.mul(new BigNumber(10).pow(decimals)).decimalPlaces(
+    0,
+    BigNumber.ROUND_DOWN
+  );
+};
+
+BigNumber.prototype.human = function (
+  decimals: number = 18,
+  digits: number = 4,
+  divider: string = ' '
+): string {
+  function bytesToSize(n: number) {
+    if (n == 0) return '0';
+    const i = Math.floor(Math.log(n) / Math.log(1000));
+    return (
+      (n / Math.pow(1024, i))
+        .toFixed(digits)
+        .replace(/(\d)(?=(\d{3})+\.)/g, `$1${divider}`) +
+      ' ' +
+      (i > 0 ? Array(i).fill('k').join('') : '')
+    );
+  }
+
+  return bytesToSize(this.fromDecimals(decimals).toNumber());
 };
 
 BigNumber.prototype.ray = (): BigNumber => {
@@ -139,9 +196,9 @@ BigNumber.prototype.halfPercentage = (): BigNumber => {
 };
 
 BigNumber.prototype.percentMul = function (b: BigNumber): BigNumber {
-  return this.halfPercentage()
-    .plus(this.multipliedBy(b))
-    .div(PERCENTAGE_FACTOR)
+  return this.multipliedBy(b)
+    .plus(HALF_PERCENTAGE)
+    .div(ONE_HUNDRED_PERCENTAGE_FACTOR)
     .decimalPlaces(0, BigNumber.ROUND_DOWN);
 };
 
@@ -149,7 +206,7 @@ BigNumber.prototype.percentDiv = function (a: BigNumber): BigNumber {
   const halfA = a.div(2).decimalPlaces(0, BigNumber.ROUND_DOWN);
 
   return halfA
-    .plus(this.multipliedBy(PERCENTAGE_FACTOR))
+    .plus(this.multipliedBy(ONE_HUNDRED_PERCENTAGE_FACTOR))
     .div(a)
     .decimalPlaces(0, BigNumber.ROUND_DOWN);
 };

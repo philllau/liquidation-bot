@@ -23,8 +23,10 @@ import { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
 
 interface IParamProviderInterface extends ethers.utils.Interface {
   functions: {
+    "WOW()": FunctionFragment;
     "baseBorrowRate()": FunctionFragment;
     "excessSlope()": FunctionFragment;
+    "feeToken()": FunctionFragment;
     "liquidationMargin()": FunctionFragment;
     "liquidationReward()": FunctionFragment;
     "maxLeverageFactor()": FunctionFragment;
@@ -37,29 +39,18 @@ interface IParamProviderInterface extends ethers.utils.Interface {
     "optimalUtilization()": FunctionFragment;
     "poolUtilizationAllowance()": FunctionFragment;
     "priceGuard()": FunctionFragment;
-    "setBaseBorrowRate(uint256)": FunctionFragment;
-    "setExcessSlope(uint256)": FunctionFragment;
-    "setLiquidationMargin(uint256)": FunctionFragment;
-    "setLiquidationReward(uint256)": FunctionFragment;
-    "setMaxLeverageFactor(uint256)": FunctionFragment;
-    "setMaxLiquidationReward(uint256)": FunctionFragment;
-    "setMaxPriceThreshold(uint256)": FunctionFragment;
-    "setMaxRateMultiplier(uint256)": FunctionFragment;
-    "setMinPositionDeposit(uint256)": FunctionFragment;
-    "setMinWOWBalance(uint256,uint256)": FunctionFragment;
-    "setOptimalSlope(uint256)": FunctionFragment;
-    "setOptimalUtilization(uint256)": FunctionFragment;
-    "setParameters(tuple)": FunctionFragment;
-    "setPoolUtilizationAllowance(uint256)": FunctionFragment;
-    "setPriceGuard(address)": FunctionFragment;
-    "setSwapRouter(address)": FunctionFragment;
-    "setTraderProfitFee(uint256)": FunctionFragment;
-    "setTreasureFactor(uint256)": FunctionFragment;
+    "referralFirstBonus()": FunctionFragment;
+    "referralProgram()": FunctionFragment;
+    "referralSecondBonus()": FunctionFragment;
+    "referralThirdBonus()": FunctionFragment;
     "swapRouter()": FunctionFragment;
     "traderProfitFee()": FunctionFragment;
     "treasureFactor()": FunctionFragment;
+    "treasurer()": FunctionFragment;
+    "xWOW()": FunctionFragment;
   };
 
+  encodeFunctionData(functionFragment: "WOW", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "baseBorrowRate",
     values?: undefined
@@ -68,6 +59,7 @@ interface IParamProviderInterface extends ethers.utils.Interface {
     functionFragment: "excessSlope",
     values?: undefined
   ): string;
+  encodeFunctionData(functionFragment: "feeToken", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "liquidationMargin",
     values?: undefined
@@ -117,90 +109,20 @@ interface IParamProviderInterface extends ethers.utils.Interface {
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "setBaseBorrowRate",
-    values: [BigNumberish]
+    functionFragment: "referralFirstBonus",
+    values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "setExcessSlope",
-    values: [BigNumberish]
+    functionFragment: "referralProgram",
+    values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "setLiquidationMargin",
-    values: [BigNumberish]
+    functionFragment: "referralSecondBonus",
+    values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "setLiquidationReward",
-    values: [BigNumberish]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "setMaxLeverageFactor",
-    values: [BigNumberish]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "setMaxLiquidationReward",
-    values: [BigNumberish]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "setMaxPriceThreshold",
-    values: [BigNumberish]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "setMaxRateMultiplier",
-    values: [BigNumberish]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "setMinPositionDeposit",
-    values: [BigNumberish]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "setMinWOWBalance",
-    values: [BigNumberish, BigNumberish]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "setOptimalSlope",
-    values: [BigNumberish]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "setOptimalUtilization",
-    values: [BigNumberish]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "setParameters",
-    values: [
-      {
-        baseBorrowRate: BigNumberish;
-        optimalSlope: BigNumberish;
-        excessSlope: BigNumberish;
-        optimalUtilization: BigNumberish;
-        treasureFactor: BigNumberish;
-        poolUtilizationAllowance: BigNumberish;
-        traderProfitFee: BigNumberish;
-        liquidationMargin: BigNumberish;
-        liquidationReward: BigNumberish;
-        maxLeverageFactor: BigNumberish;
-        maxRateMultiplier: BigNumberish;
-      }
-    ]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "setPoolUtilizationAllowance",
-    values: [BigNumberish]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "setPriceGuard",
-    values: [string]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "setSwapRouter",
-    values: [string]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "setTraderProfitFee",
-    values: [BigNumberish]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "setTreasureFactor",
-    values: [BigNumberish]
+    functionFragment: "referralThirdBonus",
+    values?: undefined
   ): string;
   encodeFunctionData(
     functionFragment: "swapRouter",
@@ -214,7 +136,10 @@ interface IParamProviderInterface extends ethers.utils.Interface {
     functionFragment: "treasureFactor",
     values?: undefined
   ): string;
+  encodeFunctionData(functionFragment: "treasurer", values?: undefined): string;
+  encodeFunctionData(functionFragment: "xWOW", values?: undefined): string;
 
+  decodeFunctionResult(functionFragment: "WOW", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "baseBorrowRate",
     data: BytesLike
@@ -223,6 +148,7 @@ interface IParamProviderInterface extends ethers.utils.Interface {
     functionFragment: "excessSlope",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "feeToken", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "liquidationMargin",
     data: BytesLike
@@ -269,75 +195,19 @@ interface IParamProviderInterface extends ethers.utils.Interface {
   ): Result;
   decodeFunctionResult(functionFragment: "priceGuard", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "setBaseBorrowRate",
+    functionFragment: "referralFirstBonus",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "setExcessSlope",
+    functionFragment: "referralProgram",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "setLiquidationMargin",
+    functionFragment: "referralSecondBonus",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "setLiquidationReward",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "setMaxLeverageFactor",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "setMaxLiquidationReward",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "setMaxPriceThreshold",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "setMaxRateMultiplier",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "setMinPositionDeposit",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "setMinWOWBalance",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "setOptimalSlope",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "setOptimalUtilization",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "setParameters",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "setPoolUtilizationAllowance",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "setPriceGuard",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "setSwapRouter",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "setTraderProfitFee",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "setTreasureFactor",
+    functionFragment: "referralThirdBonus",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "swapRouter", data: BytesLike): Result;
@@ -349,6 +219,8 @@ interface IParamProviderInterface extends ethers.utils.Interface {
     functionFragment: "treasureFactor",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "treasurer", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "xWOW", data: BytesLike): Result;
 
   events: {};
 }
@@ -397,6 +269,10 @@ export class IParamProvider extends Contract {
   interface: IParamProviderInterface;
 
   functions: {
+    WOW(overrides?: CallOverrides): Promise<[string]>;
+
+    "WOW()"(overrides?: CallOverrides): Promise<[string]>;
+
     baseBorrowRate(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     "baseBorrowRate()"(overrides?: CallOverrides): Promise<[BigNumber]>;
@@ -404,6 +280,10 @@ export class IParamProvider extends Contract {
     excessSlope(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     "excessSlope()"(overrides?: CallOverrides): Promise<[BigNumber]>;
+
+    feeToken(overrides?: CallOverrides): Promise<[string]>;
+
+    "feeToken()"(overrides?: CallOverrides): Promise<[string]>;
 
     liquidationMargin(overrides?: CallOverrides): Promise<[BigNumber]>;
 
@@ -461,211 +341,21 @@ export class IParamProvider extends Contract {
 
     "priceGuard()"(overrides?: CallOverrides): Promise<[string]>;
 
-    setBaseBorrowRate(
-      value: BigNumberish,
-      overrides?: Overrides
-    ): Promise<ContractTransaction>;
+    referralFirstBonus(overrides?: CallOverrides): Promise<[BigNumber]>;
 
-    "setBaseBorrowRate(uint256)"(
-      value: BigNumberish,
-      overrides?: Overrides
-    ): Promise<ContractTransaction>;
+    "referralFirstBonus()"(overrides?: CallOverrides): Promise<[BigNumber]>;
 
-    setExcessSlope(
-      value: BigNumberish,
-      overrides?: Overrides
-    ): Promise<ContractTransaction>;
+    referralProgram(overrides?: CallOverrides): Promise<[string]>;
 
-    "setExcessSlope(uint256)"(
-      value: BigNumberish,
-      overrides?: Overrides
-    ): Promise<ContractTransaction>;
+    "referralProgram()"(overrides?: CallOverrides): Promise<[string]>;
 
-    setLiquidationMargin(
-      value: BigNumberish,
-      overrides?: Overrides
-    ): Promise<ContractTransaction>;
+    referralSecondBonus(overrides?: CallOverrides): Promise<[BigNumber]>;
 
-    "setLiquidationMargin(uint256)"(
-      value: BigNumberish,
-      overrides?: Overrides
-    ): Promise<ContractTransaction>;
+    "referralSecondBonus()"(overrides?: CallOverrides): Promise<[BigNumber]>;
 
-    setLiquidationReward(
-      value: BigNumberish,
-      overrides?: Overrides
-    ): Promise<ContractTransaction>;
+    referralThirdBonus(overrides?: CallOverrides): Promise<[BigNumber]>;
 
-    "setLiquidationReward(uint256)"(
-      value: BigNumberish,
-      overrides?: Overrides
-    ): Promise<ContractTransaction>;
-
-    setMaxLeverageFactor(
-      value: BigNumberish,
-      overrides?: Overrides
-    ): Promise<ContractTransaction>;
-
-    "setMaxLeverageFactor(uint256)"(
-      value: BigNumberish,
-      overrides?: Overrides
-    ): Promise<ContractTransaction>;
-
-    setMaxLiquidationReward(
-      value: BigNumberish,
-      overrides?: Overrides
-    ): Promise<ContractTransaction>;
-
-    "setMaxLiquidationReward(uint256)"(
-      value: BigNumberish,
-      overrides?: Overrides
-    ): Promise<ContractTransaction>;
-
-    setMaxPriceThreshold(
-      value: BigNumberish,
-      overrides?: Overrides
-    ): Promise<ContractTransaction>;
-
-    "setMaxPriceThreshold(uint256)"(
-      value: BigNumberish,
-      overrides?: Overrides
-    ): Promise<ContractTransaction>;
-
-    setMaxRateMultiplier(
-      value: BigNumberish,
-      overrides?: Overrides
-    ): Promise<ContractTransaction>;
-
-    "setMaxRateMultiplier(uint256)"(
-      value: BigNumberish,
-      overrides?: Overrides
-    ): Promise<ContractTransaction>;
-
-    setMinPositionDeposit(
-      value: BigNumberish,
-      overrides?: Overrides
-    ): Promise<ContractTransaction>;
-
-    "setMinPositionDeposit(uint256)"(
-      value: BigNumberish,
-      overrides?: Overrides
-    ): Promise<ContractTransaction>;
-
-    setMinWOWBalance(
-      leverageFactor: BigNumberish,
-      value: BigNumberish,
-      overrides?: Overrides
-    ): Promise<ContractTransaction>;
-
-    "setMinWOWBalance(uint256,uint256)"(
-      leverageFactor: BigNumberish,
-      value: BigNumberish,
-      overrides?: Overrides
-    ): Promise<ContractTransaction>;
-
-    setOptimalSlope(
-      value: BigNumberish,
-      overrides?: Overrides
-    ): Promise<ContractTransaction>;
-
-    "setOptimalSlope(uint256)"(
-      value: BigNumberish,
-      overrides?: Overrides
-    ): Promise<ContractTransaction>;
-
-    setOptimalUtilization(
-      value: BigNumberish,
-      overrides?: Overrides
-    ): Promise<ContractTransaction>;
-
-    "setOptimalUtilization(uint256)"(
-      value: BigNumberish,
-      overrides?: Overrides
-    ): Promise<ContractTransaction>;
-
-    setParameters(
-      parameters: {
-        baseBorrowRate: BigNumberish;
-        optimalSlope: BigNumberish;
-        excessSlope: BigNumberish;
-        optimalUtilization: BigNumberish;
-        treasureFactor: BigNumberish;
-        poolUtilizationAllowance: BigNumberish;
-        traderProfitFee: BigNumberish;
-        liquidationMargin: BigNumberish;
-        liquidationReward: BigNumberish;
-        maxLeverageFactor: BigNumberish;
-        maxRateMultiplier: BigNumberish;
-      },
-      overrides?: Overrides
-    ): Promise<ContractTransaction>;
-
-    "setParameters((uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256))"(
-      parameters: {
-        baseBorrowRate: BigNumberish;
-        optimalSlope: BigNumberish;
-        excessSlope: BigNumberish;
-        optimalUtilization: BigNumberish;
-        treasureFactor: BigNumberish;
-        poolUtilizationAllowance: BigNumberish;
-        traderProfitFee: BigNumberish;
-        liquidationMargin: BigNumberish;
-        liquidationReward: BigNumberish;
-        maxLeverageFactor: BigNumberish;
-        maxRateMultiplier: BigNumberish;
-      },
-      overrides?: Overrides
-    ): Promise<ContractTransaction>;
-
-    setPoolUtilizationAllowance(
-      value: BigNumberish,
-      overrides?: Overrides
-    ): Promise<ContractTransaction>;
-
-    "setPoolUtilizationAllowance(uint256)"(
-      value: BigNumberish,
-      overrides?: Overrides
-    ): Promise<ContractTransaction>;
-
-    setPriceGuard(
-      priceGuard: string,
-      overrides?: Overrides
-    ): Promise<ContractTransaction>;
-
-    "setPriceGuard(address)"(
-      priceGuard: string,
-      overrides?: Overrides
-    ): Promise<ContractTransaction>;
-
-    setSwapRouter(
-      swapRouter: string,
-      overrides?: Overrides
-    ): Promise<ContractTransaction>;
-
-    "setSwapRouter(address)"(
-      swapRouter: string,
-      overrides?: Overrides
-    ): Promise<ContractTransaction>;
-
-    setTraderProfitFee(
-      value: BigNumberish,
-      overrides?: Overrides
-    ): Promise<ContractTransaction>;
-
-    "setTraderProfitFee(uint256)"(
-      value: BigNumberish,
-      overrides?: Overrides
-    ): Promise<ContractTransaction>;
-
-    setTreasureFactor(
-      value: BigNumberish,
-      overrides?: Overrides
-    ): Promise<ContractTransaction>;
-
-    "setTreasureFactor(uint256)"(
-      value: BigNumberish,
-      overrides?: Overrides
-    ): Promise<ContractTransaction>;
+    "referralThirdBonus()"(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     swapRouter(overrides?: CallOverrides): Promise<[string]>;
 
@@ -678,7 +368,19 @@ export class IParamProvider extends Contract {
     treasureFactor(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     "treasureFactor()"(overrides?: CallOverrides): Promise<[BigNumber]>;
+
+    treasurer(overrides?: CallOverrides): Promise<[string]>;
+
+    "treasurer()"(overrides?: CallOverrides): Promise<[string]>;
+
+    xWOW(overrides?: CallOverrides): Promise<[string]>;
+
+    "xWOW()"(overrides?: CallOverrides): Promise<[string]>;
   };
+
+  WOW(overrides?: CallOverrides): Promise<string>;
+
+  "WOW()"(overrides?: CallOverrides): Promise<string>;
 
   baseBorrowRate(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -687,6 +389,10 @@ export class IParamProvider extends Contract {
   excessSlope(overrides?: CallOverrides): Promise<BigNumber>;
 
   "excessSlope()"(overrides?: CallOverrides): Promise<BigNumber>;
+
+  feeToken(overrides?: CallOverrides): Promise<string>;
+
+  "feeToken()"(overrides?: CallOverrides): Promise<string>;
 
   liquidationMargin(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -742,211 +448,21 @@ export class IParamProvider extends Contract {
 
   "priceGuard()"(overrides?: CallOverrides): Promise<string>;
 
-  setBaseBorrowRate(
-    value: BigNumberish,
-    overrides?: Overrides
-  ): Promise<ContractTransaction>;
+  referralFirstBonus(overrides?: CallOverrides): Promise<BigNumber>;
 
-  "setBaseBorrowRate(uint256)"(
-    value: BigNumberish,
-    overrides?: Overrides
-  ): Promise<ContractTransaction>;
+  "referralFirstBonus()"(overrides?: CallOverrides): Promise<BigNumber>;
 
-  setExcessSlope(
-    value: BigNumberish,
-    overrides?: Overrides
-  ): Promise<ContractTransaction>;
+  referralProgram(overrides?: CallOverrides): Promise<string>;
 
-  "setExcessSlope(uint256)"(
-    value: BigNumberish,
-    overrides?: Overrides
-  ): Promise<ContractTransaction>;
+  "referralProgram()"(overrides?: CallOverrides): Promise<string>;
 
-  setLiquidationMargin(
-    value: BigNumberish,
-    overrides?: Overrides
-  ): Promise<ContractTransaction>;
+  referralSecondBonus(overrides?: CallOverrides): Promise<BigNumber>;
 
-  "setLiquidationMargin(uint256)"(
-    value: BigNumberish,
-    overrides?: Overrides
-  ): Promise<ContractTransaction>;
+  "referralSecondBonus()"(overrides?: CallOverrides): Promise<BigNumber>;
 
-  setLiquidationReward(
-    value: BigNumberish,
-    overrides?: Overrides
-  ): Promise<ContractTransaction>;
+  referralThirdBonus(overrides?: CallOverrides): Promise<BigNumber>;
 
-  "setLiquidationReward(uint256)"(
-    value: BigNumberish,
-    overrides?: Overrides
-  ): Promise<ContractTransaction>;
-
-  setMaxLeverageFactor(
-    value: BigNumberish,
-    overrides?: Overrides
-  ): Promise<ContractTransaction>;
-
-  "setMaxLeverageFactor(uint256)"(
-    value: BigNumberish,
-    overrides?: Overrides
-  ): Promise<ContractTransaction>;
-
-  setMaxLiquidationReward(
-    value: BigNumberish,
-    overrides?: Overrides
-  ): Promise<ContractTransaction>;
-
-  "setMaxLiquidationReward(uint256)"(
-    value: BigNumberish,
-    overrides?: Overrides
-  ): Promise<ContractTransaction>;
-
-  setMaxPriceThreshold(
-    value: BigNumberish,
-    overrides?: Overrides
-  ): Promise<ContractTransaction>;
-
-  "setMaxPriceThreshold(uint256)"(
-    value: BigNumberish,
-    overrides?: Overrides
-  ): Promise<ContractTransaction>;
-
-  setMaxRateMultiplier(
-    value: BigNumberish,
-    overrides?: Overrides
-  ): Promise<ContractTransaction>;
-
-  "setMaxRateMultiplier(uint256)"(
-    value: BigNumberish,
-    overrides?: Overrides
-  ): Promise<ContractTransaction>;
-
-  setMinPositionDeposit(
-    value: BigNumberish,
-    overrides?: Overrides
-  ): Promise<ContractTransaction>;
-
-  "setMinPositionDeposit(uint256)"(
-    value: BigNumberish,
-    overrides?: Overrides
-  ): Promise<ContractTransaction>;
-
-  setMinWOWBalance(
-    leverageFactor: BigNumberish,
-    value: BigNumberish,
-    overrides?: Overrides
-  ): Promise<ContractTransaction>;
-
-  "setMinWOWBalance(uint256,uint256)"(
-    leverageFactor: BigNumberish,
-    value: BigNumberish,
-    overrides?: Overrides
-  ): Promise<ContractTransaction>;
-
-  setOptimalSlope(
-    value: BigNumberish,
-    overrides?: Overrides
-  ): Promise<ContractTransaction>;
-
-  "setOptimalSlope(uint256)"(
-    value: BigNumberish,
-    overrides?: Overrides
-  ): Promise<ContractTransaction>;
-
-  setOptimalUtilization(
-    value: BigNumberish,
-    overrides?: Overrides
-  ): Promise<ContractTransaction>;
-
-  "setOptimalUtilization(uint256)"(
-    value: BigNumberish,
-    overrides?: Overrides
-  ): Promise<ContractTransaction>;
-
-  setParameters(
-    parameters: {
-      baseBorrowRate: BigNumberish;
-      optimalSlope: BigNumberish;
-      excessSlope: BigNumberish;
-      optimalUtilization: BigNumberish;
-      treasureFactor: BigNumberish;
-      poolUtilizationAllowance: BigNumberish;
-      traderProfitFee: BigNumberish;
-      liquidationMargin: BigNumberish;
-      liquidationReward: BigNumberish;
-      maxLeverageFactor: BigNumberish;
-      maxRateMultiplier: BigNumberish;
-    },
-    overrides?: Overrides
-  ): Promise<ContractTransaction>;
-
-  "setParameters((uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256))"(
-    parameters: {
-      baseBorrowRate: BigNumberish;
-      optimalSlope: BigNumberish;
-      excessSlope: BigNumberish;
-      optimalUtilization: BigNumberish;
-      treasureFactor: BigNumberish;
-      poolUtilizationAllowance: BigNumberish;
-      traderProfitFee: BigNumberish;
-      liquidationMargin: BigNumberish;
-      liquidationReward: BigNumberish;
-      maxLeverageFactor: BigNumberish;
-      maxRateMultiplier: BigNumberish;
-    },
-    overrides?: Overrides
-  ): Promise<ContractTransaction>;
-
-  setPoolUtilizationAllowance(
-    value: BigNumberish,
-    overrides?: Overrides
-  ): Promise<ContractTransaction>;
-
-  "setPoolUtilizationAllowance(uint256)"(
-    value: BigNumberish,
-    overrides?: Overrides
-  ): Promise<ContractTransaction>;
-
-  setPriceGuard(
-    priceGuard: string,
-    overrides?: Overrides
-  ): Promise<ContractTransaction>;
-
-  "setPriceGuard(address)"(
-    priceGuard: string,
-    overrides?: Overrides
-  ): Promise<ContractTransaction>;
-
-  setSwapRouter(
-    swapRouter: string,
-    overrides?: Overrides
-  ): Promise<ContractTransaction>;
-
-  "setSwapRouter(address)"(
-    swapRouter: string,
-    overrides?: Overrides
-  ): Promise<ContractTransaction>;
-
-  setTraderProfitFee(
-    value: BigNumberish,
-    overrides?: Overrides
-  ): Promise<ContractTransaction>;
-
-  "setTraderProfitFee(uint256)"(
-    value: BigNumberish,
-    overrides?: Overrides
-  ): Promise<ContractTransaction>;
-
-  setTreasureFactor(
-    value: BigNumberish,
-    overrides?: Overrides
-  ): Promise<ContractTransaction>;
-
-  "setTreasureFactor(uint256)"(
-    value: BigNumberish,
-    overrides?: Overrides
-  ): Promise<ContractTransaction>;
+  "referralThirdBonus()"(overrides?: CallOverrides): Promise<BigNumber>;
 
   swapRouter(overrides?: CallOverrides): Promise<string>;
 
@@ -960,7 +476,19 @@ export class IParamProvider extends Contract {
 
   "treasureFactor()"(overrides?: CallOverrides): Promise<BigNumber>;
 
+  treasurer(overrides?: CallOverrides): Promise<string>;
+
+  "treasurer()"(overrides?: CallOverrides): Promise<string>;
+
+  xWOW(overrides?: CallOverrides): Promise<string>;
+
+  "xWOW()"(overrides?: CallOverrides): Promise<string>;
+
   callStatic: {
+    WOW(overrides?: CallOverrides): Promise<string>;
+
+    "WOW()"(overrides?: CallOverrides): Promise<string>;
+
     baseBorrowRate(overrides?: CallOverrides): Promise<BigNumber>;
 
     "baseBorrowRate()"(overrides?: CallOverrides): Promise<BigNumber>;
@@ -968,6 +496,10 @@ export class IParamProvider extends Contract {
     excessSlope(overrides?: CallOverrides): Promise<BigNumber>;
 
     "excessSlope()"(overrides?: CallOverrides): Promise<BigNumber>;
+
+    feeToken(overrides?: CallOverrides): Promise<string>;
+
+    "feeToken()"(overrides?: CallOverrides): Promise<string>;
 
     liquidationMargin(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -1023,205 +555,21 @@ export class IParamProvider extends Contract {
 
     "priceGuard()"(overrides?: CallOverrides): Promise<string>;
 
-    setBaseBorrowRate(
-      value: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<void>;
+    referralFirstBonus(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "setBaseBorrowRate(uint256)"(
-      value: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<void>;
+    "referralFirstBonus()"(overrides?: CallOverrides): Promise<BigNumber>;
 
-    setExcessSlope(
-      value: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<void>;
+    referralProgram(overrides?: CallOverrides): Promise<string>;
 
-    "setExcessSlope(uint256)"(
-      value: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<void>;
+    "referralProgram()"(overrides?: CallOverrides): Promise<string>;
 
-    setLiquidationMargin(
-      value: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<void>;
+    referralSecondBonus(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "setLiquidationMargin(uint256)"(
-      value: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<void>;
+    "referralSecondBonus()"(overrides?: CallOverrides): Promise<BigNumber>;
 
-    setLiquidationReward(
-      value: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<void>;
+    referralThirdBonus(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "setLiquidationReward(uint256)"(
-      value: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    setMaxLeverageFactor(
-      value: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    "setMaxLeverageFactor(uint256)"(
-      value: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    setMaxLiquidationReward(
-      value: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    "setMaxLiquidationReward(uint256)"(
-      value: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    setMaxPriceThreshold(
-      value: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    "setMaxPriceThreshold(uint256)"(
-      value: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    setMaxRateMultiplier(
-      value: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    "setMaxRateMultiplier(uint256)"(
-      value: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    setMinPositionDeposit(
-      value: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    "setMinPositionDeposit(uint256)"(
-      value: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    setMinWOWBalance(
-      leverageFactor: BigNumberish,
-      value: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    "setMinWOWBalance(uint256,uint256)"(
-      leverageFactor: BigNumberish,
-      value: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    setOptimalSlope(
-      value: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    "setOptimalSlope(uint256)"(
-      value: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    setOptimalUtilization(
-      value: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    "setOptimalUtilization(uint256)"(
-      value: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    setParameters(
-      parameters: {
-        baseBorrowRate: BigNumberish;
-        optimalSlope: BigNumberish;
-        excessSlope: BigNumberish;
-        optimalUtilization: BigNumberish;
-        treasureFactor: BigNumberish;
-        poolUtilizationAllowance: BigNumberish;
-        traderProfitFee: BigNumberish;
-        liquidationMargin: BigNumberish;
-        liquidationReward: BigNumberish;
-        maxLeverageFactor: BigNumberish;
-        maxRateMultiplier: BigNumberish;
-      },
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    "setParameters((uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256))"(
-      parameters: {
-        baseBorrowRate: BigNumberish;
-        optimalSlope: BigNumberish;
-        excessSlope: BigNumberish;
-        optimalUtilization: BigNumberish;
-        treasureFactor: BigNumberish;
-        poolUtilizationAllowance: BigNumberish;
-        traderProfitFee: BigNumberish;
-        liquidationMargin: BigNumberish;
-        liquidationReward: BigNumberish;
-        maxLeverageFactor: BigNumberish;
-        maxRateMultiplier: BigNumberish;
-      },
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    setPoolUtilizationAllowance(
-      value: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    "setPoolUtilizationAllowance(uint256)"(
-      value: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    setPriceGuard(priceGuard: string, overrides?: CallOverrides): Promise<void>;
-
-    "setPriceGuard(address)"(
-      priceGuard: string,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    setSwapRouter(swapRouter: string, overrides?: CallOverrides): Promise<void>;
-
-    "setSwapRouter(address)"(
-      swapRouter: string,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    setTraderProfitFee(
-      value: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    "setTraderProfitFee(uint256)"(
-      value: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    setTreasureFactor(
-      value: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    "setTreasureFactor(uint256)"(
-      value: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<void>;
+    "referralThirdBonus()"(overrides?: CallOverrides): Promise<BigNumber>;
 
     swapRouter(overrides?: CallOverrides): Promise<string>;
 
@@ -1234,11 +582,23 @@ export class IParamProvider extends Contract {
     treasureFactor(overrides?: CallOverrides): Promise<BigNumber>;
 
     "treasureFactor()"(overrides?: CallOverrides): Promise<BigNumber>;
+
+    treasurer(overrides?: CallOverrides): Promise<string>;
+
+    "treasurer()"(overrides?: CallOverrides): Promise<string>;
+
+    xWOW(overrides?: CallOverrides): Promise<string>;
+
+    "xWOW()"(overrides?: CallOverrides): Promise<string>;
   };
 
   filters: {};
 
   estimateGas: {
+    WOW(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "WOW()"(overrides?: CallOverrides): Promise<BigNumber>;
+
     baseBorrowRate(overrides?: CallOverrides): Promise<BigNumber>;
 
     "baseBorrowRate()"(overrides?: CallOverrides): Promise<BigNumber>;
@@ -1246,6 +606,10 @@ export class IParamProvider extends Contract {
     excessSlope(overrides?: CallOverrides): Promise<BigNumber>;
 
     "excessSlope()"(overrides?: CallOverrides): Promise<BigNumber>;
+
+    feeToken(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "feeToken()"(overrides?: CallOverrides): Promise<BigNumber>;
 
     liquidationMargin(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -1301,211 +665,21 @@ export class IParamProvider extends Contract {
 
     "priceGuard()"(overrides?: CallOverrides): Promise<BigNumber>;
 
-    setBaseBorrowRate(
-      value: BigNumberish,
-      overrides?: Overrides
-    ): Promise<BigNumber>;
+    referralFirstBonus(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "setBaseBorrowRate(uint256)"(
-      value: BigNumberish,
-      overrides?: Overrides
-    ): Promise<BigNumber>;
+    "referralFirstBonus()"(overrides?: CallOverrides): Promise<BigNumber>;
 
-    setExcessSlope(
-      value: BigNumberish,
-      overrides?: Overrides
-    ): Promise<BigNumber>;
+    referralProgram(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "setExcessSlope(uint256)"(
-      value: BigNumberish,
-      overrides?: Overrides
-    ): Promise<BigNumber>;
+    "referralProgram()"(overrides?: CallOverrides): Promise<BigNumber>;
 
-    setLiquidationMargin(
-      value: BigNumberish,
-      overrides?: Overrides
-    ): Promise<BigNumber>;
+    referralSecondBonus(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "setLiquidationMargin(uint256)"(
-      value: BigNumberish,
-      overrides?: Overrides
-    ): Promise<BigNumber>;
+    "referralSecondBonus()"(overrides?: CallOverrides): Promise<BigNumber>;
 
-    setLiquidationReward(
-      value: BigNumberish,
-      overrides?: Overrides
-    ): Promise<BigNumber>;
+    referralThirdBonus(overrides?: CallOverrides): Promise<BigNumber>;
 
-    "setLiquidationReward(uint256)"(
-      value: BigNumberish,
-      overrides?: Overrides
-    ): Promise<BigNumber>;
-
-    setMaxLeverageFactor(
-      value: BigNumberish,
-      overrides?: Overrides
-    ): Promise<BigNumber>;
-
-    "setMaxLeverageFactor(uint256)"(
-      value: BigNumberish,
-      overrides?: Overrides
-    ): Promise<BigNumber>;
-
-    setMaxLiquidationReward(
-      value: BigNumberish,
-      overrides?: Overrides
-    ): Promise<BigNumber>;
-
-    "setMaxLiquidationReward(uint256)"(
-      value: BigNumberish,
-      overrides?: Overrides
-    ): Promise<BigNumber>;
-
-    setMaxPriceThreshold(
-      value: BigNumberish,
-      overrides?: Overrides
-    ): Promise<BigNumber>;
-
-    "setMaxPriceThreshold(uint256)"(
-      value: BigNumberish,
-      overrides?: Overrides
-    ): Promise<BigNumber>;
-
-    setMaxRateMultiplier(
-      value: BigNumberish,
-      overrides?: Overrides
-    ): Promise<BigNumber>;
-
-    "setMaxRateMultiplier(uint256)"(
-      value: BigNumberish,
-      overrides?: Overrides
-    ): Promise<BigNumber>;
-
-    setMinPositionDeposit(
-      value: BigNumberish,
-      overrides?: Overrides
-    ): Promise<BigNumber>;
-
-    "setMinPositionDeposit(uint256)"(
-      value: BigNumberish,
-      overrides?: Overrides
-    ): Promise<BigNumber>;
-
-    setMinWOWBalance(
-      leverageFactor: BigNumberish,
-      value: BigNumberish,
-      overrides?: Overrides
-    ): Promise<BigNumber>;
-
-    "setMinWOWBalance(uint256,uint256)"(
-      leverageFactor: BigNumberish,
-      value: BigNumberish,
-      overrides?: Overrides
-    ): Promise<BigNumber>;
-
-    setOptimalSlope(
-      value: BigNumberish,
-      overrides?: Overrides
-    ): Promise<BigNumber>;
-
-    "setOptimalSlope(uint256)"(
-      value: BigNumberish,
-      overrides?: Overrides
-    ): Promise<BigNumber>;
-
-    setOptimalUtilization(
-      value: BigNumberish,
-      overrides?: Overrides
-    ): Promise<BigNumber>;
-
-    "setOptimalUtilization(uint256)"(
-      value: BigNumberish,
-      overrides?: Overrides
-    ): Promise<BigNumber>;
-
-    setParameters(
-      parameters: {
-        baseBorrowRate: BigNumberish;
-        optimalSlope: BigNumberish;
-        excessSlope: BigNumberish;
-        optimalUtilization: BigNumberish;
-        treasureFactor: BigNumberish;
-        poolUtilizationAllowance: BigNumberish;
-        traderProfitFee: BigNumberish;
-        liquidationMargin: BigNumberish;
-        liquidationReward: BigNumberish;
-        maxLeverageFactor: BigNumberish;
-        maxRateMultiplier: BigNumberish;
-      },
-      overrides?: Overrides
-    ): Promise<BigNumber>;
-
-    "setParameters((uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256))"(
-      parameters: {
-        baseBorrowRate: BigNumberish;
-        optimalSlope: BigNumberish;
-        excessSlope: BigNumberish;
-        optimalUtilization: BigNumberish;
-        treasureFactor: BigNumberish;
-        poolUtilizationAllowance: BigNumberish;
-        traderProfitFee: BigNumberish;
-        liquidationMargin: BigNumberish;
-        liquidationReward: BigNumberish;
-        maxLeverageFactor: BigNumberish;
-        maxRateMultiplier: BigNumberish;
-      },
-      overrides?: Overrides
-    ): Promise<BigNumber>;
-
-    setPoolUtilizationAllowance(
-      value: BigNumberish,
-      overrides?: Overrides
-    ): Promise<BigNumber>;
-
-    "setPoolUtilizationAllowance(uint256)"(
-      value: BigNumberish,
-      overrides?: Overrides
-    ): Promise<BigNumber>;
-
-    setPriceGuard(
-      priceGuard: string,
-      overrides?: Overrides
-    ): Promise<BigNumber>;
-
-    "setPriceGuard(address)"(
-      priceGuard: string,
-      overrides?: Overrides
-    ): Promise<BigNumber>;
-
-    setSwapRouter(
-      swapRouter: string,
-      overrides?: Overrides
-    ): Promise<BigNumber>;
-
-    "setSwapRouter(address)"(
-      swapRouter: string,
-      overrides?: Overrides
-    ): Promise<BigNumber>;
-
-    setTraderProfitFee(
-      value: BigNumberish,
-      overrides?: Overrides
-    ): Promise<BigNumber>;
-
-    "setTraderProfitFee(uint256)"(
-      value: BigNumberish,
-      overrides?: Overrides
-    ): Promise<BigNumber>;
-
-    setTreasureFactor(
-      value: BigNumberish,
-      overrides?: Overrides
-    ): Promise<BigNumber>;
-
-    "setTreasureFactor(uint256)"(
-      value: BigNumberish,
-      overrides?: Overrides
-    ): Promise<BigNumber>;
+    "referralThirdBonus()"(overrides?: CallOverrides): Promise<BigNumber>;
 
     swapRouter(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -1518,9 +692,21 @@ export class IParamProvider extends Contract {
     treasureFactor(overrides?: CallOverrides): Promise<BigNumber>;
 
     "treasureFactor()"(overrides?: CallOverrides): Promise<BigNumber>;
+
+    treasurer(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "treasurer()"(overrides?: CallOverrides): Promise<BigNumber>;
+
+    xWOW(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "xWOW()"(overrides?: CallOverrides): Promise<BigNumber>;
   };
 
   populateTransaction: {
+    WOW(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    "WOW()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
     baseBorrowRate(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     "baseBorrowRate()"(
@@ -1530,6 +716,10 @@ export class IParamProvider extends Contract {
     excessSlope(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     "excessSlope()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    feeToken(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    "feeToken()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     liquidationMargin(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
@@ -1609,210 +799,34 @@ export class IParamProvider extends Contract {
 
     "priceGuard()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    setBaseBorrowRate(
-      value: BigNumberish,
-      overrides?: Overrides
+    referralFirstBonus(
+      overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    "setBaseBorrowRate(uint256)"(
-      value: BigNumberish,
-      overrides?: Overrides
+    "referralFirstBonus()"(
+      overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    setExcessSlope(
-      value: BigNumberish,
-      overrides?: Overrides
+    referralProgram(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    "referralProgram()"(
+      overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    "setExcessSlope(uint256)"(
-      value: BigNumberish,
-      overrides?: Overrides
+    referralSecondBonus(
+      overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    setLiquidationMargin(
-      value: BigNumberish,
-      overrides?: Overrides
+    "referralSecondBonus()"(
+      overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    "setLiquidationMargin(uint256)"(
-      value: BigNumberish,
-      overrides?: Overrides
+    referralThirdBonus(
+      overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    setLiquidationReward(
-      value: BigNumberish,
-      overrides?: Overrides
-    ): Promise<PopulatedTransaction>;
-
-    "setLiquidationReward(uint256)"(
-      value: BigNumberish,
-      overrides?: Overrides
-    ): Promise<PopulatedTransaction>;
-
-    setMaxLeverageFactor(
-      value: BigNumberish,
-      overrides?: Overrides
-    ): Promise<PopulatedTransaction>;
-
-    "setMaxLeverageFactor(uint256)"(
-      value: BigNumberish,
-      overrides?: Overrides
-    ): Promise<PopulatedTransaction>;
-
-    setMaxLiquidationReward(
-      value: BigNumberish,
-      overrides?: Overrides
-    ): Promise<PopulatedTransaction>;
-
-    "setMaxLiquidationReward(uint256)"(
-      value: BigNumberish,
-      overrides?: Overrides
-    ): Promise<PopulatedTransaction>;
-
-    setMaxPriceThreshold(
-      value: BigNumberish,
-      overrides?: Overrides
-    ): Promise<PopulatedTransaction>;
-
-    "setMaxPriceThreshold(uint256)"(
-      value: BigNumberish,
-      overrides?: Overrides
-    ): Promise<PopulatedTransaction>;
-
-    setMaxRateMultiplier(
-      value: BigNumberish,
-      overrides?: Overrides
-    ): Promise<PopulatedTransaction>;
-
-    "setMaxRateMultiplier(uint256)"(
-      value: BigNumberish,
-      overrides?: Overrides
-    ): Promise<PopulatedTransaction>;
-
-    setMinPositionDeposit(
-      value: BigNumberish,
-      overrides?: Overrides
-    ): Promise<PopulatedTransaction>;
-
-    "setMinPositionDeposit(uint256)"(
-      value: BigNumberish,
-      overrides?: Overrides
-    ): Promise<PopulatedTransaction>;
-
-    setMinWOWBalance(
-      leverageFactor: BigNumberish,
-      value: BigNumberish,
-      overrides?: Overrides
-    ): Promise<PopulatedTransaction>;
-
-    "setMinWOWBalance(uint256,uint256)"(
-      leverageFactor: BigNumberish,
-      value: BigNumberish,
-      overrides?: Overrides
-    ): Promise<PopulatedTransaction>;
-
-    setOptimalSlope(
-      value: BigNumberish,
-      overrides?: Overrides
-    ): Promise<PopulatedTransaction>;
-
-    "setOptimalSlope(uint256)"(
-      value: BigNumberish,
-      overrides?: Overrides
-    ): Promise<PopulatedTransaction>;
-
-    setOptimalUtilization(
-      value: BigNumberish,
-      overrides?: Overrides
-    ): Promise<PopulatedTransaction>;
-
-    "setOptimalUtilization(uint256)"(
-      value: BigNumberish,
-      overrides?: Overrides
-    ): Promise<PopulatedTransaction>;
-
-    setParameters(
-      parameters: {
-        baseBorrowRate: BigNumberish;
-        optimalSlope: BigNumberish;
-        excessSlope: BigNumberish;
-        optimalUtilization: BigNumberish;
-        treasureFactor: BigNumberish;
-        poolUtilizationAllowance: BigNumberish;
-        traderProfitFee: BigNumberish;
-        liquidationMargin: BigNumberish;
-        liquidationReward: BigNumberish;
-        maxLeverageFactor: BigNumberish;
-        maxRateMultiplier: BigNumberish;
-      },
-      overrides?: Overrides
-    ): Promise<PopulatedTransaction>;
-
-    "setParameters((uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256))"(
-      parameters: {
-        baseBorrowRate: BigNumberish;
-        optimalSlope: BigNumberish;
-        excessSlope: BigNumberish;
-        optimalUtilization: BigNumberish;
-        treasureFactor: BigNumberish;
-        poolUtilizationAllowance: BigNumberish;
-        traderProfitFee: BigNumberish;
-        liquidationMargin: BigNumberish;
-        liquidationReward: BigNumberish;
-        maxLeverageFactor: BigNumberish;
-        maxRateMultiplier: BigNumberish;
-      },
-      overrides?: Overrides
-    ): Promise<PopulatedTransaction>;
-
-    setPoolUtilizationAllowance(
-      value: BigNumberish,
-      overrides?: Overrides
-    ): Promise<PopulatedTransaction>;
-
-    "setPoolUtilizationAllowance(uint256)"(
-      value: BigNumberish,
-      overrides?: Overrides
-    ): Promise<PopulatedTransaction>;
-
-    setPriceGuard(
-      priceGuard: string,
-      overrides?: Overrides
-    ): Promise<PopulatedTransaction>;
-
-    "setPriceGuard(address)"(
-      priceGuard: string,
-      overrides?: Overrides
-    ): Promise<PopulatedTransaction>;
-
-    setSwapRouter(
-      swapRouter: string,
-      overrides?: Overrides
-    ): Promise<PopulatedTransaction>;
-
-    "setSwapRouter(address)"(
-      swapRouter: string,
-      overrides?: Overrides
-    ): Promise<PopulatedTransaction>;
-
-    setTraderProfitFee(
-      value: BigNumberish,
-      overrides?: Overrides
-    ): Promise<PopulatedTransaction>;
-
-    "setTraderProfitFee(uint256)"(
-      value: BigNumberish,
-      overrides?: Overrides
-    ): Promise<PopulatedTransaction>;
-
-    setTreasureFactor(
-      value: BigNumberish,
-      overrides?: Overrides
-    ): Promise<PopulatedTransaction>;
-
-    "setTreasureFactor(uint256)"(
-      value: BigNumberish,
-      overrides?: Overrides
+    "referralThirdBonus()"(
+      overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
     swapRouter(overrides?: CallOverrides): Promise<PopulatedTransaction>;
@@ -1830,5 +844,13 @@ export class IParamProvider extends Contract {
     "treasureFactor()"(
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
+
+    treasurer(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    "treasurer()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    xWOW(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    "xWOW()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
   };
 }

@@ -13,20 +13,24 @@ export class PairMonitor extends AbstractMonitor<Pair> {
     lendable: Token;
     tradable: Token;
     proxy?: Token;
+    short: boolean;
   }> = [];
   private lendables: Token[] = [];
   private tradables: Token[] = [];
   private proxies: Token[] = [];
+  private shortables: Token[] = [];
   private processing = false;
 
   async run(): Promise<Observable<Pair>> {
     this.repository = this.context.db.getRepository(Pair);
 
+
     (await this.context.getChannel(TokenMonitor)).subscribe(
       (token) => {
         if (token.lendable) this.onNewLendable(token);
         if (token.proxy) this.onNewProxy(token);
-        this.onNewTradable(token);
+        if (token.tradable) this.onNewTradable(token, false);
+        if (token.shortable) this.onNewTradable(token, true);
       }
     );
 
@@ -37,11 +41,12 @@ export class PairMonitor extends AbstractMonitor<Pair> {
     return this.channel;
   }
 
-  async onNewTradable(tradable: Token) {
-    if (this.tradables.some((known) => known.address === tradable.address)) {
+  async onNewTradable(tradable: Token, short: boolean) {
+    const map = short ? this.shortables : this.tradables;
+    if (map.some((known) => known.address === tradable.address)) {
       return;
     }
-    this.tradables.push(tradable);
+    map.push(tradable);
     this.lendables
       .filter((lendable) => tradable.address !== lendable.address)
       .forEach((lendable) => {
@@ -52,12 +57,13 @@ export class PairMonitor extends AbstractMonitor<Pair> {
               proxy.address !== lendable.address
           )
           .forEach((proxy) =>
-            this.unfoundPairs.push({ lendable, proxy, tradable })
+            this.unfoundPairs.push({ lendable, proxy, tradable, short })
           );
-        this.unfoundPairs.push({ lendable, tradable });
+        this.unfoundPairs.push({ lendable, tradable, short });
       });
 
     this.update();
+
   }
 
   onNewLendable(lendable: Token): void {
@@ -65,23 +71,24 @@ export class PairMonitor extends AbstractMonitor<Pair> {
       return;
     }
     this.lendables.push(lendable);
+
     this.tradables
       .filter((tradable) => tradable.address !== lendable.address)
-      .forEach((tradable) => this.unfoundPairs.push({ lendable, tradable }));
+      .forEach((tradable) => {
+        this.proxies
+          .filter((proxy) => proxy.address !== lendable.address && proxy.address !== tradable.address)
+          .forEach((proxy) => this.unfoundPairs.push({ lendable, proxy, tradable, short: false }));
+        this.unfoundPairs.push({ lendable, tradable, short: false })
+      });
 
-    this.proxies
-      .filter((proxy) => proxy.address !== lendable.address)
-      .forEach((proxy) =>
-        this.tradables
-          .filter(
-            (tradable) =>
-              tradable.address !== proxy.address &&
-              tradable.address !== lendable.address
-          )
-          .forEach((tradable) =>
-            this.unfoundPairs.push({ lendable, proxy, tradable })
-          )
-      );
+    this.shortables
+      .filter((tradable) => tradable.address !== lendable.address)
+      .forEach((tradable) => {
+        this.proxies
+          .filter((proxy) => proxy.address !== lendable.address && proxy.address !== tradable.address)
+          .forEach((proxy) => this.unfoundPairs.push({ lendable, proxy, tradable, short: true }));
+        this.unfoundPairs.push({ lendable, tradable, short: true })
+      });
 
     this.update();
   }
@@ -91,19 +98,22 @@ export class PairMonitor extends AbstractMonitor<Pair> {
       return;
     }
     this.proxies.push(proxy);
-    this.lendables
-      .filter((lendable) => lendable.address !== proxy.address)
-      .forEach((lendable) =>
-        this.tradables
-          .filter(
-            (tradable) =>
-              tradable.address !== proxy.address &&
-              tradable.address !== lendable.address
-          )
-          .forEach((tradable) =>
-            this.unfoundPairs.push({ lendable, proxy, tradable })
-          )
-      );
+
+    this.tradables
+      .filter((tradable) => tradable.address !== proxy.address)
+      .forEach((tradable) => {
+        this.lendables
+          .filter((lendable) => tradable.address !== lendable.address && proxy.address !== lendable.address)
+          .forEach((lendable) => this.unfoundPairs.push({ lendable, proxy, tradable, short: false }));
+      });
+
+    this.shortables
+      .filter((tradable) => tradable.address !== proxy.address)
+      .forEach((tradable) => {
+        this.lendables
+          .filter((lendable) => tradable.address !== lendable.address && proxy.address !== lendable.address)
+          .forEach((lendable) => this.unfoundPairs.push({ lendable, proxy, tradable, short: true }));
+      });
 
     this.update();
   }
@@ -115,24 +125,16 @@ export class PairMonitor extends AbstractMonitor<Pair> {
     this.processing = true;
     const unfoundPairs = this.unfoundPairs.splice(0, this.unfoundPairs.length);
 
+
     const possiblePairParams = await Promise.all(
-      unfoundPairs.map(({ lendable, tradable, proxy }) =>
-        (proxy
-          ? this.context.sender.call(
-              this.context.pairFactory,
-              "getRoutablePair",
-              lendable.address,
-              proxy.address,
-              tradable.address
-            )
-          : this.context.sender.call(
-              this.context.pairFactory,
-              "getPair",
-              lendable.address,
-              tradable.address
-            )
-        ).then((address) => ({ lendable, tradable, proxy, address }))
-      )
+      unfoundPairs.map(({ lendable, tradable, proxy, short }) => {
+        const method = short ? proxy ? "getRoutableShortingPair" : "getShortingPair" : proxy ? "getRoutablePair" : "getPair"
+        const inputs = [lendable.address, proxy?.address, tradable.address].filter(defined) as [string, string] | [string, string, string]
+        return this.context.sender.call(
+          this.context.pairFactory,
+          method,
+          ...inputs).then((address) => ({ lendable, tradable, proxy, short, address }))
+      })
     );
 
     this.unfoundPairs.push(
@@ -145,21 +147,22 @@ export class PairMonitor extends AbstractMonitor<Pair> {
     const pairs = await Promise.all(
       possiblePairParams
         .filter(({ address }) => address !== ethers.constants.AddressZero)
-        .map(async ({ lendable, tradable, proxy, address }) => {
+        .map(async ({ lendable, tradable, proxy, address, short }) => {
           let instance = await this.repository.get(address);
 
           const path = [lendable, tradable, proxy]
-            .map((t) => t?.address)
+            .map((t) => t?.symbol)
             .filter(defined)
             .join("/");
 
-          if (!instance || proxy?.address !== instance.proxy) {
-            console.log(`Create new pair pair ${address} ${path}}`);
+          if (!instance || proxy?.address !== instance.proxy || short !== instance.short) {
+            console.log(`Create new ${short ? "short" : "long"} pair ${address} ${path}}`);
             instance = new Pair();
             instance.address = address;
             instance.lendable = lendable.address;
             instance.tradable = tradable.address;
             instance.proxy = proxy?.address;
+            instance.short = short;
             instance.updateAt = this.context.startBlock;
 
             await this.repository.put(instance);

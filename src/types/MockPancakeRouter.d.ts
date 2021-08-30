@@ -23,16 +23,28 @@ import { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
 
 interface MockPancakeRouterInterface extends ethers.utils.Interface {
   functions: {
+    "amountIn()": FunctionFragment;
     "factory()": FunctionFragment;
+    "getAmountsIn(uint256,address[])": FunctionFragment;
     "getAmountsOut(uint256,address[])": FunctionFragment;
+    "setAmountIn(uint256)": FunctionFragment;
     "swapExactTokensForTokens(uint256,uint256,address[],address,uint256)": FunctionFragment;
     "swapExactTokensForTokensSupportingFeeOnTransferTokens(uint256,uint256,address[],address,uint256)": FunctionFragment;
   };
 
+  encodeFunctionData(functionFragment: "amountIn", values?: undefined): string;
   encodeFunctionData(functionFragment: "factory", values?: undefined): string;
+  encodeFunctionData(
+    functionFragment: "getAmountsIn",
+    values: [BigNumberish, string[]]
+  ): string;
   encodeFunctionData(
     functionFragment: "getAmountsOut",
     values: [BigNumberish, string[]]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "setAmountIn",
+    values: [BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "swapExactTokensForTokens",
@@ -43,9 +55,18 @@ interface MockPancakeRouterInterface extends ethers.utils.Interface {
     values: [BigNumberish, BigNumberish, string[], string, BigNumberish]
   ): string;
 
+  decodeFunctionResult(functionFragment: "amountIn", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "factory", data: BytesLike): Result;
   decodeFunctionResult(
+    functionFragment: "getAmountsIn",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "getAmountsOut",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "setAmountIn",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -104,9 +125,25 @@ export class MockPancakeRouter extends Contract {
   interface: MockPancakeRouterInterface;
 
   functions: {
+    amountIn(overrides?: CallOverrides): Promise<[BigNumber]>;
+
+    "amountIn()"(overrides?: CallOverrides): Promise<[BigNumber]>;
+
     factory(overrides?: CallOverrides): Promise<[string]>;
 
     "factory()"(overrides?: CallOverrides): Promise<[string]>;
+
+    getAmountsIn(
+      amountOut: BigNumberish,
+      path: string[],
+      overrides?: CallOverrides
+    ): Promise<[BigNumber[]] & { amounts: BigNumber[] }>;
+
+    "getAmountsIn(uint256,address[])"(
+      amountOut: BigNumberish,
+      path: string[],
+      overrides?: CallOverrides
+    ): Promise<[BigNumber[]] & { amounts: BigNumber[] }>;
 
     getAmountsOut(
       amountIn: BigNumberish,
@@ -119,6 +156,16 @@ export class MockPancakeRouter extends Contract {
       path: string[],
       overrides?: CallOverrides
     ): Promise<[BigNumber[]] & { amounts: BigNumber[] }>;
+
+    setAmountIn(
+      value: BigNumberish,
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
+
+    "setAmountIn(uint256)"(
+      value: BigNumberish,
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
 
     swapExactTokensForTokens(
       amountIn: BigNumberish,
@@ -157,9 +204,25 @@ export class MockPancakeRouter extends Contract {
     ): Promise<ContractTransaction>;
   };
 
+  amountIn(overrides?: CallOverrides): Promise<BigNumber>;
+
+  "amountIn()"(overrides?: CallOverrides): Promise<BigNumber>;
+
   factory(overrides?: CallOverrides): Promise<string>;
 
   "factory()"(overrides?: CallOverrides): Promise<string>;
+
+  getAmountsIn(
+    amountOut: BigNumberish,
+    path: string[],
+    overrides?: CallOverrides
+  ): Promise<BigNumber[]>;
+
+  "getAmountsIn(uint256,address[])"(
+    amountOut: BigNumberish,
+    path: string[],
+    overrides?: CallOverrides
+  ): Promise<BigNumber[]>;
 
   getAmountsOut(
     amountIn: BigNumberish,
@@ -172,6 +235,16 @@ export class MockPancakeRouter extends Contract {
     path: string[],
     overrides?: CallOverrides
   ): Promise<BigNumber[]>;
+
+  setAmountIn(
+    value: BigNumberish,
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
+
+  "setAmountIn(uint256)"(
+    value: BigNumberish,
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
 
   swapExactTokensForTokens(
     amountIn: BigNumberish,
@@ -210,9 +283,25 @@ export class MockPancakeRouter extends Contract {
   ): Promise<ContractTransaction>;
 
   callStatic: {
+    amountIn(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "amountIn()"(overrides?: CallOverrides): Promise<BigNumber>;
+
     factory(overrides?: CallOverrides): Promise<string>;
 
     "factory()"(overrides?: CallOverrides): Promise<string>;
+
+    getAmountsIn(
+      amountOut: BigNumberish,
+      path: string[],
+      overrides?: CallOverrides
+    ): Promise<BigNumber[]>;
+
+    "getAmountsIn(uint256,address[])"(
+      amountOut: BigNumberish,
+      path: string[],
+      overrides?: CallOverrides
+    ): Promise<BigNumber[]>;
 
     getAmountsOut(
       amountIn: BigNumberish,
@@ -225,6 +314,13 @@ export class MockPancakeRouter extends Contract {
       path: string[],
       overrides?: CallOverrides
     ): Promise<BigNumber[]>;
+
+    setAmountIn(value: BigNumberish, overrides?: CallOverrides): Promise<void>;
+
+    "setAmountIn(uint256)"(
+      value: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<void>;
 
     swapExactTokensForTokens(
       amountIn: BigNumberish,
@@ -266,9 +362,25 @@ export class MockPancakeRouter extends Contract {
   filters: {};
 
   estimateGas: {
+    amountIn(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "amountIn()"(overrides?: CallOverrides): Promise<BigNumber>;
+
     factory(overrides?: CallOverrides): Promise<BigNumber>;
 
     "factory()"(overrides?: CallOverrides): Promise<BigNumber>;
+
+    getAmountsIn(
+      amountOut: BigNumberish,
+      path: string[],
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "getAmountsIn(uint256,address[])"(
+      amountOut: BigNumberish,
+      path: string[],
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
 
     getAmountsOut(
       amountIn: BigNumberish,
@@ -280,6 +392,13 @@ export class MockPancakeRouter extends Contract {
       amountIn: BigNumberish,
       path: string[],
       overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    setAmountIn(value: BigNumberish, overrides?: Overrides): Promise<BigNumber>;
+
+    "setAmountIn(uint256)"(
+      value: BigNumberish,
+      overrides?: Overrides
     ): Promise<BigNumber>;
 
     swapExactTokensForTokens(
@@ -320,9 +439,25 @@ export class MockPancakeRouter extends Contract {
   };
 
   populateTransaction: {
+    amountIn(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    "amountIn()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
     factory(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     "factory()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    getAmountsIn(
+      amountOut: BigNumberish,
+      path: string[],
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    "getAmountsIn(uint256,address[])"(
+      amountOut: BigNumberish,
+      path: string[],
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
 
     getAmountsOut(
       amountIn: BigNumberish,
@@ -334,6 +469,16 @@ export class MockPancakeRouter extends Contract {
       amountIn: BigNumberish,
       path: string[],
       overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    setAmountIn(
+      value: BigNumberish,
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
+
+    "setAmountIn(uint256)"(
+      value: BigNumberish,
+      overrides?: Overrides
     ): Promise<PopulatedTransaction>;
 
     swapExactTokensForTokens(

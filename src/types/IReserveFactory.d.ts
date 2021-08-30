@@ -25,11 +25,12 @@ interface IReserveFactoryInterface extends ethers.utils.Interface {
   functions: {
     "getAllLendables()": FunctionFragment;
     "getOrCreateReserve(address)": FunctionFragment;
+    "getOrCreateShortingReserve(address)": FunctionFragment;
     "getReserve(address)": FunctionFragment;
+    "isRegisteredLendable(address)": FunctionFragment;
     "registerLendable(address)": FunctionFragment;
     "registerLendables(address[])": FunctionFragment;
     "reserveBytecodeHash()": FunctionFragment;
-    "sweepFee(address,address)": FunctionFragment;
   };
 
   encodeFunctionData(
@@ -40,7 +41,15 @@ interface IReserveFactoryInterface extends ethers.utils.Interface {
     functionFragment: "getOrCreateReserve",
     values: [string]
   ): string;
+  encodeFunctionData(
+    functionFragment: "getOrCreateShortingReserve",
+    values: [string]
+  ): string;
   encodeFunctionData(functionFragment: "getReserve", values: [string]): string;
+  encodeFunctionData(
+    functionFragment: "isRegisteredLendable",
+    values: [string]
+  ): string;
   encodeFunctionData(
     functionFragment: "registerLendable",
     values: [string]
@@ -53,10 +62,6 @@ interface IReserveFactoryInterface extends ethers.utils.Interface {
     functionFragment: "reserveBytecodeHash",
     values?: undefined
   ): string;
-  encodeFunctionData(
-    functionFragment: "sweepFee",
-    values: [string, string]
-  ): string;
 
   decodeFunctionResult(
     functionFragment: "getAllLendables",
@@ -66,7 +71,15 @@ interface IReserveFactoryInterface extends ethers.utils.Interface {
     functionFragment: "getOrCreateReserve",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(
+    functionFragment: "getOrCreateShortingReserve",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "getReserve", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "isRegisteredLendable",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(
     functionFragment: "registerLendable",
     data: BytesLike
@@ -79,7 +92,6 @@ interface IReserveFactoryInterface extends ethers.utils.Interface {
     functionFragment: "reserveBytecodeHash",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "sweepFee", data: BytesLike): Result;
 
   events: {};
 }
@@ -142,12 +154,32 @@ export class IReserveFactory extends Contract {
       overrides?: Overrides
     ): Promise<ContractTransaction>;
 
+    getOrCreateShortingReserve(
+      shortable: string,
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
+
+    "getOrCreateShortingReserve(address)"(
+      shortable: string,
+      overrides?: Overrides
+    ): Promise<ContractTransaction>;
+
     getReserve(lendable: string, overrides?: CallOverrides): Promise<[string]>;
 
     "getReserve(address)"(
       lendable: string,
       overrides?: CallOverrides
     ): Promise<[string]>;
+
+    isRegisteredLendable(
+      token: string,
+      overrides?: CallOverrides
+    ): Promise<[boolean]>;
+
+    "isRegisteredLendable(address)"(
+      token: string,
+      overrides?: CallOverrides
+    ): Promise<[boolean]>;
 
     registerLendable(
       token: string,
@@ -172,18 +204,6 @@ export class IReserveFactory extends Contract {
     reserveBytecodeHash(overrides?: CallOverrides): Promise<[string]>;
 
     "reserveBytecodeHash()"(overrides?: CallOverrides): Promise<[string]>;
-
-    sweepFee(
-      lendable: string,
-      to: string,
-      overrides?: Overrides
-    ): Promise<ContractTransaction>;
-
-    "sweepFee(address,address)"(
-      lendable: string,
-      to: string,
-      overrides?: Overrides
-    ): Promise<ContractTransaction>;
   };
 
   getAllLendables(overrides?: Overrides): Promise<ContractTransaction>;
@@ -200,12 +220,32 @@ export class IReserveFactory extends Contract {
     overrides?: Overrides
   ): Promise<ContractTransaction>;
 
+  getOrCreateShortingReserve(
+    shortable: string,
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
+
+  "getOrCreateShortingReserve(address)"(
+    shortable: string,
+    overrides?: Overrides
+  ): Promise<ContractTransaction>;
+
   getReserve(lendable: string, overrides?: CallOverrides): Promise<string>;
 
   "getReserve(address)"(
     lendable: string,
     overrides?: CallOverrides
   ): Promise<string>;
+
+  isRegisteredLendable(
+    token: string,
+    overrides?: CallOverrides
+  ): Promise<boolean>;
+
+  "isRegisteredLendable(address)"(
+    token: string,
+    overrides?: CallOverrides
+  ): Promise<boolean>;
 
   registerLendable(
     token: string,
@@ -231,18 +271,6 @@ export class IReserveFactory extends Contract {
 
   "reserveBytecodeHash()"(overrides?: CallOverrides): Promise<string>;
 
-  sweepFee(
-    lendable: string,
-    to: string,
-    overrides?: Overrides
-  ): Promise<ContractTransaction>;
-
-  "sweepFee(address,address)"(
-    lendable: string,
-    to: string,
-    overrides?: Overrides
-  ): Promise<ContractTransaction>;
-
   callStatic: {
     getAllLendables(overrides?: CallOverrides): Promise<string[]>;
 
@@ -258,12 +286,32 @@ export class IReserveFactory extends Contract {
       overrides?: CallOverrides
     ): Promise<string>;
 
+    getOrCreateShortingReserve(
+      shortable: string,
+      overrides?: CallOverrides
+    ): Promise<string>;
+
+    "getOrCreateShortingReserve(address)"(
+      shortable: string,
+      overrides?: CallOverrides
+    ): Promise<string>;
+
     getReserve(lendable: string, overrides?: CallOverrides): Promise<string>;
 
     "getReserve(address)"(
       lendable: string,
       overrides?: CallOverrides
     ): Promise<string>;
+
+    isRegisteredLendable(
+      token: string,
+      overrides?: CallOverrides
+    ): Promise<boolean>;
+
+    "isRegisteredLendable(address)"(
+      token: string,
+      overrides?: CallOverrides
+    ): Promise<boolean>;
 
     registerLendable(
       token: string,
@@ -288,18 +336,6 @@ export class IReserveFactory extends Contract {
     reserveBytecodeHash(overrides?: CallOverrides): Promise<string>;
 
     "reserveBytecodeHash()"(overrides?: CallOverrides): Promise<string>;
-
-    sweepFee(
-      lendable: string,
-      to: string,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    "sweepFee(address,address)"(
-      lendable: string,
-      to: string,
-      overrides?: CallOverrides
-    ): Promise<void>;
   };
 
   filters: {};
@@ -319,10 +355,30 @@ export class IReserveFactory extends Contract {
       overrides?: Overrides
     ): Promise<BigNumber>;
 
+    getOrCreateShortingReserve(
+      shortable: string,
+      overrides?: Overrides
+    ): Promise<BigNumber>;
+
+    "getOrCreateShortingReserve(address)"(
+      shortable: string,
+      overrides?: Overrides
+    ): Promise<BigNumber>;
+
     getReserve(lendable: string, overrides?: CallOverrides): Promise<BigNumber>;
 
     "getReserve(address)"(
       lendable: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    isRegisteredLendable(
+      token: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    "isRegisteredLendable(address)"(
+      token: string,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
@@ -346,18 +402,6 @@ export class IReserveFactory extends Contract {
     reserveBytecodeHash(overrides?: CallOverrides): Promise<BigNumber>;
 
     "reserveBytecodeHash()"(overrides?: CallOverrides): Promise<BigNumber>;
-
-    sweepFee(
-      lendable: string,
-      to: string,
-      overrides?: Overrides
-    ): Promise<BigNumber>;
-
-    "sweepFee(address,address)"(
-      lendable: string,
-      to: string,
-      overrides?: Overrides
-    ): Promise<BigNumber>;
   };
 
   populateTransaction: {
@@ -375,6 +419,16 @@ export class IReserveFactory extends Contract {
       overrides?: Overrides
     ): Promise<PopulatedTransaction>;
 
+    getOrCreateShortingReserve(
+      shortable: string,
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
+
+    "getOrCreateShortingReserve(address)"(
+      shortable: string,
+      overrides?: Overrides
+    ): Promise<PopulatedTransaction>;
+
     getReserve(
       lendable: string,
       overrides?: CallOverrides
@@ -382,6 +436,16 @@ export class IReserveFactory extends Contract {
 
     "getReserve(address)"(
       lendable: string,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    isRegisteredLendable(
+      token: string,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    "isRegisteredLendable(address)"(
+      token: string,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
@@ -411,18 +475,6 @@ export class IReserveFactory extends Contract {
 
     "reserveBytecodeHash()"(
       overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    sweepFee(
-      lendable: string,
-      to: string,
-      overrides?: Overrides
-    ): Promise<PopulatedTransaction>;
-
-    "sweepFee(address,address)"(
-      lendable: string,
-      to: string,
-      overrides?: Overrides
     ): Promise<PopulatedTransaction>;
   };
 }

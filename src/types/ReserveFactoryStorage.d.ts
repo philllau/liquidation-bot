@@ -23,11 +23,16 @@ import { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
 
 interface ReserveFactoryStorageInterface extends ethers.utils.Interface {
   functions: {
+    "m_reserveDeployer()": FunctionFragment;
     "owner()": FunctionFragment;
     "renounceOwnership()": FunctionFragment;
     "transferOwnership(address)": FunctionFragment;
   };
 
+  encodeFunctionData(
+    functionFragment: "m_reserveDeployer",
+    values?: undefined
+  ): string;
   encodeFunctionData(functionFragment: "owner", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "renounceOwnership",
@@ -38,6 +43,10 @@ interface ReserveFactoryStorageInterface extends ethers.utils.Interface {
     values: [string]
   ): string;
 
+  decodeFunctionResult(
+    functionFragment: "m_reserveDeployer",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "owner", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "renounceOwnership",
@@ -99,6 +108,10 @@ export class ReserveFactoryStorage extends Contract {
   interface: ReserveFactoryStorageInterface;
 
   functions: {
+    m_reserveDeployer(overrides?: CallOverrides): Promise<[string]>;
+
+    "m_reserveDeployer()"(overrides?: CallOverrides): Promise<[string]>;
+
     owner(overrides?: CallOverrides): Promise<[string]>;
 
     "owner()"(overrides?: CallOverrides): Promise<[string]>;
@@ -117,6 +130,10 @@ export class ReserveFactoryStorage extends Contract {
       overrides?: Overrides
     ): Promise<ContractTransaction>;
   };
+
+  m_reserveDeployer(overrides?: CallOverrides): Promise<string>;
+
+  "m_reserveDeployer()"(overrides?: CallOverrides): Promise<string>;
 
   owner(overrides?: CallOverrides): Promise<string>;
 
@@ -137,6 +154,10 @@ export class ReserveFactoryStorage extends Contract {
   ): Promise<ContractTransaction>;
 
   callStatic: {
+    m_reserveDeployer(overrides?: CallOverrides): Promise<string>;
+
+    "m_reserveDeployer()"(overrides?: CallOverrides): Promise<string>;
+
     owner(overrides?: CallOverrides): Promise<string>;
 
     "owner()"(overrides?: CallOverrides): Promise<string>;
@@ -167,6 +188,10 @@ export class ReserveFactoryStorage extends Contract {
   };
 
   estimateGas: {
+    m_reserveDeployer(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "m_reserveDeployer()"(overrides?: CallOverrides): Promise<BigNumber>;
+
     owner(overrides?: CallOverrides): Promise<BigNumber>;
 
     "owner()"(overrides?: CallOverrides): Promise<BigNumber>;
@@ -187,6 +212,12 @@ export class ReserveFactoryStorage extends Contract {
   };
 
   populateTransaction: {
+    m_reserveDeployer(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    "m_reserveDeployer()"(
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
     owner(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     "owner()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;

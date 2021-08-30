@@ -24,6 +24,7 @@ import { PairMonitor } from "./PairMonitor";
 import { PositionMonitor } from "./PositionMonitor";
 import { TokenMonitor } from "./TokenMonitor";
 import { TotalValueMonitor } from "./ValueMonitor";
+import { HealthMonitor } from "./HealthMonitor";
 
 
 export type Ctor<T> = new (context: ExecutionContext) => T;
@@ -47,6 +48,7 @@ const monitors = [
   PairMonitor,
   PositionMonitor,
   TotalValueMonitor,
+  HealthMonitor
 ] as const;
 
 type InstanceType<T> = T extends Ctor<infer TInstance> ? TInstance : never;
@@ -152,6 +154,7 @@ export class ExecutionContext implements InitializeParams {
     this.runMonitor(PairMonitor);
     this.runMonitor(PositionMonitor);
     this.runMonitor(TotalValueMonitor);
+    this.runMonitor(HealthMonitor);
 
     this.api();
   }
