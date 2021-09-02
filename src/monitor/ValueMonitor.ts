@@ -6,7 +6,6 @@ import { HeightMonitor } from "./HeightMonitor";
 import { Pair, Token } from "./models";
 import { PairMonitor } from "./PairMonitor";
 import { TokenMonitor } from "./TokenMonitor";
-import { Block } from '@ethersproject/abstract-provider';
 import { protocol } from '@wowswap/evm-sdk';
 
 export enum LockType {
@@ -54,7 +53,7 @@ export class TotalValueMonitor extends AbstractMonitor<TotalValue> {
     return this.channel;
   }
 
-  async update(height: Block) {
+  async update(height: number) {
     const pairsWithSupply = await Promise.all(
       this.pairs.map(async (p) => ({
         ...p,

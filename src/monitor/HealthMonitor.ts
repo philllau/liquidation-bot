@@ -4,8 +4,8 @@ import { defined, sleep } from '../utils'
 import { AbstractMonitor } from './AbstractMonitor'
 import { Pair, Position, Token } from './models'
 import { amount, bn, toBN } from '../math'
-import { Pair__factory } from '../types'
 import { HeightMonitor } from './HeightMonitor'
+import { protocol } from '@wowswap/evm-sdk'
 
 export class HealthMonitor extends AbstractMonitor<boolean> {
   private positions!: DatastoreRepository<Position>
@@ -72,12 +72,10 @@ export class HealthMonitor extends AbstractMonitor<boolean> {
     let pairsWithTotals = await Promise.all(
       pairsWithPaths.map(async (pair) => ({
         ...pair,
-        total: await this.context
-          .sender!.call(
-            Pair__factory.connect(pair.address, this.context.provider),
-            'totalSupply',
-          )
-          .then(toBN),
+        total: await this.context.ctx.core.useCall(
+          this.context.ctx.core.useContract(protocol.Pair__factory, pair.address),
+          'totalSupply'
+        ).then(toBN),
       })),
     )
 

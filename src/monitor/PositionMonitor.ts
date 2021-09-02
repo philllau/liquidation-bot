@@ -2,11 +2,12 @@ import axios from "axios";
 import { Observable } from "observable-fns";
 import { DatastoreRepository } from "../db/repository";
 import { amount, bn, oneEther, oneRay, toBN } from "../math";
-import { Pair__factory } from "../types";
 import { defined, fewRetry, infRetry, sleep } from "../utils";
 import { AbstractMonitor } from "./AbstractMonitor";
 import { HeightMonitor } from "./HeightMonitor";
 import { Pair, Position, Token } from "./models";
+import { protocol } from '@wowswap/evm-sdk';
+import { addException } from '../sentry';
 
 // const BATCH_SIZE = 500;
 
@@ -62,13 +63,11 @@ export class PositionMonitor extends AbstractMonitor<Position> {
         }`
       );
 
-      await new Pair__factory(this.context.signer)
+      await new protocol.Pair__factory(this.context.signer)
         .attach(p.pair)
         .liquidatePosition(p.trader, this.context.signer.address)
         .then((tx) => tx.wait())
-        .catch(() => {
-          console.error(`Failed liquidate position of ${path} ${p.trader}`);
-        });
+        .catch((e) => addException("pair", p.pair, e, { message: `Failed liquidate position of ${path} ${p.trader} ${e.message}` }));
     }
   }
 
@@ -180,8 +179,6 @@ export class PositionMonitor extends AbstractMonitor<Position> {
       return position;
     }
 
-    const contract = this.context.router;
-
     const lendableToken = await this.context.db
       .getRepository(Token)
       .get(position.lendable);
@@ -217,9 +214,12 @@ export class PositionMonitor extends AbstractMonitor<Position> {
       liquidationCost,
       updateAt,
     ] = await infRetry(() =>
-      this.context
-        .sender!.callWithBlock(contract, method, ...(inputs as any))
-        .then(({ result, blockHeight }) => {
+      this.context.ctx.core.useCallWithBlock(
+        this.context.ctx.router.router,
+        method,
+        ...(inputs as any)
+      ).then(({ result, blockHeight }) => {
+          // @ts-ignore
           return [...result.map(toBN), toBN(blockHeight)];
         })
         .catch((e) => {

@@ -3,7 +3,7 @@ name: docker_deploy
 on:
   push:
     branches:
-      - binance/deploy
+      - binance-smart-chain
 
 jobs:
   build:

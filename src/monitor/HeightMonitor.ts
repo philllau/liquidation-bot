@@ -3,7 +3,7 @@ import { Block } from '@ethersproject/abstract-provider'
 import { Observable } from 'observable-fns'
 import { infRetry } from '../utils'
 
-export class HeightMonitor extends AbstractMonitor<Block> {
+export class HeightMonitor extends AbstractMonitor<number> {
   public latest: number = 0
 
   private lastUpdatedAt: number = 0
@@ -11,7 +11,7 @@ export class HeightMonitor extends AbstractMonitor<Block> {
   private onHeight(block: Block) {
     // Update current block(and update all other monitors) only if this.context.sleepTime ms passed from last update
     if (this.latest < block.number && (Number(new Date()) - this.lastUpdatedAt) > this.context.sleepTime) {
-      this.channel.next(block)
+      this.channel.next(block.number)
       this.latest = block.number
       this.lastUpdatedAt = Number(new Date())
     }
@@ -24,7 +24,7 @@ export class HeightMonitor extends AbstractMonitor<Block> {
       then(this.onHeight.bind(this)))
   }
 
-  async run(): Promise<Observable<Block>> {
+  async run(): Promise<Observable<number>> {
     await this.updateBlock()
     this.context.ctx.provider.on('block', this.updateBlock.bind(this))
 

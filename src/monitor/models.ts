@@ -133,18 +133,6 @@ export class Pair extends DatastoreDocument<Pair> {
 
   @Index()
   updateAt!: number;
-
-  async getPath(tokenRepository: DatastoreRepository<Token>): Promise<string> {
-    const lendableToken = await tokenRepository.get(this.lendable)
-    const tradableToken = await tokenRepository.get(this.tradable)
-    /* eslint no-undefined: "off" */
-    const proxyToken = this.proxy ? await tokenRepository.get(this.proxy) : undefined
-
-    return [lendableToken, proxyToken, tradableToken].
-    map((token) => token?.symbol).
-    filter(defined).
-    join('/')
-  }
 }
 
 export class Transfer extends DatastoreDocument<Transfer> { }
