@@ -6,6 +6,7 @@ import { AbstractMonitor } from "./AbstractMonitor";
 import { HeightMonitor } from "./HeightMonitor";
 import { Pair, Token } from "./models";
 import { TokenMonitor } from "./TokenMonitor";
+import { addBreadcrumb } from '../sentry';
 
 export class PairMonitor extends AbstractMonitor<Pair> {
   private repository!: DatastoreRepository<Pair>;
@@ -156,7 +157,7 @@ export class PairMonitor extends AbstractMonitor<Pair> {
             .join("/");
 
           if (!instance || proxy?.address !== instance.proxy || short !== instance.short) {
-            console.log(`Create new ${short ? "short" : "long"} pair ${address} ${path}}`);
+            addBreadcrumb("pair", address, `Create new ${short ? "short" : "long"} pair ${address} ${path}}`);
             instance = new Pair();
             instance.address = address;
             instance.lendable = lendable.address;
