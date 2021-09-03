@@ -4,14 +4,14 @@ import { run } from "./monitor"
 import { Router__factory } from "./types";
 import { init as sentryInit } from "./sentry"
 
-const { PRIVATE_KEY, NODE_ENDPOINT, MULTICALL_ADDRESS, ROUTER_ADDRESS, SLEEP_TIME, START_BLOCK, SENTRY_DSN, pm_id, instances } = process.env;
+const { PRIVATE_KEY, NODE_ENDPOINT, MULTICALL_ADDRESS, ROUTER_ADDRESS, SLEEP_TIME, START_BLOCK, pm_id, instances } = process.env;
 
 if (!NODE_ENDPOINT) throw new Error("Set NODE_ENDPOINT to run liquidator bot")
 if (!MULTICALL_ADDRESS) throw new Error("Set MULTICALL_ADDRESS to run liquidator bot")
 if (!ROUTER_ADDRESS) throw new Error("Set ROUTER_ADDRESS to run liquidator bot")
 if (!START_BLOCK) throw new Error("Set START_BLOCK to run liquidator bot")
 
-sentryInit(SENTRY_DSN, { MULTICALL_ADDRESS, ROUTER_ADDRESS });
+sentryInit({ MULTICALL_ADDRESS, ROUTER_ADDRESS });
 
 const dispatchSize = instances ? parseInt(instances) : 1;
 const dispatchId = pm_id ? parseInt(pm_id) : 0;

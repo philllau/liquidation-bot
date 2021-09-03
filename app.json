@@ -30,6 +30,10 @@
     },
     "START_BLOCK": {
       "value": "1"
+    },
+    "SENTRY_DSN": {
+      "description": "DSN for error reporting. Disables Sentry if empty",
+      "value": ""
     }
   }
 }

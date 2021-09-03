@@ -1,8 +1,13 @@
-import { init as sentryInit, addBreadcrumb as sentryAddBreadcrumb, captureMessage, captureException } from "@sentry/node";
+import {
+  init as sentryInit,
+  addBreadcrumb as sentryAddBreadcrumb,
+  captureMessage,
+  captureException
+} from "@sentry/node";
 
-export function init(dsn: string | undefined, extra: { [key: string]: string }) {
+export function init(extra: { [key: string]: string }) {
   sentryInit({
-    dsn: dsn ?? "https://fe7936cb58f443a4b0e125d6a02312e7@o960063.ingest.sentry.io/5941418",
+    dsn: process.env.SENTRY_DSN,
     beforeBreadcrumb: (crumb, _) => {
       if (crumb.category === "console" && crumb.message?.charAt(0) === '[') return null; // Remove logs from addBreadcrumb
       if (crumb.category === "http") return null; // Remove http calls
