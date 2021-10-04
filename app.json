@@ -13,17 +13,9 @@
       "description": "Enter your private key of liquidator wallet",
       "value": ""
     },
-    "NODE_ENDPOINT": {
-      "description": "JSON RPC node",
-      "value": "https://bsc-dataseed2.binance.org"
-    },
-    "MULTICALL_ADDRESS": {
-      "description": "Address of the multicall sender",
-      "value": "0x8BB95a1E0D9556997Ab9B56Fc3DE62B7110a95E8"
-    },
-    "ROUTER_ADDRESS": {
-      "description": "Address of the router",
-      "value": "0x168Ea9Cf517F29045098961423397dBC742cf264"
+    "CHAIN_ID": {
+      "description": "Id for Blockchain connection configs. Supported: 1(Ethereum), 56(BinanceSmartChain), 128(Heco), 137(Matic), 43114(Avalance). Default: BinanceSmartChain",
+      "value": "56"
     },
     "SLEEP_TIME": {
       "value": "250"
