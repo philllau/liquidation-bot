@@ -1,126 +1,84 @@
-import { Diff, diff, DiffArray, DiffNew } from "deep-diff";
-import { map, Observable } from "observable-fns";
-import { IERC20Detailed__factory } from "../types";
-import { byteToAddress, mapAll } from "../utils";
-import { AbstractMonitor } from "./AbstractMonitor";
-import { HeightMonitor } from "./HeightMonitor";
-import { Token } from "./models";
+import { Diff, diff, DiffArray, DiffNew } from 'deep-diff'
+import { map, Observable } from 'observable-fns'
+import { fewRetry } from '../utils'
+import { AbstractMonitor } from './AbstractMonitor'
+import { HeightMonitor } from './HeightMonitor'
+import { Token } from './models'
 
 export class TokenMonitor extends AbstractMonitor<Token> {
-  public lendables: string[] = [];
-  public tradables: string[] = [];
-  public proxies: string[] = [];
-  public shortables: string[] = [];
-
-  get lendableTokens(): Promise<Token[]> {
-    return this.context.db.getRepository(Token).find("lendable", true);
-  }
-
-  get tradableTokens(): Promise<Token[]> {
-    return this.context.db.getRepository(Token).find("lendable", false);
-  }
-
-  get proxyTokens(): Promise<Token[]> {
-    return this.context.db.getRepository(Token).find("proxy", true);
-  }
-
-  get shortableTokens(): Promise<Token[]> {
-    return this.context.db.getRepository(Token).find("shortable", true);
-
-  }
+  public lendables: string[] = []
+  public tradables: string[] = []
+  public proxies: string[] = []
+  public shortables: string[] = []
 
   async run(): Promise<Observable<Token>> {
     this.context.getChannel(HeightMonitor).then((channel) =>
       channel
-        .pipe(
-          map(() =>
-            this.context.sender
-              .call(this.context.reserveFactory, "getAllLendables")
-              .then(mapAll(byteToAddress))
-          )
-        )
+        .pipe(map(() => this.context.ctx.reserves.useAllLendables()))
         .subscribe((values) => {
-          const difference = diff(this.lendables, values);
+          const difference = diff(this.lendables, values)
           if (difference) {
-            this.lendables = values;
-            this.parseDifference(difference as any);
+            this.lendables = values
+            fewRetry(() => this.parseDifference(difference as any))
           }
-        })
-    );
+        }),
+    )
     this.context.getChannel(HeightMonitor).then((channel) =>
       channel
-        .pipe(
-          map(() =>
-            this.context.sender
-              .call(this.context.pairFactory, "getAllTradables")
-              .then(mapAll(byteToAddress))
-          )
-        )
+        .pipe(map(() => this.context.ctx.pairs.useAllTradables()))
         .subscribe((values) => {
-          const difference = diff(this.tradables, values);
+          const difference = diff(this.tradables, values)
           if (difference) {
-            this.tradables = values;
-            this.parseDifference(difference as any);
+            this.tradables = values
+            fewRetry(() => this.parseDifference(difference as any))
           }
-        })
-    );
+        }),
+    )
 
     this.context.getChannel(HeightMonitor).then((channel) =>
       channel
-        .pipe(
-          map(() =>
-            this.context.sender
-              .call(this.context.pairFactory, "getAllProxyLendables")
-              .then(mapAll(byteToAddress))
-          )
-        )
+        .pipe(map(() => this.context.ctx.pairs.useAllProxies()))
         .subscribe((values) => {
-          const difference = diff(this.proxies, values);
+          const difference = diff(this.proxies, values)
           if (difference) {
-            this.proxies = values;
-            this.parseDifference(difference as any);
+            this.proxies = values
+            fewRetry(() => this.parseDifference(difference as any))
           }
-        })
-    );
+        }),
+    )
 
     this.context.getChannel(HeightMonitor).then((channel) =>
       channel
-        .pipe(
-          map(() =>
-            this.context.sender
-              .call(this.context.pairFactory, "getAllShortables")
-              .then(mapAll(byteToAddress))
-          )
-        )
+        .pipe(map(() => this.context.ctx.pairs.useAllShotables()))
         .subscribe((values) => {
-          const difference = diff(this.shortables, values);
+          const difference = diff(this.shortables, values)
           if (difference) {
-            this.shortables = values;
-            this.parseDifference(difference as any);
+            this.shortables = values
+            fewRetry(() => this.parseDifference(difference as any))
           }
-        })
-    );
+        }),
+    )
 
-    return this.channel;
+    return this.channel
   }
 
   private parseDifference(difference: Diff<string[], string>[]) {
-    const repository = this.context.db.getRepository(Token);
+    const repository = this.context.db.getRepository(Token)
 
     const newTokens: string[] = difference
-      .filter((dif): dif is DiffArray<string[], string> => dif.kind === "A")
+      .filter((dif): dif is DiffArray<string[], string> => dif.kind === 'A')
       .map((difs) => difs.item)
-      .filter((dif): dif is DiffNew<string> => dif.kind === "N")
-      .map((dif) => dif.rhs);
+      .filter((dif): dif is DiffNew<string> => dif.kind === 'N')
+      .map((dif) => dif.rhs)
 
-    Promise.all(
+    return Promise.all(
       newTokens.map(async (address) => {
-        const lendable = this.lendables.includes(address);
-        const proxy = this.proxies.includes(address);
-        const tradable = this.tradables.includes(address);
-        const shortable = this.shortables.includes(address);
+        const lendable = this.lendables.includes(address)
+        const proxy = this.proxies.includes(address)
+        const tradable = this.tradables.includes(address)
+        const shortable = this.shortables.includes(address)
 
-        let instance = await repository.get(address);
+        let instance = await repository.get(address)
         if (
           !instance ||
           instance.lendable !== lendable ||
@@ -128,30 +86,23 @@ export class TokenMonitor extends AbstractMonitor<Token> {
           instance.proxy !== proxy ||
           instance.shortable !== shortable
         ) {
-          instance = new Token();
+          instance = new Token()
           instance.lendable = lendable
           instance.proxy = proxy
           instance.tradable = tradable
           instance.shortable = shortable
-          instance.address = address;
+          instance.address = address
 
-          const contract = IERC20Detailed__factory.connect(
-            address,
-            this.context.provider
-          );
+          const contract = await this.context.ctx.tokens.useDetails(address)
+          instance.name = contract.name
+          instance.symbol = contract.symbol
+          instance.decimals = contract.decimals
 
-          [instance.name, instance.symbol, instance.decimals] =
-            await Promise.all([
-              this.context.sender!.call(contract, "name"),
-              this.context.sender!.call(contract, "symbol"),
-              this.context.sender!.call(contract, "decimals"),
-            ]);
-
-          await this.context.db.getRepository(Token).put(instance);
+          await this.context.db.getRepository(Token).put(instance)
         }
 
-        this.channel.next(instance);
-      })
-    );
+        this.channel.next(instance)
+      }),
+    )
   }
 }

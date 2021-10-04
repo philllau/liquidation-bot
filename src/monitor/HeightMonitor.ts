@@ -1,22 +1,33 @@
-import { Observable } from "observable-fns";
-import { infRetry } from "../utils";
-import { AbstractMonitor } from "./AbstractMonitor";
+import { AbstractMonitor } from './AbstractMonitor'
+import { Block } from '@ethersproject/abstract-provider'
+import { Observable } from 'observable-fns'
+import { infRetry } from '../utils'
 
-export class HeightMonitor extends AbstractMonitor<number> {
-  public latest : number = 0;
+export class HeightMonitor extends AbstractMonitor<Block> {
+  public latest: number = 0
 
-  private onHeight(height: number) {
-    if (this.latest < height) {
-      this.channel.next(height);
-      this.latest = height;
+  private lastUpdatedAt: number = 0
+
+  private onHeight(block: Block) {
+    // Update current block(and update all other monitors) only if this.context.sleepTime ms passed from last update
+    if (this.latest < block.number && (Number(new Date()) - this.lastUpdatedAt) > this.context.sleepTime) {
+      this.channel.next(block)
+      this.latest = block.number
+      this.lastUpdatedAt = Number(new Date())
     }
   }
 
-  async run(): Promise<Observable<number>> {
-    this.latest = this.context.startBlock;
-    await infRetry(() => this.context.provider.getBlockNumber().then(this.onHeight.bind(this)));
-    this.context.provider.on("block", this.onHeight.bind(this));
+  private async updateBlock() {
+    await infRetry(() =>
+      this.context.ctx.provider.
+      getBlock('latest').
+      then(this.onHeight.bind(this)))
+  }
 
-    return this.channel;
+  async run(): Promise<Observable<Block>> {
+    await this.updateBlock()
+    this.context.ctx.provider.on('block', this.updateBlock.bind(this))
+
+    return this.channel
   }
 }

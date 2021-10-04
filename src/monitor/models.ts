@@ -2,6 +2,8 @@ import BigNumber from "bignumber.js";
 import { Expose, Transform } from "class-transformer";
 import { DatastoreDocument, Index, Key } from "../db/document";
 import { bn, ray } from "../math";
+import { DatastoreRepository } from '../db/repository';
+import { defined } from '../utils';
 
 function BigNumberTransform() {
   return Transform((params) => {
@@ -131,6 +133,18 @@ export class Pair extends DatastoreDocument<Pair> {
 
   @Index()
   updateAt!: number;
+
+  async getPath(tokenRepository: DatastoreRepository<Token>): Promise<string> {
+    const lendableToken = await tokenRepository.get(this.lendable)
+    const tradableToken = await tokenRepository.get(this.tradable)
+    /* eslint no-undefined: "off" */
+    const proxyToken = this.proxy ? await tokenRepository.get(this.proxy) : undefined
+
+    return [lendableToken, proxyToken, tradableToken].
+    map((token) => token?.symbol).
+    filter(defined).
+    join('/')
+  }
 }
 
 export class Transfer extends DatastoreDocument<Transfer> { }
@@ -201,6 +215,18 @@ export class Position extends DatastoreDocument<Position> {
     trader = trader.startsWith("0x") ? trader.substr(2) : trader;
     const prefix = short ? "10" : '00'
     return [prefix, pair, trader].join("");
+  }
+
+  async getPath(tokenRepository: DatastoreRepository<Token>): Promise<string> {
+    const lendableToken = await tokenRepository.get(this.lendable)
+    const tradableToken = await tokenRepository.get(this.tradable)
+    /* eslint no-undefined: "off" */
+    const proxyToken = this.proxy ? await tokenRepository.get(this.proxy) : undefined
+
+    return [lendableToken, proxyToken, tradableToken].
+    map((token) => token?.symbol).
+    filter(defined).
+    join('/')
   }
 }
 

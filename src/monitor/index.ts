@@ -1,45 +1,31 @@
-import { JsonRpcProvider } from "@ethersproject/providers";
 import { Wallet } from "ethers";
 import express from "express";
 import http from "http";
 import { Observable } from "observable-fns";
 import { DatastoreConnection } from "../db/connection";
 import { connect } from "../db/datastore";
-import {
-  PairFactory,
-  PairFactory__factory,
-  PancakeFactory,
-  PancakeFactory__factory,
-  PancakeRouter01,
-  PancakeRouter01__factory,
-  ReserveFactory,
-  ReserveFactory__factory,
-  Router
-} from "../types";
-import { infRetry, logError } from "../utils";
 import { AbstractMonitor } from "./AbstractMonitor";
 import { HeightMonitor } from "./HeightMonitor";
-import { Multisender } from "./multisender";
 import { PairMonitor } from "./PairMonitor";
 import { PositionMonitor } from "./PositionMonitor";
 import { TokenMonitor } from "./TokenMonitor";
 import { TotalValueMonitor } from "./ValueMonitor";
 import { HealthMonitor } from "./HealthMonitor";
+import { Context } from '@wowswap/evm-sdk';
+import { initMetrics, Metrics } from '../utils/metrics';
+import { sdkInit } from '../sdk';
+import cors from 'cors';
+import { healthEndpoint } from '../utils/health';
 
 
 export type Ctor<T> = new (context: ExecutionContext) => T;
 
 export type InitializeParams = Readonly<{
-  dispatchId: number;
-  dispatchSize: number;
   covalentAPI: string;
-  provider: JsonRpcProvider;
-  providerUrl: string;
-  signer: Wallet;
-  multicall: string;
-  router: Router;
   sleep: number;
   startBlock: number;
+  privateKey: string;
+  sleepTime: number;
 }>;
 
 const monitors = [
@@ -61,32 +47,17 @@ export class ExecutionContext implements InitializeParams {
   get covalentAPI() {
     return this.params.covalentAPI;
   }
-  get dispatchId() {
-    return this.params.dispatchId;
-  }
-  get dispatchSize() {
-    return this.params.dispatchSize;
-  }
-  get provider() {
-    return this.params.provider;
-  }
-  get providerUrl() {
-    return this.params.providerUrl;
-  }
-  get signer() {
-    return this.params.signer;
-  }
-  get multicall() {
-    return this.params.multicall;
-  }
-  get router() {
-    return this.params.router;
-  }
   get sleep() {
     return this.params.sleep;
   }
   get startBlock() {
     return this.params.startBlock;
+  }
+  get privateKey(): string {
+    return this.params.privateKey
+  }
+  get sleepTime(): number {
+    return this.params.sleepTime
   }
 
   monitors: {
@@ -100,63 +71,29 @@ export class ExecutionContext implements InitializeParams {
   } = {};
 
   db!: DatastoreConnection;
-  pairFactory!: PairFactory;
-  reserveFactory!: ReserveFactory;
-  swapFactory!: PancakeFactory;
-  swapRouter!: PancakeRouter01;
-  sender!: Multisender;
   chainId!: number;
+
+  ctx!: Context
+
+  signer!: Wallet
+
+  metrics!: Metrics
 
   constructor(private params: InitializeParams) {}
 
   async run() {
-    this.chainId = await this.provider.getNetwork().then((n) => n.chainId);
+    this.ctx = await sdkInit()
+    this.chainId = await this.ctx.provider.getNetwork().then((network) => network.chainId)
+    this.db = connect(`.snapshot/instance-${this.chainId}`)
+    this.signer = new Wallet(this.privateKey, this.ctx.provider)
 
-    this.db = connect(`.snapshot/instance-${this.chainId}`);
-
-    this.pairFactory = PairFactory__factory.connect(
-      await infRetry(() =>
-        this.router
-          .pairFactory()
-          .catch(logError(`Failed request pairFactory()`))
-      ),
-      this.provider
-    ).connect(this.signer);
-
-    this.reserveFactory = ReserveFactory__factory.connect(
-      await infRetry(() =>
-        this.router
-          .reserveFactory()
-          .catch(logError(`Failed request reserveFactory()`))
-      ),
-      this.provider
-    ).connect(this.signer);
-
-    this.swapFactory = PancakeFactory__factory.connect(
-      await infRetry(() =>
-        this.router
-          .swapFactory()
-          .catch(logError(`Failed request swapFactory()`))
-      ),
-      this.provider
-    ).connect(this.signer);
-
-    this.swapRouter = PancakeRouter01__factory.connect(
-      await infRetry(() =>
-        this.router.swapRouter().catch(logError(`Failed request swapRouter()`))
-      ),
-      this.provider
-    ).connect(this.signer);
-
+    this.api();
     this.runMonitor(HeightMonitor);
-    this.sender = new Multisender(this, this.multicall);
     this.runMonitor(TokenMonitor);
     this.runMonitor(PairMonitor);
     this.runMonitor(PositionMonitor);
     this.runMonitor(TotalValueMonitor);
     this.runMonitor(HealthMonitor);
-
-    this.api();
   }
 
   async api() {
@@ -166,6 +103,12 @@ export class ExecutionContext implements InitializeParams {
       res.json({ result: "Hello" })
       next()
     });
+
+    app.use(cors({ origin: '*' }))
+    app.get('/health', healthEndpoint)
+
+    this.metrics = initMetrics({ express: app, prefix: 'health_bot', defaultLabels: { chainId: this.chainId.toString() } })
+
     server.listen(process.env.PORT, async () => {
       console.log("Server started");
     });
@@ -207,13 +150,6 @@ export class ExecutionContext implements InitializeParams {
 
     const channel = this.channels[index];
     return channel as Promise<Observable<ChannelType<T>>>;
-  }
-
-  getNewConnection() {
-    const provider = new JsonRpcProvider(this.providerUrl);
-    const signer = Wallet.createRandom().connect(provider);
-
-    return signer;
   }
 }
 
