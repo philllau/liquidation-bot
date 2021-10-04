@@ -2,7 +2,7 @@ import { init as sentryInit, addBreadcrumb as sentryAddBreadcrumb, captureMessag
 
 export function init(dsn: string | undefined, extra: { [key: string]: string }) {
   sentryInit({
-    dsn: dsn ?? "https://fe7936cb58f443a4b0e125d6a02312e7@o960063.ingest.sentry.io/5941418",
+    dsn,
     beforeBreadcrumb: (crumb, _) => {
       if (crumb.category === "console" && crumb.message?.charAt(0) === '[') return null; // Remove logs from addBreadcrumb
       if (crumb.category === "http") return null; // Remove http calls
@@ -39,7 +39,7 @@ export function addBreadcrumb(category: string, tag: string, message: string) {
     message,
     data: {
       category,
-      tag
+      tag: tag.toLowerCase()
     }
   })
 }
@@ -47,11 +47,11 @@ export function addBreadcrumb(category: string, tag: string, message: string) {
 export function addMessage(category: string, tag: string, message: string, extra: { [key: string]: string } = {}) {
   console.log(`[${tag}] ${message}`, extra)
 
-  captureMessage(message, { tags: { category, tag }, extra })
+  captureMessage(message, { tags: { category, tag: tag.toLowerCase() }, extra })
 }
 
 export function addException(category: string, tag: string, exception: any, extra: { [key: string]: string } = {}) {
   console.error(`[${tag}] ${exception}`, extra)
 
-  captureException(exception, { tags: { category, tag }, extra })
+  captureException(exception, { tags: { category, tag: tag.toLowerCase() }, extra })
 }

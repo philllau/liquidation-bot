@@ -6,6 +6,7 @@ import { Pair, Position, Token } from './models'
 import { amount, bn, toBN } from '../math'
 import { HeightMonitor } from './HeightMonitor'
 import { protocol } from '@wowswap/evm-sdk'
+import { addBreadcrumb } from '../sentry';
 
 export class HealthMonitor extends AbstractMonitor<boolean> {
   private positions!: DatastoreRepository<Position>
@@ -97,8 +98,10 @@ export class HealthMonitor extends AbstractMonitor<boolean> {
     )
 
     pairWithPositionsTotal.forEach((pair) =>
-      console.log(
-        `[${pair.address} ${pair.short ? 'SHORT' : 'LONG'} ${pair.path}]: totalSupply: ${pair.total.human(
+      addBreadcrumb(
+        'pair',
+        pair.address,
+        `${pair.short ? 'SHORT' : 'LONG'} ${pair.path} totalSupply: ${pair.total.human(
           pair.lendable?.decimals,
         )} totalPositions: ${pair.positionTotal.human(
           pair.lendable?.decimals,

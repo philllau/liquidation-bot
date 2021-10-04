@@ -6,7 +6,7 @@ import { AbstractMonitor } from './AbstractMonitor'
 import { HeightMonitor } from './HeightMonitor'
 import { Pair, Token } from './models'
 import { TokenMonitor } from './TokenMonitor'
-import { addBreadcrumb } from '../sentry'
+import { addBreadcrumb, addException } from '../sentry'
 
 export class PairMonitor extends AbstractMonitor<Pair> {
   private repository!: DatastoreRepository<Pair>
@@ -217,7 +217,7 @@ export class PairMonitor extends AbstractMonitor<Pair> {
 
       pairs.forEach(this.channel.next.bind(this.channel))
     } catch (e) {
-      console.error(e)
+      addException('-', '-', e)
     }
 
     this.processing = false

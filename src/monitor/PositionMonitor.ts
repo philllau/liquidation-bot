@@ -6,8 +6,8 @@ import { defined, fewRetry, infRetry, sleep } from "../utils";
 import { AbstractMonitor } from "./AbstractMonitor";
 import { HeightMonitor } from "./HeightMonitor";
 import { Pair, Position, Token } from "./models";
-import { protocol } from '@wowswap/evm-sdk';
-import { addException } from '../sentry';
+import { protocol, ray } from '@wowswap/evm-sdk';
+import { addBreadcrumb, addException } from '../sentry';
 
 // const BATCH_SIZE = 500;
 
@@ -58,16 +58,14 @@ export class PositionMonitor extends AbstractMonitor<Position> {
         .decimalPlaces(tradableToken?.decimals!)
         .dividedBy(bn(10).pow(tradableToken!.decimals));
 
-      console.log(
-        `Liquidate position: ${path} ${p.trader} - ${amount.toString()} ${tradableToken?.symbol
-        }`
-      );
+      addBreadcrumb('pair', p.pair, `Liquidate position: ${path} `
+        + `${p.trader} - ${amount.toString()} ${tradableToken?.symbol}`);
 
       await new protocol.Pair__factory(this.context.signer)
         .attach(p.pair)
         .liquidatePosition(p.trader, this.context.signer.address)
         .then((tx) => tx.wait())
-        .catch((e) => addException("pair", p.pair, e, { message: `Failed liquidate position of ${path} ${p.trader} ${e.message}` }));
+        .catch((e) => addException('pair', p.pair, e, { message: `Failed liquidate position of ${path} ${p.trader} ${e.message}` }));
     }
   }
 
@@ -80,11 +78,10 @@ export class PositionMonitor extends AbstractMonitor<Position> {
     });
     await Promise.all(
       positionToUpdate.map((position) => this.updatePosition(position))
-    ).catch(() => console.error(`Failed update position run`));
+    ).catch((e) => addException('-', '-', e, { message: `Failed update position run` }));
 
-    await this.liquidateUnhealty().catch(() =>
-      console.error(`Failed liquidation run`)
-    );
+    await this.liquidateUnhealty()
+      .catch((e) => addException('-', '-', e, { message: `Failed liquidation run` }));
 
     while (height === this.lastHeight) {
       await sleep(this.context.sleep);
@@ -127,11 +124,11 @@ export class PositionMonitor extends AbstractMonitor<Position> {
           )
           .then((r) => r.data.data.items)
           .catch((e) => {
-            console.error(`Failed get holders for ${path}: \n${e}`);
+            addException('pair', pair.address, e, { message: `Failed get holders for ${path}`, response: e.response.data });
             throw e;
           })
       ).catch(() => [] as Array<{ address: string; balance: string }>);
-      console.log(`Got holders of ${pair.short ? 'short' : 'long'} ${path} ${pair.address} ${holders.length} ${holders.reduce((total, holder) => total.add(bn(holder.balance)), bn(0)).str()}`);
+      addBreadcrumb('pair', pair.address, `Got holders of ${pair.short ? 'short' : 'long'} ${path} ${pair.address} ${holders.length} ${holders.reduce((total, holder) => total.add(bn(holder.balance)), bn(0)).str()}`);
 
       // await sleep(this.context.sleep);
 
@@ -142,7 +139,7 @@ export class PositionMonitor extends AbstractMonitor<Position> {
 
       await Promise.all(
         unknown.map(({ address }) => {
-          console.log(`Create position ${pair.short} ${path}`)
+          addBreadcrumb('pair', pair.address, `Create position ${pair.short} ${path}`)
           const position = new Position();
           position.lendable = pair.lendable;
           position.tradable = pair.tradable;
@@ -203,6 +200,24 @@ export class PositionMonitor extends AbstractMonitor<Position> {
     inputs.push(position.tradable);
 
     const method = position.short ? position.proxy ? "getProxyShortPosition" : "getShortPosition" : position.proxy ? "getProxyPosition" : "getPosition"
+
+    const result = await infRetry(() =>
+      this.context.ctx.core.useCallWithBlock(
+        this.context.ctx.router.router,
+        method,
+        ...(inputs as any)
+      ).then(({ result, blockHeight }) => {
+          // @ts-ignore
+          return [...result.map(toBN), toBN(blockHeight)];
+        })
+        .catch((e) => {
+          addException('pair', position.pair, e, { message: `Error on position state ${path} ${position.trader}` });
+          throw e;
+        })
+    );
+    result.forEach((v, i) => {
+      console.log(`${position.pair} : ${i} - ${v.decimalPlaces(18).dividedBy(oneEther)}`)
+    })
     const [
       amount,
       value,
@@ -213,22 +228,10 @@ export class PositionMonitor extends AbstractMonitor<Position> {
       currentCost,
       liquidationCost,
       updateAt,
-    ] = await infRetry(() =>
-      this.context.ctx.core.useCallWithBlock(
-        this.context.ctx.router.router,
-        method,
-        ...(inputs as any)
-      ).then(({ result, blockHeight }) => {
-          // @ts-ignore
-          return [...result.map(toBN), toBN(blockHeight)];
-        })
-        .catch((e) => {
-          console.log(
-            `Error on position state ${path} ${position.trader} \nissue: ${e}`
-          );
-          throw e;
-        })
-    );
+    ] = result;
+
+    console.log(`health: ${ray(currentCost.gt(liquidationCost) ? currentCost.sub(liquidationCost).div(currentCost) : bn(0))} 
+    current: ${currentCost.decimalPlaces(18).dividedBy(oneEther).human()} liquidation: ${liquidationCost.decimalPlaces(18).dividedBy(oneEther).human()}`)
 
     position.amount = amount;
     position.value = value;
@@ -241,7 +244,9 @@ export class PositionMonitor extends AbstractMonitor<Position> {
     position.updateAt = updateAt.toNumber();
     position.lastUpdatedAt = Date.now();
 
-    console.log(
+    addBreadcrumb(
+      'pair',
+      position.pair,
       `Update ${position.short ? 'short' : 'long' } position:  ${path} ${position.trader} (heath: ${position.health
         .decimalPlaces(27)
         .dividedBy(oneRay)}, value: ${position.value
@@ -250,7 +255,7 @@ export class PositionMonitor extends AbstractMonitor<Position> {
     );
 
     await this.repository.put(position).catch((e) => {
-      console.error(position);
+      addException('pair', position.pair, e, { position: position.toString() });
       throw e;
     });
 
