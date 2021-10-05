@@ -14,6 +14,6 @@ export function healthUpdate(metrics?: Metrics): void {
   lastUpdated = Date.now()
 
   if (defined(metrics)) {
-    metrics.update('last_updated_at', lastUpdated)
+    metrics.update('last_updated_at', Number(lastUpdated))
   }
 }

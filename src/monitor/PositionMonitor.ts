@@ -238,7 +238,7 @@ export class PositionMonitor extends AbstractMonitor<Position> {
       addException('-', '-', e)
     }
 
-    healthUpdate()
+    healthUpdate(this.context.metrics)
     this.context.metrics.update('position_monitor_update_holders_duration', Number(new Date()) - startedAt)
 
     while (height === this.lastHeight) {
