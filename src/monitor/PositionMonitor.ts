@@ -6,7 +6,7 @@ import { defined, fewRetry, infRetry, sleep } from "../utils";
 import { AbstractMonitor } from "./AbstractMonitor";
 import { HeightMonitor } from "./HeightMonitor";
 import { Pair, Position, Token } from "./models";
-import { protocol, ray } from '@wowswap/evm-sdk';
+import { protocol } from '@wowswap/evm-sdk';
 import { addBreadcrumb, addException } from '../sentry';
 
 // const BATCH_SIZE = 500;
@@ -59,7 +59,8 @@ export class PositionMonitor extends AbstractMonitor<Position> {
         .dividedBy(bn(10).pow(tradableToken!.decimals));
 
       addBreadcrumb('pair', p.pair, `Liquidate position: ${path} `
-        + `${p.trader} - ${amount.toString()} ${tradableToken?.symbol}`);
+        + `${p.trader} - ${amount.toString()} ${tradableToken?.symbol}, `
+        + `health: ${p.health.decimalPlaces(27).dividedBy(oneRay)}`);
 
       await new protocol.Pair__factory(this.context.signer)
         .attach(p.pair)
@@ -201,7 +202,17 @@ export class PositionMonitor extends AbstractMonitor<Position> {
 
     const method = position.short ? position.proxy ? "getProxyShortPosition" : "getShortPosition" : position.proxy ? "getProxyPosition" : "getPosition"
 
-    const result = await infRetry(() =>
+    const [
+      amount,
+      value,
+      selfValue,
+      principalDebt,
+      currentDebt,
+      rate,
+      currentCost,
+      liquidationCost,
+      updateAt,
+    ] = await infRetry(() =>
       this.context.ctx.core.useCallWithBlock(
         this.context.ctx.router.router,
         method,
@@ -215,23 +226,6 @@ export class PositionMonitor extends AbstractMonitor<Position> {
           throw e;
         })
     );
-    result.forEach((v, i) => {
-      console.log(`${position.pair} : ${i} - ${v.decimalPlaces(18).dividedBy(oneEther)}`)
-    })
-    const [
-      amount,
-      value,
-      selfValue,
-      principalDebt,
-      currentDebt,
-      rate,
-      currentCost,
-      liquidationCost,
-      updateAt,
-    ] = result;
-
-    console.log(`health: ${ray(currentCost.gt(liquidationCost) ? currentCost.sub(liquidationCost).div(currentCost) : bn(0))} 
-    current: ${currentCost.decimalPlaces(18).dividedBy(oneEther).human()} liquidation: ${liquidationCost.decimalPlaces(18).dividedBy(oneEther).human()}`)
 
     position.amount = amount;
     position.value = value;
