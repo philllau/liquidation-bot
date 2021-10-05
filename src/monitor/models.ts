@@ -130,6 +130,11 @@ export class Pair extends DatastoreDocument<Pair> {
   proxy?: string;
   @BooleanIndex()
   short!: boolean;
+  
+  totalSupply!: string;
+
+  queryUpper!: number;
+  queryBottom!: number;
 
   @Index()
   updateAt!: number;
