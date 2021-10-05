@@ -11,6 +11,8 @@ export class HeightMonitor extends AbstractMonitor<number> {
   private onHeight(block: Block) {
     // Update current block(and update all other monitors) only if this.context.sleepTime ms passed from last update
     if (this.latest < block.number && (Number(new Date()) - this.lastUpdatedAt) > this.context.sleepTime) {
+      this.context.metrics.update('current_block', block.number)
+
       this.channel.next(block.number)
       this.latest = block.number
       this.lastUpdatedAt = Number(new Date())

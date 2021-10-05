@@ -1,10 +1,10 @@
 import { ethers } from 'ethers'
-import { protocol, ray } from '@wowswap/evm-sdk'
+import { protocol } from '@wowswap/evm-sdk'
 import { Observable } from 'observable-fns'
 import { DatastoreRepository } from '../db/repository'
 import { amount, bn, oneEther, oneRay, toBN } from '../math'
 import { addBreadcrumb, addException } from '../sentry'
-import { defined, infRetry, sleep, withTimeout } from '../utils'
+import { defined, infRetry, sleep } from '../utils'
 import { AbstractMonitor } from './AbstractMonitor'
 import { HeightMonitor } from './HeightMonitor'
 import { Pair, Position, Token } from './models'
@@ -91,7 +91,7 @@ export class PositionMonitor extends AbstractMonitor<Position> {
     )
 
     while (height === this.lastHeight) {
-      await sleep(this.context.sleep)
+      await sleep(this.context.loopSleep)
     }
 
     this.updatePositions()
@@ -100,39 +100,46 @@ export class PositionMonitor extends AbstractMonitor<Position> {
   private async updateHolders() {
     const height = this.lastHeight
     console.log('update holders at height', height)
+    const startedAt = Number(new Date())
 
     let positions = await this.repository.all()
     const pairs = await this.pairRepository.all() //.find("updateAt", { $lt: height });
 
-    for (let pair of pairs.filter((p) => p.totalSupply !== '0')) {
-      const pairPositions = positions.filter((p) => p.pair === pair.address)
-      const pairPositionsTotal = pairPositions.reduce(
-        (total, position) => total.add(position.amount),
-        bn(0),
-      )
-      const pairTotal = bn(pair.totalSupply)
-      const lendableToken = await this.context.db
-        .getRepository(Token)
-        .get(pair.lendable)
-      const tradableToken = await this.context.db
-        .getRepository(Token)
-        .get(pair.tradable)
-      const proxyToken = pair.proxy
-        ? await this.context.db.getRepository(Token).get(pair.proxy)
-        : undefined
-      const path = [lendableToken, proxyToken, tradableToken]
-        .map((t) => t?.symbol)
-        .filter(defined)
-        .join('/')
+    //
+    // Validate pairs with areAllPositionsFound: true
+    //
 
-      const pairContract = this.context.ctx.core.useContract(
-        protocol.Pair__factory,
-        pair.address,
+    try {
+      const pairsWthTotals = await Promise.all(pairs.filter(this.areAllPositionsFound(positions)).map(async (pair) => {
+        const totalSupply = await this.context.ctx.core
+          .useCall(
+            this.context.ctx.core.useContract(protocol.Pair__factory, pair.address),
+            'totalSupply',)
+          .then((bn) => bn.toString())
+
+        return { pair, totalSupply }
+      }))
+
+      await Promise.all(
+        pairsWthTotals
+          .filter(({ pair, totalSupply }) => pair.totalSupply != totalSupply)
+          .map(({ pair }) => {
+            addBreadcrumb('pair', pair.address, `Pair become unhealhty`)
+            pair.queryBottom = 0
+            pair.queryUpper = 0
+
+            this.pairRepository.put(pair)
+          })
       )
 
-      if (!pairTotal.eq(pairPositionsTotal)) {
-        try {
-          const transfers = pairContract.filters.Transfer(null, null, null)
+      //
+      // Try to find positions for pairs with areAllPositionsFound: false
+      //
+
+      const pairsWithRanges = await Promise.all(pairs.filter(this.areAllPositionsFound(positions, false))
+        .filter((p) => p.totalSupply !== '0')
+        .map(async (pair) => {
+          const { path, tradableToken } = await pair.getPath(this.context.db)
 
           if (!pair.queryBottom || !pair.queryUpper) {
             pair.queryUpper = pair.queryBottom = height
@@ -140,13 +147,15 @@ export class PositionMonitor extends AbstractMonitor<Position> {
 
           const from = Math.max(
             this.context.startBlock,
-            pair.queryBottom - 3000,
+            pair.queryBottom - this.context.transferEventsLimit,
           )
           const to = Math.min(pair.queryBottom)
 
           pair.queryBottom = from
 
-          console.log(
+          addBreadcrumb(
+            'pair',
+            pair.address,
             `Need holders of ${path} (total supply is ${bn(
               pair.totalSupply,
             ).human(tradableToken?.decimals)} ${
@@ -154,131 +163,80 @@ export class PositionMonitor extends AbstractMonitor<Position> {
             }) (from ${from} to ${to})`,
           )
 
-          const transferEvents = await withTimeout(1000, () => pairContract.queryFilter(
-            transfers,
-            from,
-            to,
-          ))
+          return { pair, from, to }
+        }))
 
-          const holders = transferEvents.reduce((map, ev) => {
-            ;[ev.args.to, ev.args.from]
-              .filter(
-                (address) =>
-                  address !== pair.address &&
-                  address !== ethers.constants.AddressZero,
-              )
-              .forEach((address) => map.push({ address }))
+      const pairsWithEvents = await Promise.all(pairsWithRanges.map(async ({ pair, from, to }) => {
+        const pairContract = this.context.ctx.core.useContract(
+          protocol.Pair__factory,
+          pair.address,
+        )
 
-            return map
-          }, [] as Array<{ address: string }>)
+        const transfers = pairContract.filters.Transfer(null, null, null)
 
-          pair.updateAt = to
-          await this.pairRepository.put(pair)
+        const transferEvents = await pairContract.queryFilter(
+          transfers,
+          from,
+          to,
+        )
 
-          const known = await this.repository.find('pair', pair.address)
-          const unknown = holders.filter(
-            (h) => !known.some((k) => k.trader === h.address),
-          )
+        return { pair, transferEvents, to }
+      }))
 
-          await Promise.all(
-            unknown.map(({ address }) => {
-              const position = new Position()
-              position.lendable = pair.lendable
-              position.tradable = pair.tradable
-              position.proxy = pair.proxy
-              position.pair = pair.address
-              position.trader = address
-              position.amount = bn(0)
-              position.value = bn(0)
-              position.selfValue = bn(0)
-              position.principalDebt = bn(0)
-              position.currentDebt = bn(0)
-              position.rate = bn(0)
-              position.currentCost = bn(0)
-              position.liquidationCost = bn(0)
-              position.updateAt = 0
-              position.appearAt = height
+      await Promise.all(pairsWithEvents.map(async ({ pair, transferEvents, to }) => {
+        const holders = transferEvents.reduce((map, ev) => {
+          ;[ev.args.to, ev.args.from]
+            .filter(
+              (address) =>
+                address !== pair.address &&
+                address !== ethers.constants.AddressZero,
+            )
+            .forEach((address) => map.push({ address }))
 
-              return this.repository.put(position)
-            }),
-          )
-        } catch (e) {
-          console.error(e)
-        }
-      } else {
-        console.log(`Skip healthy ${path}`)
-        await sleep(100)
-      }
+          return map
+        }, [] as Array<{ address: string }>)
 
-      // const holders = await fewRetry(() =>
-      //   axios
-      //     .get<{
-      //       data: { items: Array<{ address: string; balance: string }> }
-      //     }>(
-      //       `https://api.covalenthq.com/v1/${this.context.chainId}/tokens/${pair.address}/token_holders/`,
-      //       {
-      //         params: {
-      //           key: this.context.covalentAPI,
-      //         },
-      //       },
-      //     )
-      //     .then((r) => r.data.data.items)
-      //     .catch((e) => {
-      //       addException('pair', pair.address, e, {
-      //         message: `Failed get holders for ${path}`,
-      //         response: e.response.data,
-      //       })
-      //       throw e
-      //     }),
-      // ).catch(() => [] as Array<{ address: string; balance: string }>)
-      // addBreadcrumb(
-      //   'pair',
-      //   pair.address,
-      //   `Got holders of ${pair.short ? 'short' : 'long'} ${path} ${
-      //     pair.address
-      //   } ${holders.length} ${holders
-      //     .reduce((total, holder) => total.add(bn(holder.balance)), bn(0))
-      //     .str()}`,
-      // )
+        pair.updateAt = to
+        await this.pairRepository.put(pair)
 
-      // // await sleep(this.context.sleep);
+        const known = await this.repository.find('pair', pair.address)
+        const unknown = holders.filter(
+          (h) => !known.some((k) => k.trader === h.address),
+        )
 
-      // const known = await this.repository.find('pair', pair.address)
-      // const unknown = holders.filter(
-      //   (h) =>
-      //     !known.some((k) => k.trader === h.address && k.short === pair.short),
-      // )
+        await Promise.all(
+          unknown.map(({ address }) => {
+            const position = new Position()
+            position.lendable = pair.lendable
+            position.tradable = pair.tradable
+            position.proxy = pair.proxy
+            position.pair = pair.address
+            position.trader = address
+            position.amount = bn(0)
+            position.value = bn(0)
+            position.selfValue = bn(0)
+            position.principalDebt = bn(0)
+            position.currentDebt = bn(0)
+            position.rate = bn(0)
+            position.currentCost = bn(0)
+            position.liquidationCost = bn(0)
+            position.updateAt = 0
+            position.appearAt = height
 
-      // await Promise.all(
-      //   unknown.map(({ address }) => {
-      //     addBreadcrumb(
-      //       'pair',
-      //       pair.address,
-      //       `Create position ${pair.short} ${path}`,
-      //     )
-      //     const position = new Position()
-      //     position.lendable = pair.lendable
-      //     position.tradable = pair.tradable
-      //     position.proxy = pair.proxy
-      //     position.pair = pair.address
-      //     position.trader = address
-      //     position.amount = bn(0)
-      //     position.value = bn(0)
-      //     position.selfValue = bn(0)
-      //     position.principalDebt = bn(0)
-      //     position.currentDebt = bn(0)
-      //     position.rate = bn(0)
-      //     position.currentCost = bn(0)
-      //     position.liquidationCost = bn(0)
-      //     position.updateAt = 0
-      //     position.lastUpdatedAt = 0
-      //     position.appearAt = height
-      //     position.short = pair.short
-
-      //     return this.repository.put(position)
-      //   }),
-      // )
+            return this.repository.put(position)
+          }),
+        )
+      }))
+    } catch (e) {
+      addException('-', '-', e)
     }
+
+    this.context.metrics.update('position_monitor_update_holders_duration', Number(new Date()) - startedAt)
+
+    while (height === this.lastHeight) {
+      await sleep(this.context.loopSleep)
+    }
+
     this.updateHolders()
   }
 
@@ -316,10 +274,20 @@ export class PositionMonitor extends AbstractMonitor<Position> {
         ? 'getProxyShortPosition'
         : 'getShortPosition'
       : position.proxy
-      ? 'getProxyPosition'
-      : 'getPosition'
+        ? 'getProxyPosition'
+        : 'getPosition'
 
-    const result = await infRetry(() =>
+    const [
+      amount,
+      value,
+      selfValue,
+      principalDebt,
+      currentDebt,
+      rate,
+      currentCost,
+      liquidationCost,
+      updateAt,
+    ] = await infRetry(() =>
       this.context.ctx.core
         .useCallWithBlock(
           this.context.ctx.router.router,
@@ -337,30 +305,6 @@ export class PositionMonitor extends AbstractMonitor<Position> {
           throw e
         }),
     )
-    const [
-      amount,
-      value,
-      selfValue,
-      principalDebt,
-      currentDebt,
-      rate,
-      currentCost,
-      liquidationCost,
-      updateAt,
-    ] = result
-
-    console.log(`health: ${ray(
-      currentCost.gt(liquidationCost)
-        ? currentCost.sub(liquidationCost).div(currentCost)
-        : bn(0),
-    )} 
-    current: ${currentCost
-      .decimalPlaces(18)
-      .dividedBy(oneEther)
-      .human()} liquidation: ${liquidationCost
-      .decimalPlaces(18)
-      .dividedBy(oneEther)
-      .human()}`)
 
     position.amount = amount
     position.value = value
@@ -391,5 +335,18 @@ export class PositionMonitor extends AbstractMonitor<Position> {
     })
 
     return position
+  }
+
+  private areAllPositionsFound(positions: Position[], condition: boolean = true): (pair: Pair) => boolean {
+    return (pair) => {
+      const pairPositions = positions.filter((p) => p.pair === pair.address)
+      const pairPositionsTotal = pairPositions.reduce(
+        (total, position) => total.add(position.amount),
+        bn(0),
+      )
+      const pairTotal = bn(pair.totalSupply)
+
+      return pairTotal.eq(pairPositionsTotal) === condition
+    }
   }
 }

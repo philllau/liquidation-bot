@@ -2,8 +2,8 @@ import BigNumber from "bignumber.js";
 import { Expose, Transform } from "class-transformer";
 import { DatastoreDocument, Index, Key } from "../db/document";
 import { bn, ray } from "../math";
-import { DatastoreRepository } from '../db/repository';
 import { defined } from '../utils';
+import { DatastoreConnection } from '../db/connection';
 
 function BigNumberTransform() {
   return Transform((params) => {
@@ -130,7 +130,7 @@ export class Pair extends DatastoreDocument<Pair> {
   proxy?: string;
   @BooleanIndex()
   short!: boolean;
-  
+
   totalSupply!: string;
 
   queryUpper!: number;
@@ -138,9 +138,21 @@ export class Pair extends DatastoreDocument<Pair> {
 
   @Index()
   updateAt!: number;
+
+  async getPath(db: DatastoreConnection): Promise<{ path: string, tradableToken: Token | undefined }> {
+    const repo = db.getRepository(Token)
+    const lendableToken = await repo.get(this.lendable)
+    const tradableToken = await repo.get(this.tradable)
+    /* eslint no-undefined: "off" */
+    const proxyToken = this.proxy ? await repo.get(this.proxy) : undefined
+    const path = [lendableToken, proxyToken, tradableToken].map((token) => token?.symbol).filter(defined).join('/')
+
+    return { path, tradableToken }
+  }
 }
 
-export class Transfer extends DatastoreDocument<Transfer> { }
+export class Transfer extends DatastoreDocument<Transfer> {
+}
 
 export class Position extends DatastoreDocument<Position> {
   @HexKey(42)
@@ -208,18 +220,6 @@ export class Position extends DatastoreDocument<Position> {
     trader = trader.startsWith("0x") ? trader.substr(2) : trader;
     const prefix = short ? "10" : '00'
     return [prefix, pair, trader].join("");
-  }
-
-  async getPath(tokenRepository: DatastoreRepository<Token>): Promise<string> {
-    const lendableToken = await tokenRepository.get(this.lendable)
-    const tradableToken = await tokenRepository.get(this.tradable)
-    /* eslint no-undefined: "off" */
-    const proxyToken = this.proxy ? await tokenRepository.get(this.proxy) : undefined
-
-    return [lendableToken, proxyToken, tradableToken].
-    map((token) => token?.symbol).
-    filter(defined).
-    join('/')
   }
 }
 

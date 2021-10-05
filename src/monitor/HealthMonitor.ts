@@ -7,6 +7,7 @@ import { amount, bn, toBN } from '../math'
 import { HeightMonitor } from './HeightMonitor'
 import { protocol } from '@wowswap/evm-sdk'
 import { addBreadcrumb } from '../sentry';
+import { Metrics } from '../utils/metrics';
 
 export class HealthMonitor extends AbstractMonitor<boolean> {
   private positions!: DatastoreRepository<Position>
@@ -28,11 +29,8 @@ export class HealthMonitor extends AbstractMonitor<boolean> {
   }
 
   private async checkPairs() {
-    // Temporarily disabled
-    // return;
-
     const height = this.lastHeight
-    await sleep(this.context.sleep)
+    await sleep(this.context.loopSleep)
 
     let pairs = await this.pairs.all()
     let positions = await this.positions.all()
@@ -81,7 +79,7 @@ export class HealthMonitor extends AbstractMonitor<boolean> {
       })),
     )
 
-    pairWithPositionsTotal.forEach((pair) =>
+    pairWithPositionsTotal.forEach((pair) => {
       addBreadcrumb(
         'pair',
         pair.address,
@@ -90,11 +88,28 @@ export class HealthMonitor extends AbstractMonitor<boolean> {
         )} totalPositions: ${pair.positionTotal.human(
           pair.lendable?.decimals,
         )}`,
-      ),
-    )
+      )
+
+      this.context.metrics.update('pair_total_supply', { [pair.path]: Metrics.format(bn(pair.totalSupply)) })
+      this.context.metrics.update('pair_positions_count', {
+        [pair.path]: positions.filter((p) => p.pair === pair.address).length
+      })
+    })
+
+    //
+    // Pair.QueryBottom
+    //
+
+    const queryBottom = Math.min(...pairs.map((p) => p.queryBottom).filter((n) => n > 0))
+    if (queryBottom == Infinity) {
+      this.context.metrics.update('pairs_query_bottom', -1)
+    } else {
+      console.log(`HealthMonitor: lowest queryBottom: ${queryBottom}`)
+      this.context.metrics.update('pairs_query_bottom', queryBottom)
+    }
 
     while (height === this.lastHeight) {
-      await sleep(this.context.sleep)
+      await sleep(this.context.loopSleep)
     }
 
     await this.checkPairs()
@@ -102,7 +117,7 @@ export class HealthMonitor extends AbstractMonitor<boolean> {
 
   private async checkPositions() {
     const height = this.lastHeight
-    await sleep(this.context.sleep)
+    await sleep(this.context.loopSleep)
 
     let positions = await this.positions.all()
     positions = positions.filter((p) => p.amount.gt(amount(0)))
@@ -113,6 +128,9 @@ export class HealthMonitor extends AbstractMonitor<boolean> {
     let not_updated_positions = positions.filter(
       (p) => p.lastUpdatedAt === undefined,
     ) // Positions that were never updated
+
+    this.context.metrics.update('positions_health', {
+      expired: expired_positions.length, not_updated: not_updated_positions.length })
 
     console.log(
       `HealthMonitor: positions count: expired ${expired_positions.length}, never updated ${not_updated_positions.length}`,
@@ -125,7 +143,7 @@ export class HealthMonitor extends AbstractMonitor<boolean> {
     formatted.forEach((pos) => console.log(`HealthMonitor: ${pos}`))
 
     while (height === this.lastHeight) {
-      await sleep(this.context.sleep)
+      await sleep(this.context.loopSleep)
     }
 
     await this.checkPositions()

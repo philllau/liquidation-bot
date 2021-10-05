@@ -21,11 +21,10 @@ import { healthEndpoint } from '../utils/health';
 export type Ctor<T> = new (context: ExecutionContext) => T;
 
 export type InitializeParams = Readonly<{
-  covalentAPI: string;
-  sleep: number;
   startBlock: number;
   privateKey: string;
   sleepTime: number;
+  transferEventsLimit: number;
 }>;
 
 const monitors = [
@@ -44,12 +43,6 @@ type ChannelType<T> = T extends Ctor<AbstractMonitor<infer TChannel>>
   : never;
 
 export class ExecutionContext implements InitializeParams {
-  get covalentAPI() {
-    return this.params.covalentAPI;
-  }
-  get sleep() {
-    return this.params.sleep;
-  }
   get startBlock() {
     return this.params.startBlock;
   }
@@ -58,6 +51,12 @@ export class ExecutionContext implements InitializeParams {
   }
   get sleepTime(): number {
     return this.params.sleepTime
+  }
+  get transferEventsLimit(): number {
+    return this.params.transferEventsLimit
+  }
+  get loopSleep(): number {
+    return 250
   }
 
   monitors: {
@@ -107,7 +106,7 @@ export class ExecutionContext implements InitializeParams {
     app.use(cors({ origin: '*' }))
     app.get('/health', healthEndpoint)
 
-    this.metrics = initMetrics({ express: app, prefix: 'health_bot', defaultLabels: { chainId: this.chainId.toString() } })
+    this.metrics = initMetrics({ express: app, prefix: 'liquidation_bot', defaultLabels: { chainId: this.chainId.toString() } })
 
     server.listen(process.env.PORT, async () => {
       console.log("Server started");
