@@ -1,12 +1,13 @@
+import { protocol } from '@wowswap/evm-sdk'
 import { ethers } from 'ethers'
 import { Observable } from 'observable-fns'
 import { DatastoreRepository } from '../db/repository'
+import { addBreadcrumb, addException } from '../sentry'
 import { defined } from '../utils'
 import { AbstractMonitor } from './AbstractMonitor'
 import { HeightMonitor } from './HeightMonitor'
 import { Pair, Token } from './models'
 import { TokenMonitor } from './TokenMonitor'
-import { addBreadcrumb, addException } from '../sentry'
 
 export class PairMonitor extends AbstractMonitor<Pair> {
   private repository!: DatastoreRepository<Pair>
@@ -153,8 +154,8 @@ export class PairMonitor extends AbstractMonitor<Pair> {
               ? 'getRoutableShortingPair'
               : 'getShortingPair'
             : proxy
-              ? 'getRoutablePair'
-              : 'getPair'
+            ? 'getRoutablePair'
+            : 'getPair'
           const inputs = [
             lendable.address,
             proxy?.address,
@@ -168,8 +169,25 @@ export class PairMonitor extends AbstractMonitor<Pair> {
         }),
       )
 
+      const possiblePairParamsWithSupply = await Promise.all(
+        possiblePairParams
+          .filter(({ address }) => address !== ethers.constants.AddressZero)
+          .map(async (pair) => ({
+            ...pair,
+            totalSupply: await this.context.ctx.core
+              .useCall(
+                this.context.ctx.core.useContract(
+                  protocol.Pair__factory,
+                  pair.address,
+                ),
+                'totalSupply',
+              )
+              .then((bn) => bn.toString()),
+          })),
+      )
+
       this.unfoundPairs.push(
-        ...possiblePairParams
+        ...possiblePairParamsWithSupply
           .map((params, index) => ({ params, index }))
           .filter(
             ({ params }) => params.address === ethers.constants.AddressZero,
@@ -178,9 +196,15 @@ export class PairMonitor extends AbstractMonitor<Pair> {
       )
 
       const pairs = await Promise.all(
-        possiblePairParams
-          .filter(({ address }) => address !== ethers.constants.AddressZero)
-          .map(async ({ lendable, tradable, proxy, address, short }) => {
+        possiblePairParamsWithSupply.map(
+          async ({
+            lendable,
+            tradable,
+            proxy,
+            address,
+            short,
+            totalSupply,
+          }) => {
             let instance = await this.repository.get(address)
 
             const path = [lendable, tradable, proxy]
@@ -208,11 +232,15 @@ export class PairMonitor extends AbstractMonitor<Pair> {
               instance.proxy = proxy?.address
               instance.short = short
               instance.updateAt = 0
+              instance.totalSupply = totalSupply
+              instance.queryBottom = 0
+              instance.queryUpper = 0
 
               await this.repository.put(instance)
             }
             return instance
-          }),
+          },
+        ),
       )
 
       pairs.forEach(this.channel.next.bind(this.channel))

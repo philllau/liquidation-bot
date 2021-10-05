@@ -1,34 +1,32 @@
-import { getAddress } from "@ethersproject/address";
+import { getAddress } from '@ethersproject/address'
 
 export const sleep = (ms: number) =>
-  new Promise((resolve) => setTimeout(resolve, ms));
+  new Promise((resolve) => setTimeout(resolve, ms))
 
-export const mapAll =
-  <TIn, TOut>(func: (el: TIn) => TOut) =>
-  (collection: TIn[]) =>
-    collection.map(func);
+export const mapAll = <TIn, TOut>(func: (el: TIn) => TOut) => (
+  collection: TIn[],
+) => collection.map(func)
 
 export const byteToAddress = (bytes: string) =>
-  getAddress("0x" + bytes.slice(26));
+  getAddress('0x' + bytes.slice(26))
 
 export const defined = <T>(something: T | undefined): something is T =>
-  typeof something !== "undefined";
+  typeof something !== 'undefined'
 
 export const flatten = <TElement>(collection: Array<Array<TElement>>) =>
-  collection.reduce((accumulator, value) => accumulator.concat(value), []);
-
+  collection.reduce((accumulator, value) => accumulator.concat(value), [])
 
 export const logError = (msg: string) => <TError>(e: TError) => {
-  console.error(msg, "\n", e)
+  console.error(msg, '\n', e)
   throw e
 }
 
 function wait(ms: number): Promise<void> {
-  return new Promise((resolve) => setTimeout(resolve, ms));
+  return new Promise((resolve) => setTimeout(resolve, ms))
 }
 
 function waitRandom(min: number, max: number): Promise<void> {
-  return wait(min + Math.round(Math.random() * Math.max(0, max - min)));
+  return wait(min + Math.round(Math.random() * Math.max(0, max - min)))
 }
 
 /**
@@ -36,7 +34,7 @@ function waitRandom(min: number, max: number): Promise<void> {
  */
 export class CancelledError extends Error {
   constructor() {
-    super("Cancelled");
+    super('Cancelled')
   }
 }
 
@@ -54,53 +52,87 @@ export class RetryableError extends Error {}
  */
 export function retry<T>(
   fn: () => Promise<T>,
-  { n, minWait, maxWait }: { n: number; minWait: number; maxWait: number }
+  { n, minWait, maxWait }: { n: number; minWait: number; maxWait: number },
 ): { promise: Promise<T>; cancel: () => void } {
-  let completed = false;
-  let rejectCancelled: (error: Error) => void;
+  let completed = false
+  let rejectCancelled: (error: Error) => void
   const promise = new Promise<T>(async (resolve, reject) => {
-    rejectCancelled = reject;
+    rejectCancelled = reject
     while (true) {
-      let result: T;
+      let result: T
       try {
-        result = await fn();
+        result = await fn()
         if (!completed) {
-          resolve(result);
-          completed = true;
+          resolve(result)
+          completed = true
         }
-        break;
+        break
       } catch (error) {
         if (completed) {
-          break;
+          break
         }
         if (n <= 0) {
-          reject(error);
-          completed = true;
-          break;
+          reject(error)
+          completed = true
+          break
         }
-        n--;
+        n--
       }
-      await waitRandom(minWait, maxWait);
+      await waitRandom(minWait, maxWait)
     }
-  });
+  })
   return {
     promise,
     cancel: () => {
-      if (completed) return;
-      completed = true;
-      rejectCancelled(new CancelledError());
+      if (completed) return
+      completed = true
+      rejectCancelled(new CancelledError())
     },
-  };
+  }
 }
 
 export function isMineRoutine(id: number, instances: number, taskId: number) {
-  return taskId % instances === id;
+  return taskId % instances === id
 }
 
 export function infRetry<T>(fn: () => Promise<T>): Promise<T> {
-  return retry(fn, { n: Infinity, minWait: 250, maxWait: 250 }).promise;
+  return retry(fn, { n: Infinity, minWait: 250, maxWait: 250 }).promise
 }
 
 export function fewRetry<T>(fn: () => Promise<T>): Promise<T> {
-  return retry(fn, { n: 3, minWait: 250, maxWait: 250 }).promise;
+  return retry(fn, { n: 3, minWait: 250, maxWait: 250 }).promise
+}
+
+export function withTimeout<T>(
+  timeoutMs: number,
+  promise: () => Promise<T>,
+  onTimeout: () => void = () => null,
+) {
+  let timeoutHandle: NodeJS.Timeout
+  const timeoutPromise = new Promise((resolve, _reject) => {
+    timeoutHandle = setTimeout(() => {
+      onTimeout()
+      resolve(null)
+    }, timeoutMs)
+  })
+
+  return Promise.race([
+    promise()
+      .then((result) => ({ error: false, result }))
+      .catch((e) => ({ error: e, result: undefined })),
+    timeoutPromise.then(() => ({
+      error: new Error('timeouted'),
+      result: undefined,
+    })),
+  ]).then(({ error, result }) => {
+    clearTimeout(timeoutHandle)
+    if (error) {
+      throw error
+    }
+    if (!result) {
+      throw new Error('no result')
+    }
+
+    return result
+  })
 }

@@ -36,22 +36,6 @@ export class HealthMonitor extends AbstractMonitor<boolean> {
 
     let pairs = await this.pairs.all()
     let positions = await this.positions.all()
-    // {
-    //   const lendableToken = await this.context.db
-    //     .getRepository(Token)
-    //     .get(p.lendable);
-    //   const tradableToken = await this.context.db
-    //     .getRepository(Token)
-    //     .get(p.tradable);
-    //   const proxyToken = p.proxy
-    //     ? await this.context.db.getRepository(Token).get(p.proxy)
-    //     : undefined;
-
-    //   const path = [lendableToken, proxyToken, tradableToken]
-    //     .map((t) => t?.symbol)
-    //     .filter(defined)
-    //     .join("/");
-
     const pairsWithTokens = await Promise.all(
       pairs.map(async (pair) => ({
         ...pair,
