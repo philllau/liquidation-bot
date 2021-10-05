@@ -178,59 +178,66 @@ export class PositionMonitor extends AbstractMonitor<Position> {
           transfers,
           from,
           to,
-        )
+        ).catch((e) => {
+          addException('pair', pair.address, e, { message: 'Failed to get TransferEvents' })
+          return undefined
+        })
 
         return { pair, transferEvents, to }
       }))
 
-      await Promise.all(pairsWithEvents.map(async ({ pair, transferEvents, to }) => {
-        const holders = transferEvents.reduce((map, ev) => {
-          ;[ev.args.to, ev.args.from]
-            .filter(
-              (address) =>
-                address !== pair.address &&
-                address !== ethers.constants.AddressZero,
+      await Promise.all(
+        pairsWithEvents
+          .filter(({ transferEvents }) => typeof transferEvents !== 'undefined')
+          .map(async ({ pair, transferEvents, to }) => {
+            const holders = transferEvents!.reduce((map, ev) => {
+              ;[ev.args.to, ev.args.from]
+                .filter(
+                  (address) =>
+                    address !== pair.address &&
+                    address !== ethers.constants.AddressZero,
+                )
+                .forEach((address) => map.push({ address }))
+
+              return map
+            }, [] as Array<{ address: string }>)
+
+            pair.updateAt = to
+            await this.pairRepository.put(pair)
+
+            const known = await this.repository.find('pair', pair.address)
+            const unknown = holders.filter(
+              (h) => !known.some((k) => k.trader === h.address),
             )
-            .forEach((address) => map.push({ address }))
 
-          return map
-        }, [] as Array<{ address: string }>)
+            await Promise.all(
+              unknown.map(({ address }) => {
+                const position = new Position()
+                position.lendable = pair.lendable
+                position.tradable = pair.tradable
+                position.proxy = pair.proxy
+                position.pair = pair.address
+                position.trader = address
+                position.amount = bn(0)
+                position.value = bn(0)
+                position.selfValue = bn(0)
+                position.principalDebt = bn(0)
+                position.currentDebt = bn(0)
+                position.rate = bn(0)
+                position.currentCost = bn(0)
+                position.liquidationCost = bn(0)
+                position.updateAt = 0
+                position.appearAt = height
 
-        pair.updateAt = to
-        await this.pairRepository.put(pair)
-
-        const known = await this.repository.find('pair', pair.address)
-        const unknown = holders.filter(
-          (h) => !known.some((k) => k.trader === h.address),
-        )
-
-        await Promise.all(
-          unknown.map(({ address }) => {
-            const position = new Position()
-            position.lendable = pair.lendable
-            position.tradable = pair.tradable
-            position.proxy = pair.proxy
-            position.pair = pair.address
-            position.trader = address
-            position.amount = bn(0)
-            position.value = bn(0)
-            position.selfValue = bn(0)
-            position.principalDebt = bn(0)
-            position.currentDebt = bn(0)
-            position.rate = bn(0)
-            position.currentCost = bn(0)
-            position.liquidationCost = bn(0)
-            position.updateAt = 0
-            position.appearAt = height
-
-            return this.repository.put(position)
-          }),
-        )
-      }))
+                return this.repository.put(position)
+              }),
+            )
+          }))
     } catch (e) {
       addException('-', '-', e)
     }
 
+    console.log('Finished updateHolders')
     this.context.metrics.update('position_monitor_update_holders_duration', Number(new Date()) - startedAt)
 
     while (height === this.lastHeight) {
