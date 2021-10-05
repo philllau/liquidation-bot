@@ -87,7 +87,7 @@ export class HealthMonitor extends AbstractMonitor<boolean> {
           pair.lendable?.decimals,
         )} totalPositions: ${pair.positionTotal.human(
           pair.lendable?.decimals,
-        )}`,
+        )} queryBottom: ${pair.queryBottom}`,
       )
 
       this.context.metrics.update('pair_total_supply', { [pair.path]: Metrics.format(bn(pair.totalSupply)) })
@@ -150,20 +150,7 @@ export class HealthMonitor extends AbstractMonitor<boolean> {
   }
 
   private async formatPosition(position: Position) {
-    const lendableToken = await this.context.db
-      .getRepository(Token)
-      .get(position.lendable)
-    const tradableToken = await this.context.db
-      .getRepository(Token)
-      .get(position.tradable)
-    const proxyToken = position.proxy
-      ? await this.context.db.getRepository(Token).get(position.proxy)
-      : undefined
-
-    const path = [lendableToken, proxyToken, tradableToken]
-      .map((t) => t?.symbol)
-      .filter(defined)
-      .join('/')
+    const { path } = await position.getPath(this.context.db)
 
     return `${
       position.lastUpdatedAt === undefined ? 'never updated' : 'expired'

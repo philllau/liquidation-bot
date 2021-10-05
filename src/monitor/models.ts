@@ -221,6 +221,17 @@ export class Position extends DatastoreDocument<Position> {
     const prefix = short ? "10" : '00'
     return [prefix, pair, trader].join("");
   }
+
+  async getPath(db: DatastoreConnection): Promise<{ path: string, tradableToken: Token | undefined }> {
+    const repo = db.getRepository(Token)
+    const lendableToken = await repo.get(this.lendable)
+    const tradableToken = await repo.get(this.tradable)
+    /* eslint no-undefined: "off" */
+    const proxyToken = this.proxy ? await repo.get(this.proxy) : undefined
+    const path = [lendableToken, proxyToken, tradableToken].map((token) => token?.symbol).filter(defined).join('/')
+
+    return { path, tradableToken }
+  }
 }
 
 export class State extends DatastoreDocument<State> {

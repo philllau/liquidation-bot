@@ -4,10 +4,10 @@ import { Observable } from 'observable-fns'
 import { DatastoreRepository } from '../db/repository'
 import { amount, bn, oneEther, oneRay, toBN } from '../math'
 import { addBreadcrumb, addException } from '../sentry'
-import { defined, infRetry, sleep } from '../utils'
+import { infRetry, sleep } from '../utils'
 import { AbstractMonitor } from './AbstractMonitor'
 import { HeightMonitor } from './HeightMonitor'
-import { Pair, Position, Token } from './models'
+import { Pair, Position } from './models'
 import { healthUpdate } from '../utils/health';
 
 // const BATCH_SIZE = 500;
@@ -37,20 +37,7 @@ export class PositionMonitor extends AbstractMonitor<Position> {
     unhealty = await Promise.all(unhealty.map((p) => this.updatePosition(p)))
 
     for (let p of unhealty.filter((p) => p.amount.gt(amount(0)))) {
-      const lendableToken = await this.context.db
-        .getRepository(Token)
-        .get(p.lendable)
-      const tradableToken = await this.context.db
-        .getRepository(Token)
-        .get(p.tradable)
-      const proxyToken = p.proxy
-        ? await this.context.db.getRepository(Token).get(p.proxy)
-        : undefined
-
-      const path = [lendableToken, proxyToken, tradableToken]
-        .map((t) => t?.symbol)
-        .filter(defined)
-        .join('/')
+      const { path, tradableToken } = await p.getPath(this.context.db)
 
       let amount = p.amount
         .decimalPlaces(tradableToken?.decimals!)
@@ -68,9 +55,7 @@ export class PositionMonitor extends AbstractMonitor<Position> {
           addException('pair', p.pair, e, {
             message: `Failed liquidate position of ${path} ${p.trader} ${e.message}`,
           }),
-        )
-
-      console.log('next')
+        ).then(() => this.context.metrics.increment('liquidations', ['successful']))
     }
   }
 
@@ -123,13 +108,22 @@ export class PositionMonitor extends AbstractMonitor<Position> {
 
       await Promise.all(
         pairsWthTotals
-          .filter(({ pair, totalSupply }) => pair.totalSupply != totalSupply)
-          .map(({ pair }) => {
-            addBreadcrumb('pair', pair.address, `Pair become unhealhty`)
-            pair.queryBottom = 0
-            pair.queryUpper = 0
+          .filter((p) => p.totalSupply !== '0')
+          .map(({ pair, totalSupply }) => {
+            if (pair.totalSupply == totalSupply) {
+              // Set pair to synchronized
+              pair.queryBottom = -1
+              pair.queryUpper = -1
 
-            this.pairRepository.put(pair)
+              this.pairRepository.put(pair)
+
+            } else {
+              addBreadcrumb('pair', pair.address, `Pair become unhealhty`)
+              pair.queryBottom = height
+              pair.queryUpper = height
+
+              this.pairRepository.put(pair)
+            }
           })
       )
 
@@ -254,21 +248,7 @@ export class PositionMonitor extends AbstractMonitor<Position> {
       return position
     }
 
-    const lendableToken = await this.context.db
-      .getRepository(Token)
-      .get(position.lendable)
-    const tradableToken = await this.context.db
-      .getRepository(Token)
-      .get(position.tradable)
-    const proxyToken = position.proxy
-      ? await this.context.db.getRepository(Token).get(position.proxy)
-      : undefined
-
-    const path = [lendableToken, proxyToken, tradableToken]
-      .map((t) => t?.symbol)
-      .filter(defined)
-      .join('/')
-
+    const { path } = await position.getPath(this.context.db)
     const inputs = [position.trader, position.lendable]
 
     if (position.proxy) {
