@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - binance-smart-chain
+      - binance/deploy
 
 jobs:
   build:
