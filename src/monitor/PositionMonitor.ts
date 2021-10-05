@@ -8,6 +8,7 @@ import { defined, infRetry, sleep } from '../utils'
 import { AbstractMonitor } from './AbstractMonitor'
 import { HeightMonitor } from './HeightMonitor'
 import { Pair, Position, Token } from './models'
+import { healthUpdate } from '../utils/health';
 
 // const BATCH_SIZE = 500;
 
@@ -237,7 +238,7 @@ export class PositionMonitor extends AbstractMonitor<Position> {
       addException('-', '-', e)
     }
 
-    console.log('Finished updateHolders')
+    healthUpdate()
     this.context.metrics.update('position_monitor_update_holders_duration', Number(new Date()) - startedAt)
 
     while (height === this.lastHeight) {
