@@ -4,11 +4,12 @@ import { Observable } from 'observable-fns'
 import { DatastoreRepository } from '../db/repository'
 import { amount, bn, oneEther, oneRay, toBN } from '../math'
 import { addBreadcrumb, addException } from '../sentry'
-import { infRetry, sleep } from '../utils'
+import { fewRetry, infRetry, sleep } from '../utils'
 import { AbstractMonitor } from './AbstractMonitor'
 import { HeightMonitor } from './HeightMonitor'
 import { Pair, Position } from './models'
 import { healthUpdate } from '../utils/health';
+import axios from 'axios';
 
 // const BATCH_SIZE = 500;
 
@@ -26,9 +27,27 @@ export class PositionMonitor extends AbstractMonitor<Position> {
       this.lastHeight = height
     })
 
-    this.updateHolders()
+    this.launchLoop(this.updatePairs.bind(this))
+    this.launchLoop(this.updateHolders.bind(this))
     this.updatePositions()
     return this.channel
+  }
+
+  async launchLoop(fn: (block: number) => Promise<void>): Promise<void> {
+    /* eslint no-constant-condition: "off" */
+    while (true) {
+      const height = this.lastHeight
+
+      if (height) {
+        healthUpdate(this.context.metrics)
+
+        await fn(height).catch((err) => addException('-', '-', err))
+      }
+
+      while (this.lastHeight <= height) {
+        await sleep(this.context.loopSleep)
+      }
+    }
   }
 
   async liquidateUnhealty() {
@@ -83,163 +102,62 @@ export class PositionMonitor extends AbstractMonitor<Position> {
     this.updatePositions()
   }
 
-  private async updateHolders() {
-    const height = this.lastHeight
+  private async updateHolders(height: number) {
     console.log('update holders at height', height)
     const startedAt = Number(new Date())
 
     let positions = await this.repository.all()
     const pairs = await this.pairRepository.all() //.find("updateAt", { $lt: height });
 
-    //
-    // Validate pairs with areAllPositionsFound: true
-    //
-
-    try {
-      const pairsWthTotals = await Promise.all(pairs.filter(this.areAllPositionsFound(positions)).map(async (pair) => {
-        const totalSupply = await this.context.ctx.core
-          .useCall(
-            this.context.ctx.core.useContract(protocol.Pair__factory, pair.address),
-            'totalSupply',)
-          .then((bn) => bn.toString())
-
-        return { pair, totalSupply }
-      }))
-
-      await Promise.all(
-        pairsWthTotals
-          .filter((p) => p.totalSupply !== '0')
-          .map(({ pair, totalSupply }) => {
-            if (pair.totalSupply == totalSupply) {
-              // Set pair to synchronized
-              pair.queryBottom = -1
-              pair.queryUpper = -1
-
-              this.pairRepository.put(pair)
-
-            } else {
-              addBreadcrumb('pair', pair.address, `Pair become unhealhty`)
-              pair.queryBottom = height
-              pair.queryUpper = height
-
-              this.pairRepository.put(pair)
-            }
+    const pairsWithHolders = await Promise.all(pairs
+      .filter((pair) => pair.totalSupply !== '0')
+      .filter(PositionMonitor.areAllPositionsFound(positions, false))
+      .map(async (pair, i) => {
+        return {
+          pair,
+          holders: await this.updateHoldersForPair(pair).catch((e) => {
+            addException('pair', pair.address, e, { message: 'Failed to get TransferEvents' })
+            return []
           })
-      )
-
-      //
-      // Try to find positions for pairs with areAllPositionsFound: false
-      //
-
-      const pairsWithRanges = await Promise.all(pairs.filter(this.areAllPositionsFound(positions, false))
-        .filter((p) => p.totalSupply !== '0')
-        .map(async (pair) => {
-          const { path, tradableToken } = await pair.getPath(this.context.db)
-
-          if (!pair.queryBottom || !pair.queryUpper) {
-            pair.queryUpper = pair.queryBottom = height
-          }
-
-          const from = Math.max(
-            this.context.startBlock,
-            pair.queryBottom - this.context.transferEventsLimit,
-          )
-          const to = Math.min(pair.queryBottom)
-
-          pair.queryBottom = from
-
-          addBreadcrumb(
-            'pair',
-            pair.address,
-            `Need holders of ${path} (total supply is ${bn(
-              pair.totalSupply,
-            ).human(tradableToken?.decimals)} ${
-              tradableToken?.symbol
-            }) (from ${from} to ${to})`,
-          )
-
-          return { pair, from, to }
-        }))
-
-      const pairsWithEvents = await Promise.all(pairsWithRanges.map(async ({ pair, from, to }) => {
-        const pairContract = this.context.ctx.core.useContract(
-          protocol.Pair__factory,
-          pair.address,
-        )
-
-        const transfers = pairContract.filters.Transfer(null, null, null)
-
-        const transferEvents = await pairContract.queryFilter(
-          transfers,
-          from,
-          to,
-        ).catch((e) => {
-          addException('pair', pair.address, e, { message: 'Failed to get TransferEvents' })
-          return undefined
-        })
-
-        return { pair, transferEvents, to }
+        }
       }))
 
-      await Promise.all(
-        pairsWithEvents
-          .filter(({ transferEvents }) => typeof transferEvents !== 'undefined')
-          .map(async ({ pair, transferEvents, to }) => {
-            const holders = transferEvents!.reduce((map, ev) => {
-              ;[ev.args.to, ev.args.from]
-                .filter(
-                  (address) =>
-                    address !== pair.address &&
-                    address !== ethers.constants.AddressZero,
-                )
-                .forEach((address) => map.push({ address }))
+    await Promise.all(
+      pairsWithHolders
+        .map(async ({ pair, holders }) => {
+          const known = await this.repository.find('pair', pair.address)
+          const unknown = holders.filter(
+            (h) => !known.some((k) => k.trader === h.address),
+          )
 
-              return map
-            }, [] as Array<{ address: string }>)
+          await Promise.all(
+            unknown.map(({ address }) => {
+              const position = new Position()
+              position.lendable = pair.lendable
+              position.tradable = pair.tradable
+              position.proxy = pair.proxy
+              position.short = pair.short
+              position.pair = pair.address
+              position.trader = address
+              position.amount = bn(0)
+              position.value = bn(0)
+              position.selfValue = bn(0)
+              position.principalDebt = bn(0)
+              position.currentDebt = bn(0)
+              position.rate = bn(0)
+              position.currentCost = bn(0)
+              position.liquidationCost = bn(0)
+              position.updateAt = 0
+              position.appearAt = height
+              position.lastUpdatedAt = Date.now()
 
-            pair.updateAt = to
-            await this.pairRepository.put(pair)
-
-            const known = await this.repository.find('pair', pair.address)
-            const unknown = holders.filter(
-              (h) => !known.some((k) => k.trader === h.address),
-            )
-
-            await Promise.all(
-              unknown.map(({ address }) => {
-                const position = new Position()
-                position.lendable = pair.lendable
-                position.tradable = pair.tradable
-                position.proxy = pair.proxy
-                position.pair = pair.address
-                position.trader = address
-                position.amount = bn(0)
-                position.value = bn(0)
-                position.selfValue = bn(0)
-                position.principalDebt = bn(0)
-                position.currentDebt = bn(0)
-                position.rate = bn(0)
-                position.currentCost = bn(0)
-                position.liquidationCost = bn(0)
-                position.updateAt = 0
-                position.appearAt = height
-
-                return this.repository.put(position)
-              }),
-            )
-          }))
-    } catch (e) {
-      addException('-', '-', e)
-    }
+              return this.repository.put(position)
+            }),
+          )
+        }))
 
     healthUpdate(this.context.metrics)
     this.context.metrics.update('position_monitor_update_holders_duration', Number(new Date()) - startedAt)
-
-    while (height === this.lastHeight) {
-      await sleep(this.context.loopSleep)
-    }
-
-    this.updateHolders()
   }
 
   async updatePosition(position: Position) {
@@ -314,6 +232,8 @@ export class PositionMonitor extends AbstractMonitor<Position> {
         .decimalPlaces(27)
         .dividedBy(oneRay)}, value: ${position.value
         .decimalPlaces(18)
+        .dividedBy(oneEther)}), amount: ${position.amount
+        .decimalPlaces(18)
         .dividedBy(oneEther)})`,
     )
 
@@ -325,7 +245,128 @@ export class PositionMonitor extends AbstractMonitor<Position> {
     return position
   }
 
-  private areAllPositionsFound(positions: Position[], condition: boolean = true): (pair: Pair) => boolean {
+  private async updateHoldersForPair(pair: Pair): Promise<Array<{ address: string }>> {
+    const covalentHolders = await this.requestCovalentHolders(pair).catch((e) => {
+      addException('pair', pair.address, e, { response: e.response.data })
+      return []
+    })
+
+    // request holders from api, if present return them and skip rest of this method
+    if (covalentHolders.length > 0) {
+      addBreadcrumb('pair', pair.address, `Got ${covalentHolders.length} holders from Covalent`)
+      return covalentHolders
+    }
+
+    let ranges = [];
+    if (pair.queryBottom === 0) {
+      pair.queryBottom = this.lastHeight
+      pair.queryUpper = this.lastHeight
+    }
+
+    if (pair.queryBottom > this.context.startBlock) {
+      const from = Math.max(
+        this.context.startBlock,
+        pair.queryBottom - this.context.transferEventsLimit,
+      )
+      const to = pair.queryBottom
+
+      pair.queryBottom = from
+
+      ranges.push({ from, to })
+    }
+
+    if (pair.queryUpper !== 0) {
+      const from = pair.queryUpper
+      const to = Math.min(
+        this.lastHeight,
+        pair.queryUpper + this.context.transferEventsLimit,
+      )
+
+      pair.queryUpper = to
+
+      ranges.push({ from, to })
+    }
+
+    const transferEvents = (await Promise.all(ranges.map(async({ from, to }) => {
+      const pairContract = this.context.ctx.core.useContract(protocol.Pair__factory, pair.address)
+
+      const transfers = pairContract.filters.Transfer(null, null, null)
+      const events = await pairContract.queryFilter(
+        transfers,
+        from,
+        to
+      )
+
+      const { path, tradableToken } = await pair.getPath(this.context.db)
+      addBreadcrumb(
+        'pair',
+        pair.address,
+        `Got ${events.length} events with holders of ${path} (total supply is ` +
+        `${bn(pair.totalSupply).human(tradableToken?.decimals)} ` +
+        `${tradableToken?.symbol}) (from ${from} to ${to}) ${from === pair.queryBottom ? 'bottom' : 'up'}`
+      )
+
+      return events
+    }))).flat()
+
+    await this.pairRepository.put(pair)
+
+    return transferEvents!.reduce((map, ev) => {
+      ;[ev.args.to, ev.args.from]
+        .filter(
+          (address) =>
+            address !== pair.address &&
+            address !== ethers.constants.AddressZero,
+        )
+        .forEach((address) => map.push({ address }))
+
+      return map
+    }, [] as Array<{ address: string }>)
+  }
+
+  private async requestCovalentHolders(pair: Pair): Promise<Array<{ address: string }>> {
+    // If key is blank or chain is not supported, use other methods
+    if (this.context.covalentApiKey.length === 0 || ![1, 56, 137, 43114].includes(this.context.chainId)) {
+      return []
+    }
+
+    return await fewRetry(() =>
+      axios
+        .get<{
+          data: { items: Array<{ address: string }> };
+        }>(
+          `https://api.covalenthq.com/v1/${this.context.chainId}/tokens/${pair.address}/token_holders/`,
+          {
+            params: {
+              key: this.context.covalentApiKey,
+            },
+          }
+        )
+        .then((r) => r.data.data.items)
+    );
+  }
+
+  async updatePairs() {
+    const pairs = await this.pairRepository.all()
+
+    await Promise.all(pairs.map(async (pair) => {
+      const totalSupply = await this.context.ctx.core
+        .useCall(this.context.ctx.core.useContract(protocol.Pair__factory, pair.address), 'totalSupply')
+        .then((bn) => bn.toString())
+        .catch((e) => {
+          addException('pair', pair.address, e)
+          return undefined
+        })
+
+      if (typeof totalSupply !== 'undefined' && pair.totalSupply != totalSupply) {
+        pair.totalSupply = totalSupply
+
+        return this.pairRepository.put(pair)
+      }
+    }))
+  }
+
+  static areAllPositionsFound(positions: Position[], condition: boolean = true): (pair: Pair) => boolean {
     return (pair) => {
       const pairPositions = positions.filter((p) => p.pair === pair.address)
       const pairPositionsTotal = pairPositions.reduce(

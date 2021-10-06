@@ -15,5 +15,6 @@ run({
   privateKey: PRIVATE_KEY,
   startBlock,
   sleepTime,
-  transferEventsLimit
+  transferEventsLimit,
+  covalentApiKey: 'ckey_44edb98eba8941749fba9b9b9eb'
 });

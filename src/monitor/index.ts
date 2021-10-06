@@ -25,6 +25,7 @@ export type InitializeParams = Readonly<{
   privateKey: string;
   sleepTime: number;
   transferEventsLimit: number;
+  covalentApiKey: string;
 }>;
 
 const monitors = [
@@ -57,6 +58,9 @@ export class ExecutionContext implements InitializeParams {
   }
   get loopSleep(): number {
     return 250
+  }
+  get covalentApiKey(): string {
+    return this.params.covalentApiKey
   }
 
   monitors: {

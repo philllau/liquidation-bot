@@ -1,4 +1,3 @@
-import { protocol } from '@wowswap/evm-sdk'
 import { ethers } from 'ethers'
 import { Observable } from 'observable-fns'
 import { DatastoreRepository } from '../db/repository'
@@ -169,25 +168,8 @@ export class PairMonitor extends AbstractMonitor<Pair> {
         }),
       )
 
-      const possiblePairParamsWithSupply = await Promise.all(
-        possiblePairParams
-          .filter(({ address }) => address !== ethers.constants.AddressZero)
-          .map(async (pair) => ({
-            ...pair,
-            totalSupply: await this.context.ctx.core
-              .useCall(
-                this.context.ctx.core.useContract(
-                  protocol.Pair__factory,
-                  pair.address,
-                ),
-                'totalSupply',
-              )
-              .then((bn) => bn.toString()),
-          })),
-      )
-
       this.unfoundPairs.push(
-        ...possiblePairParamsWithSupply
+        ...possiblePairParams
           .map((params, index) => ({ params, index }))
           .filter(
             ({ params }) => params.address === ethers.constants.AddressZero,
@@ -196,15 +178,9 @@ export class PairMonitor extends AbstractMonitor<Pair> {
       )
 
       const pairs = await Promise.all(
-        possiblePairParamsWithSupply.map(
-          async ({
-            lendable,
-            tradable,
-            proxy,
-            address,
-            short,
-            totalSupply,
-          }) => {
+        possiblePairParams
+          .filter(({ address }) => address.toLowerCase() !== ethers.constants.AddressZero)
+          .map(async ({ lendable, tradable, proxy, address, short}) => {
             let instance = await this.repository.get(address)
 
             const path = [lendable, tradable, proxy]
@@ -232,7 +208,7 @@ export class PairMonitor extends AbstractMonitor<Pair> {
               instance.proxy = proxy?.address
               instance.short = short
               instance.updateAt = 0
-              instance.totalSupply = totalSupply
+              instance.totalSupply = '0'
               instance.queryBottom = 0
               instance.queryUpper = 0
 

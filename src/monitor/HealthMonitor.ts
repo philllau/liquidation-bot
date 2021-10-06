@@ -3,9 +3,8 @@ import { DatastoreRepository } from '../db/repository'
 import { defined, sleep } from '../utils'
 import { AbstractMonitor } from './AbstractMonitor'
 import { Pair, Position, Token } from './models'
-import { amount, bn, toBN } from '../math'
+import { amount, bn } from '../math'
 import { HeightMonitor } from './HeightMonitor'
-import { protocol } from '@wowswap/evm-sdk'
 import { addBreadcrumb } from '../sentry';
 import { Metrics } from '../utils/metrics';
 
@@ -52,18 +51,18 @@ export class HealthMonitor extends AbstractMonitor<boolean> {
       })),
     )
 
-    let pairsWithTotals = await Promise.all(
-      pairsWithPaths.map(async (pair) => ({
-        ...pair,
-        total: await this.context.ctx.core.useCall(
-          this.context.ctx.core.useContract(protocol.Pair__factory, pair.address),
-          'totalSupply'
-        ).then(toBN),
-      })),
-    )
+    // let pairsWithTotals = await Promise.all(
+    //   pairsWithPaths.map(async (pair) => ({
+    //     ...pair,
+    //     total: await this.context.ctx.core.useCall(
+    //       this.context.ctx.core.useContract(protocol.Pair__factory, pair.address),
+    //       'totalSupply'
+    //     ).then(toBN),
+    //   })),
+    // )
 
     let pairsWithPositions = await Promise.all(
-      pairsWithTotals.map(async (pair) => ({
+      pairsWithPaths.map(async (pair) => ({
         ...pair,
         positions: positions.filter((p) => p.pair === pair.address),
       })),
@@ -79,30 +78,44 @@ export class HealthMonitor extends AbstractMonitor<boolean> {
       })),
     )
 
-    pairWithPositionsTotal.forEach((pair) => {
-      addBreadcrumb(
-        'pair',
-        pair.address,
-        `${pair.short ? 'SHORT' : 'LONG'} ${pair.path} totalSupply: ${pair.total.human(
-          pair.lendable?.decimals,
-        )} totalPositions: ${pair.positionTotal.human(
-          pair.lendable?.decimals,
-        )} queryBottom: ${pair.queryBottom}`,
-      )
+    pairWithPositionsTotal
+      .sort((p1, p2) => p1.totalSupply === p2.totalSupply
+        ? p1.path.localeCompare(p2.path)
+        : bn(p1.totalSupply).comparedTo(bn(p2.totalSupply)))
+      .forEach((pair) => {
+        addBreadcrumb(
+          'pair',
+          pair.address,
+          `${pair.short ? 'SHORT' : 'LONG '} ${pair.path} totalSupply: ${bn(pair.totalSupply).human(
+            pair.lendable?.decimals,
+          )} totalPositions: ${pair.positionTotal.human(
+            pair.lendable?.decimals,
+          )} queryBottom: ${pair.queryBottom}`,
+        )
 
-      this.context.metrics.update('pair_total_supply', { [pair.path]: Metrics.format(bn(pair.totalSupply)) })
-      this.context.metrics.update('pair_positions_count', {
-        [pair.path]: positions.filter((p) => p.pair === pair.address).length
+        this.context.metrics.update('pair_total_supply', { [pair.path]: Metrics.format(bn(pair.totalSupply)) })
+        this.context.metrics.update('pair_positions_count', {
+          [pair.path]: positions.filter((p) => p.pair === pair.address).length
+        })
       })
-    })
 
     //
     // Pair.QueryBottom
     //
 
-    const queryBottom = Math.min(...pairs.map((p) => p.queryBottom).filter((n) => n > 0))
-    if (queryBottom == Infinity) {
-      this.context.metrics.update('pairs_query_bottom', -1)
+    const notSyncedPairs = pairWithPositionsTotal.map(({ queryBottom, totalSupply, positionTotal  }) => {
+      if (bn(totalSupply).eq(positionTotal)) {
+        return 0
+      } else {
+        return queryBottom - this.context.startBlock
+      }
+    }).filter((n) => n > 0)
+    const queryBottom = Math.min(...notSyncedPairs)
+
+    this.context.metrics.update('pairs_not_synced_count', notSyncedPairs.length)
+
+    if (notSyncedPairs.length === 0) {
+      this.context.metrics.update('pairs_query_bottom', 0)
     } else {
       console.log(`HealthMonitor: lowest queryBottom: ${queryBottom}`)
       this.context.metrics.update('pairs_query_bottom', queryBottom)
@@ -132,9 +145,6 @@ export class HealthMonitor extends AbstractMonitor<boolean> {
     this.context.metrics.update('positions_health', {
       expired: expired_positions.length, not_updated: not_updated_positions.length })
 
-    console.log(
-      `HealthMonitor: positions count: expired ${expired_positions.length}, never updated ${not_updated_positions.length}`,
-    )
     let formatted = await Promise.all(
       expired_positions
         .concat(not_updated_positions)
