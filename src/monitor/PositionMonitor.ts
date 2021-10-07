@@ -4,7 +4,7 @@ import { Observable } from 'observable-fns'
 import { DatastoreRepository } from '../db/repository'
 import { amount, bn, oneEther, oneRay, toBN } from '../math'
 import { addBreadcrumb, addException } from '../sentry'
-import { fewRetry, infRetry, sleep } from '../utils'
+import { defined, fewRetry, infRetry, sleep } from '../utils'
 import { AbstractMonitor } from './AbstractMonitor'
 import { HeightMonitor } from './HeightMonitor'
 import { Pair, Position } from './models'
@@ -74,7 +74,11 @@ export class PositionMonitor extends AbstractMonitor<Position> {
           addException('pair', p.pair, e, {
             message: `Failed liquidate position of ${path} ${p.trader} ${e.message}`,
           }),
-        ).then(() => this.context.metrics.increment('liquidations', ['successful']))
+        ).then((v) => {
+          if (defined(v)) { // If call was successful
+            this.context.metrics.increment('liquidations', ['successful'])
+          }
+        })
     }
   }
 
@@ -246,10 +250,7 @@ export class PositionMonitor extends AbstractMonitor<Position> {
   }
 
   private async updateHoldersForPair(pair: Pair): Promise<Array<{ address: string }>> {
-    const covalentHolders = await this.requestCovalentHolders(pair).catch((e) => {
-      addException('pair', pair.address, e, { response: e.response.data })
-      return []
-    })
+    const covalentHolders = await this.requestCovalentHolders(pair).catch((_) => [])
 
     // request holders from api, if present return them and skip rest of this method
     if (covalentHolders.length > 0) {
@@ -295,7 +296,7 @@ export class PositionMonitor extends AbstractMonitor<Position> {
         transfers,
         from,
         to
-      )
+      ).catch((_) => [])
 
       const { path, tradableToken } = await pair.getPath(this.context.db)
       addBreadcrumb(
