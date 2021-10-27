@@ -2,6 +2,7 @@ import { AbstractMonitor } from './AbstractMonitor'
 import { Block } from '@ethersproject/abstract-provider'
 import { Observable } from 'observable-fns'
 import { infRetry } from '../utils'
+import { addException } from '../sentry';
 
 export class HeightMonitor extends AbstractMonitor<number> {
   public latest: number = 0
@@ -23,7 +24,8 @@ export class HeightMonitor extends AbstractMonitor<number> {
     await infRetry(() =>
       this.context.ctx.provider.
       getBlock('latest').
-      then(this.onHeight.bind(this)))
+      then(this.onHeight.bind(this)).
+      catch((err) => addException('-', '-', err)))
   }
 
   async run(): Promise<Observable<number>> {

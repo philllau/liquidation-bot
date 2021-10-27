@@ -135,9 +135,13 @@ export class HealthMonitor extends AbstractMonitor<boolean> {
     let positions = await this.positions.all()
     positions = positions.filter((p) => p.amount.gt(amount(0)))
 
+    positions.forEach((pos) => {
+      this.context.metrics.update('pos_health', { [[pos.pair, pos.trader].join('_')]: Metrics.format(pos.health.mul(100)) })
+    })
+
     let expired_positions = positions.filter(
-      (p) => p.lastUpdatedAt! < Date.now() - 180_000,
-    ) // Positions updated earlier than 3 minutes ago
+      (p) => p.lastUpdatedAt! < Date.now() - 600_000,
+    ) // Positions updated earlier than 10 minutes ago
     let not_updated_positions = positions.filter(
       (p) => p.lastUpdatedAt === undefined,
     ) // Positions that were never updated
