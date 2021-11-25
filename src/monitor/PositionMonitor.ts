@@ -243,7 +243,6 @@ export class PositionMonitor extends AbstractMonitor<Position> {
 
     await this.repository.put(position).catch((e) => {
       addException('pair', position.pair, e, { position: position.toString() })
-      throw e
     })
 
     return position
