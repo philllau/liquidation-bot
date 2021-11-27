@@ -12,7 +12,6 @@ export class HealthMonitor extends AbstractMonitor<boolean> {
   private positions!: DatastoreRepository<Position>
   private pairs!: DatastoreRepository<Pair>
   private tokens!: DatastoreRepository<Token>
-  private lastHeight = 0
 
   async run(): Promise<Observable<boolean>> {
     this.positions = this.context.db.getRepository(Position)

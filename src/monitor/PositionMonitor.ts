@@ -4,21 +4,16 @@ import { Observable } from 'observable-fns'
 import { DatastoreRepository } from '../db/repository'
 import { amount, bn, oneEther, oneRay, toBN } from '../math'
 import { addBreadcrumb, addException } from '../sentry'
-import { defined, fewRetry, infRetry, sleep } from '../utils'
+import { defined, fewRetry, infRetry } from '../utils'
 import { AbstractMonitor } from './AbstractMonitor'
 import { HeightMonitor } from './HeightMonitor'
 import { Pair, Position } from './models'
 import { healthUpdate } from '../utils/health';
 import axios from 'axios';
 
-// const BATCH_SIZE = 500;
-
 export class PositionMonitor extends AbstractMonitor<Position> {
   private repository!: DatastoreRepository<Position>
   private pairRepository!: DatastoreRepository<Pair>
-
-  // private connections: Record<string, Signer> = {};
-  private lastHeight = 0
 
   async run(): Promise<Observable<Position>> {
     this.repository = this.context.db.getRepository(Position)
@@ -29,25 +24,8 @@ export class PositionMonitor extends AbstractMonitor<Position> {
 
     this.launchLoop(this.updatePairs.bind(this))
     this.launchLoop(this.updateHolders.bind(this))
-    this.updatePositions()
+    this.launchLoop(this.updatePositions.bind(this))
     return this.channel
-  }
-
-  async launchLoop(fn: (block: number) => Promise<void>): Promise<void> {
-    /* eslint no-constant-condition: "off" */
-    while (true) {
-      const height = this.lastHeight
-
-      if (height) {
-        healthUpdate(this.context.metrics)
-
-        await fn(height).catch((err) => addException('-', '-', err))
-      }
-
-      while (this.lastHeight <= height) {
-        await sleep(this.context.loopSleep)
-      }
-    }
   }
 
   async liquidateUnhealty() {
@@ -82,13 +60,10 @@ export class PositionMonitor extends AbstractMonitor<Position> {
     }
   }
 
-  private async updatePositions() {
-    const height = this.lastHeight
+  private async updatePositions(height: number) {
     console.log('update positions at height', height)
 
-    const positionToUpdate = await this.repository.find('updateAt', {
-      $lt: height,
-    })
+    const positionToUpdate = await this.repository.all();
     await Promise.all(
       positionToUpdate.map((position) => this.updatePosition(position)),
     ).catch((e) =>
@@ -98,12 +73,6 @@ export class PositionMonitor extends AbstractMonitor<Position> {
     await this.liquidateUnhealty().catch((e) =>
       addException('-', '-', e, { message: `Failed liquidation run` }),
     )
-
-    while (height === this.lastHeight) {
-      await sleep(this.context.loopSleep)
-    }
-
-    this.updatePositions()
   }
 
   private async updateHolders(height: number) {
