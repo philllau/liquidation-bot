@@ -1,7 +1,7 @@
 import BigNumber from "bignumber.js";
 import { Expose, Transform } from "class-transformer";
 import { DatastoreDocument, Index, Key } from "../db/document";
-import { bn, ray } from "../math";
+import { amount, bn, ray } from "../math";
 import { defined } from '../utils';
 import { DatastoreConnection } from '../db/connection';
 
@@ -177,6 +177,15 @@ export class Position extends DatastoreDocument<Position> {
 
   lastUpdatedAt?: number;
 
+  @BigNumberTransform()
+  expirationDate?: BigNumber;
+  @BigNumberTransform()
+  stopLossPercentage?: BigNumber;
+  @BigNumberTransform()
+  takeProfitPercentage?: BigNumber;
+  @BigNumberTransform()
+  terminationReward?: BigNumber;
+
   @BigNumberIndex()
   @BigNumberTransform()
   amount!: BigNumber;
@@ -231,6 +240,35 @@ export class Position extends DatastoreDocument<Position> {
     const path = [lendableToken, proxyToken, tradableToken].map((token) => token?.symbol).filter(defined).join('/')
 
     return { path, tradableToken }
+  }
+
+  static isTerminable(pos: Position): boolean {
+    if (pos.selfValue.isZero()) {
+      return false
+    }
+
+    const stopLoss = pos.stopLossPercentage || bn(0)
+    const takeProfit = pos.takeProfitPercentage || bn(0)
+
+    let profitValue: BigNumber;
+
+    if (pos.short) {
+      const diff = pos.currentCost.gt(pos.currentDebt) ? pos.currentCost.sub(pos.currentDebt) : bn(0)
+      const debt = pos.amount.wadMul(amount(1).sub(diff.wadDiv(pos.currentCost)))
+      profitValue = pos.amount.sub(debt).sub(pos.selfValue)
+    } else {
+      profitValue = pos.currentCost.sub(pos.currentDebt).sub(pos.selfValue)
+    }
+
+    const profit = profitValue.mul(100).div(pos.selfValue).add(100)
+
+    if (stopLoss.gt(0)) {
+      return profit.lte(stopLoss)
+    } else if (takeProfit.gt(0)) {
+      return profit.gte(takeProfit)
+    }
+
+    return false
   }
 }
 

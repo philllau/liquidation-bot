@@ -1,8 +1,8 @@
 import { ethers } from 'ethers'
-import { protocol } from '@wowswap/evm-sdk'
+import { oneEther, protocol } from '@wowswap/evm-sdk'
 import { Observable } from 'observable-fns'
 import { DatastoreRepository } from '../db/repository'
-import { amount, bn, oneEther, oneRay, toBN } from '../math'
+import { amount, bn, oneRay, toBN } from '../math'
 import { addBreadcrumb, addException } from '../sentry'
 import { defined, fewRetry, infRetry } from '../utils'
 import { AbstractMonitor } from './AbstractMonitor'
@@ -10,6 +10,7 @@ import { HeightMonitor } from './HeightMonitor'
 import { Pair, Position } from './models'
 import { healthUpdate } from '../utils/health';
 import axios from 'axios';
+import BigNumber from 'bignumber.js';
 
 export class PositionMonitor extends AbstractMonitor<Position> {
   private repository!: DatastoreRepository<Position>
@@ -22,18 +23,24 @@ export class PositionMonitor extends AbstractMonitor<Position> {
       this.lastHeight = height
     })
 
-    this.launchLoop(this.updatePairs.bind(this))
-    this.launchLoop(this.updateHolders.bind(this))
-    this.launchLoop(this.updatePositions.bind(this))
+    this.launchLoop(this.updatePairs.bind(this)).then(_ => {
+      // Loop launched, do nothing
+    })
+    this.launchLoop(this.updateHolders.bind(this)).then(_ => {
+      // Loop launched, do nothing
+    })
+    this.launchLoop(this.updatePositions.bind(this)).then(_ => {
+      // Loop launched, do nothing
+    })
     return this.channel
   }
 
-  async liquidateUnhealty() {
-    let unhealty = await this.repository.find('health', { $eq: amount(0) })
-    unhealty = unhealty.filter((p) => p.amount.gt(amount(0)))
-    unhealty = await Promise.all(unhealty.map((p) => this.updatePosition(p)))
+  async liquidateUnhealthy() {
+    let unhealthy = await this.repository.find('health', { $eq: amount(0) })
+    unhealthy = unhealthy.filter((p) => p.amount.gt(amount(0)))
+    unhealthy = await Promise.all(unhealthy.map((p) => this.updatePosition(p)))
 
-    for (let p of unhealty.filter((p) => p.amount.gt(amount(0)))) {
+    for (let p of unhealthy.filter((p) => p.amount.gt(amount(0)))) {
       const { path, tradableToken } = await p.getPath(this.context.db)
 
       let amount = p.amount
@@ -44,8 +51,7 @@ export class PositionMonitor extends AbstractMonitor<Position> {
         + `${p.trader} - ${amount.toString()} ${tradableToken?.symbol}, `
         + `health: ${p.health.decimalPlaces(27).dividedBy(oneRay)}`);
 
-      await new protocol.Pair__factory(this.context.signer)
-        .attach(p.pair)
+      await protocol.IPair__factory.connect(p.pair, this.context.signer)
         .liquidatePosition(p.trader, this.context.signer.address)
         .then((tx) => tx.wait())
         .catch((e) =>
@@ -55,6 +61,36 @@ export class PositionMonitor extends AbstractMonitor<Position> {
         ).then((v) => {
           if (defined(v)) { // If call was successful
             this.context.metrics.increment('liquidations', ['successful'])
+          }
+        })
+    }
+  }
+
+  async terminateUnhealthy() {
+    const positions = await this.repository.all()
+    let terminable = positions.filter(Position.isTerminable)
+    terminable = await Promise.all(terminable.map((p) => this.updatePosition(p)))
+
+    for (let p of terminable.filter(Position.isTerminable)) {
+      const { path, tradableToken } = await p.getPath(this.context.db)
+
+      let amount = p.amount
+        .decimalPlaces(tradableToken?.decimals!)
+        .dividedBy(bn(10).pow(tradableToken!.decimals))
+
+      addBreadcrumb('pair', p.pair, `Terminate position: ${path} `
+        + `${p.trader} - ${amount.toString()} ${tradableToken?.symbol}`);
+
+      await protocol.IPair__factory.connect(p.pair, this.context.signer)
+        .terminatePosition(p.trader)
+        .then((tx) => tx.wait())
+        .catch((e) =>
+          addException('pair', p.pair, e, {
+            message: `Failed terminate position of ${path} ${p.trader} ${e.message}`,
+          }),
+        ).then((v) => {
+          if (defined(v)) { // If call was successful
+            this.context.metrics.increment('terminations', ['successful'])
           }
         })
     }
@@ -70,8 +106,11 @@ export class PositionMonitor extends AbstractMonitor<Position> {
       addException('-', '-', e, { message: `Failed update position run` }),
     )
 
-    await this.liquidateUnhealty().catch((e) =>
+    await this.liquidateUnhealthy().catch((e) =>
       addException('-', '-', e, { message: `Failed liquidation run` }),
+    )
+    await this.terminateUnhealthy().catch((e) =>
+      addException('-', '-', e, { message: `Failed termination run` }),
     )
   }
 
@@ -85,7 +124,7 @@ export class PositionMonitor extends AbstractMonitor<Position> {
     const pairsWithHolders = await Promise.all(pairs
       .filter((pair) => pair.totalSupply !== '0')
       .filter(PositionMonitor.areAllPositionsFound(positions, false))
-      .map(async (pair, i) => {
+      .map(async (pair) => {
         return {
           pair,
           holders: await this.updateHoldersForPair(pair).catch((e) => {
@@ -135,6 +174,12 @@ export class PositionMonitor extends AbstractMonitor<Position> {
 
   async updatePosition(position: Position) {
     if (position.amount.eq(bn(0)) && position.appearAt < position.updateAt) {
+      position.lastUpdatedAt = Date.now()
+
+      await this.repository.put(position).catch((e) => {
+        addException('pair', position.pair, e, { position: position.toString() })
+      })
+
       // Already fresh and empty position
       return position
     }
@@ -157,7 +202,7 @@ export class PositionMonitor extends AbstractMonitor<Position> {
         : 'getPosition'
 
     const [
-      amount,
+      posAmount,
       value,
       selfValue,
       principalDebt,
@@ -165,8 +210,12 @@ export class PositionMonitor extends AbstractMonitor<Position> {
       rate,
       currentCost,
       liquidationCost,
-      updateAt,
-    ] = await infRetry(() =>
+      expirationDate,
+      stopLossPercentage,
+      takeProfitPercentage,
+      terminationReward,
+      updateAt
+    ]: BigNumber[] = await infRetry(() =>
       this.context.ctx.core
         .useCallWithBlock(
           this.context.ctx.router.router,
@@ -175,7 +224,7 @@ export class PositionMonitor extends AbstractMonitor<Position> {
         )
         .then(({ result, blockHeight }) => {
           // @ts-ignore
-          return [...result.map(toBN), toBN(blockHeight)]
+          return [...result.flat().map(toBN), toBN(blockHeight)]
         })
         .catch((e) => {
           addException('pair', position.pair, e, {
@@ -185,7 +234,7 @@ export class PositionMonitor extends AbstractMonitor<Position> {
         }),
     )
 
-    position.amount = amount
+    position.amount = posAmount
     position.value = value
     position.selfValue = selfValue
     position.principalDebt = principalDebt
@@ -195,6 +244,10 @@ export class PositionMonitor extends AbstractMonitor<Position> {
     position.liquidationCost = liquidationCost
     position.updateAt = updateAt.toNumber()
     position.lastUpdatedAt = Date.now()
+    position.expirationDate = expirationDate
+    position.stopLossPercentage = stopLossPercentage
+    position.takeProfitPercentage = takeProfitPercentage
+    position.terminationReward = terminationReward
 
     addBreadcrumb(
       'pair',
