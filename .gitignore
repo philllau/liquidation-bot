@@ -9,3 +9,5 @@ lib
 .env
 .snapshot
 docker-compose.yml
+
+tsconfig.tsbuildinfo

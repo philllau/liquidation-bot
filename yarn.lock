@@ -548,9 +548,9 @@
     "@types/mime" "^1"
     "@types/node" "*"
 
-"@wowswap/evm-sdk@git+https://github.com/wowswap-io/evm-sdk.git#8a9ae05c53b7e52bd2a852651c4df062a5909d63":
+"@wowswap/evm-sdk@git+https://github.com/wowswap-io/evm-sdk.git#e37c9b19d920ccbccdd9df246ad1180c0eb3cfce":
   version "1.0.0"
-  resolved "git+https://github.com/wowswap-io/evm-sdk.git#8a9ae05c53b7e52bd2a852651c4df062a5909d63"
+  resolved "git+https://github.com/wowswap-io/evm-sdk.git#e37c9b19d920ccbccdd9df246ad1180c0eb3cfce"
   dependencies:
     bignumber.js "9.0.1"
     ethers "5.4.5"
