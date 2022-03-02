@@ -242,14 +242,7 @@ export class Position extends DatastoreDocument<Position> {
     return { path, tradableToken }
   }
 
-  static isTerminable(pos: Position): boolean {
-    if (pos.selfValue.isZero()) {
-      return false
-    }
-
-    const stopLoss = pos.stopLossPercentage || bn(0)
-    const takeProfit = pos.takeProfitPercentage || bn(0)
-
+  static profitPercent(pos: Position): BigNumber {
     let profitValue: BigNumber;
 
     if (pos.short) {
@@ -260,7 +253,18 @@ export class Position extends DatastoreDocument<Position> {
       profitValue = pos.currentCost.sub(pos.currentDebt).sub(pos.selfValue)
     }
 
-    const profit = profitValue.mul(100).div(pos.selfValue).add(100)
+    return profitValue.mul(100).div(pos.selfValue).add(100)
+  }
+
+  static isTerminable(pos: Position): boolean {
+    if (pos.selfValue.isZero()) {
+      return false
+    }
+
+    const stopLoss = pos.stopLossPercentage || bn(0)
+    const takeProfit = pos.takeProfitPercentage || bn(0)
+
+    const profit = Position.profitPercent(pos)
 
     if (stopLoss.gt(0)) {
       return profit.lte(stopLoss)

@@ -77,8 +77,8 @@ export class Metrics {
     }
   }
 
-  static format(thing: BigNumber): number {
-    return parseFloat(thing.fromDecimals().toFixed(8))
+  static format(thing: BigNumber, decimals: number | undefined = undefined): number {
+    return parseFloat(thing.fromDecimals(decimals).toFixed(8))
   }
 }
 
