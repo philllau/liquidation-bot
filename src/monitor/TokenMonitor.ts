@@ -4,6 +4,7 @@ import { fewRetry } from '../utils'
 import { AbstractMonitor } from './AbstractMonitor'
 import { HeightMonitor } from './HeightMonitor'
 import { Token } from './models'
+import { addGenericException } from '../sentry';
 
 export class TokenMonitor extends AbstractMonitor<Token> {
   public lendables: string[] = []
@@ -103,6 +104,6 @@ export class TokenMonitor extends AbstractMonitor<Token> {
 
         this.channel.next(instance)
       }),
-    )
+    ).catch(addGenericException)
   }
 }

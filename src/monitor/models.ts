@@ -253,7 +253,8 @@ export class Position extends DatastoreDocument<Position> {
       profitValue = pos.currentCost.sub(pos.currentDebt).sub(pos.selfValue)
     }
 
-    return profitValue.mul(100).div(pos.selfValue).add(100)
+    // StopLoss and TakeProfit have 2 decimals (100.00)
+    return profitValue.mul(10000).div(pos.selfValue).add(10000)
   }
 
   static isTerminable(pos: Position): boolean {

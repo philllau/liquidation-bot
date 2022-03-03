@@ -55,3 +55,8 @@ export function addException(category: string, tag: string, exception: any, extr
 
   captureException(exception, { tags: { category, tag: tag.toLowerCase() }, extra })
 }
+
+export function addGenericException(exception: any) {
+  addException('', '', exception)
+}
+

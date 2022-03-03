@@ -135,8 +135,8 @@ export class HealthMonitor extends AbstractMonitor<boolean> {
     positions = positions.filter((p) => p.amount.gt(amount(0)))
 
     positions.forEach((pos) => {
-      this.context.metrics.update('pos_health', { [[pos.pair, pos.trader].join('_')]: pos.health.eq(0) ? -1 : Metrics.format(pos.health) / 10_000_000 })
-      this.context.metrics.update('positions_profit_percent', { [[pos.pair, pos.trader].join('_')]: Metrics.format(Position.profitPercent(pos), 0) })
+      this.context.metrics.update('pos_health', { [[pos.pair, pos.trader].join('_').toLowerCase()]: pos.health.eq(0) ? -1 : Metrics.format(pos.health) / 10_000_000 })
+      this.context.metrics.update('positions_profit_percent', { [[pos.pair, pos.trader].join('_').toLowerCase()]: Metrics.format(Position.profitPercent(pos), 2) })
     })
 
     let expired_positions = positions.filter(
