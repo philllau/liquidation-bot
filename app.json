@@ -1,7 +1,7 @@
 {
   "name": "WOWSwap Liqidation bot",
   "description": "NodeJS implementation of Liquidation software",
-  "repository": "https://github.com/wowswap-io/liquidation-bot/tree/binance-smart-chain",
+  "repository": "https://github.com/wowswap-io/liquidation-bot/tree/feature_button_deploy",
   "logo": "https://cdn.rawgit.com/heroku/node-js-getting-started/main/public/node.svg",
   "keywords": ["node", "typescript", "heroku"],
   "image": "heroku/nodejs",
@@ -25,7 +25,8 @@
     },
     "SENTRY_DSN": {
       "description": "DSN for error reporting. Disables Sentry if empty",
-      "value": ""
+      "value": "",
+      "required": false
     }
   }
 }
