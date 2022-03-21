@@ -14,6 +14,16 @@ Requires at least dyno "Standard 2X".
 Recommended plan is Basic with one "2 GB RAM | 1 vCPU".
 [![Deploy to DigitalOcean](https://www.deploytodo.com/do-btn-blue.svg)](https://cloud.digitalocean.com/apps/new?repo=https://github.com/wowswap-io/liquidation-bot/tree/master)
 
+### Manual (Docker)
+
+1. Install `docker` and `docker-compose` packages
+2. Create directory for bot files
+3. Copy [docker-compose.example.yml](https://raw.githubusercontent.com/wowswap-io/liquidation-bot/master/docker-compose.example.yml) to `docker-compose.yml`
+4. Copy [.env.example](https://raw.githubusercontent.com/wowswap-io/liquidation-bot/master/.env.example) to `.env`
+5. Specify liquidator PRIVATE_KEY in `.env`
+6. Specify CHAIN_ID and other configuration variables in `docker-compose.yml`
+7. Run `docker-compose up -d`
+
 ### Configuration
 
 | Environment Variable | Required | Description                                                                                           | Default value |

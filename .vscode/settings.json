@@ -1,7 +1,0 @@
-{
-  "typescript.tsdk": "node_modules/typescript/lib",
-  "files.exclude": {
-    ".logs/**": true,
-    ".pm2/**": true
-  }
-}

@@ -1,15 +1,10 @@
 version: "3.4"
 
-x-health-bot: &liquidation_bot
-  build:
-    context: .
-    dockerfile: Dockerfile
-  restart: unless-stopped
-  env_file: .env
-
 services:
   health_bsc:
-    <<: *liquidation_bot
+    image: wowswap/liquidation-bot:master
+    restart: unless-stopped
+    env_file: .env
     container_name: liquidation_bsc
     environment:
       CHAIN_ID: 56
