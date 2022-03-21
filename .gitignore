@@ -1,2 +1,13 @@
-lib
+.idea
+
 node_modules
+report*.json
+lib
+.logs
+.pm2
+
+.env
+.snapshot
+docker-compose.yml
+
+tsconfig.tsbuildinfo
