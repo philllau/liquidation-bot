@@ -8,7 +8,7 @@ spec:
         registry_type: DOCKER_HUB
         registry:  wowswap
         repository: liquidation-bot
-        tag: feature_button_deploy
+        tag: master
       envs:
         - key: PRIVATE_KEY
           value: '4e...6d'

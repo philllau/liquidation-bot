@@ -8,11 +8,11 @@ Liquidation and Termination are transactions, and require some amount of native 
 
 ### Heroku
 Requires at least dyno "Standard 2X".
-[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/wowswap-io/liquidation-bot/tree/feature_button_deploy)
+[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/wowswap-io/liquidation-bot/tree/master)
 
 ### Digital Ocean
 Recommended plan is Basic with one "2 GB RAM | 1 vCPU".
-[![Deploy to DigitalOcean](https://www.deploytodo.com/do-btn-blue.svg)](https://cloud.digitalocean.com/apps/new?repo=https://github.com/wowswap-io/liquidation-bot/tree/feature_button_deploy)
+[![Deploy to DigitalOcean](https://www.deploytodo.com/do-btn-blue.svg)](https://cloud.digitalocean.com/apps/new?repo=https://github.com/wowswap-io/liquidation-bot/tree/master)
 
 ### Configuration
 
