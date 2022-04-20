@@ -11,6 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       NODE_ENV: prod
+      DOCKER_BUILDKIT: 1
 
     steps:
       - uses: actions/checkout@v2
@@ -20,6 +21,9 @@ jobs:
           GIT_BRANCH=${GITHUB_BASE_REF:-${GITHUB_REF#refs/heads/}}
           GIT_BRANCH=${GIT_BRANCH//\//_} # Replace / with _
           echo "GIT_BRANCH=$GIT_BRANCH" >> $GITHUB_ENV
+      - uses: webfactory/ssh-agent@v0.5.4
+        with:
+          ssh-private-key: ${{ secrets.SSH_CLONE_KEY }}
 
       # Enable Docker layer caching. Restores cache and saves layers after job finished
       - uses: satackey/action-docker-layer-caching@v0.0.11
@@ -27,7 +31,7 @@ jobs:
         continue-on-error: true
 
       - name: Build image
-        run: docker build --tag liquidation-bot:$GIT_BRANCH .
+        run: docker build --ssh default --tag liquidation-bot:$GIT_BRANCH .
 
       - name: Push to ECR
         id: ecr
