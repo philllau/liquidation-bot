@@ -42,37 +42,35 @@ export class Metrics {
   }
 
   // Set one or multiple values of gauge
-  update(name: string, values: { [key: string]: number } | number): void {
-    const gauge = this.gauges.get(name) || new Gauge(this.createConf(name))
+  update(name: string, values: Record<string, number> | number, labels?: Record<string, string>): void {
+    const gauge = this.gauges.get(name) || new Gauge(this.createConf(name, labels ? Object.keys(labels) : []))
     this.gauges.set(name, gauge)
 
     if (typeof values === 'object') {
       Object.keys(values).forEach((key) => {
-        gauge.set({ ...this.defaultLabels, type: key }, values[key])
+        gauge.set({ ...this.defaultLabels, ...labels, type: key }, values[key])
       })
     } else {
-      gauge.set(this.defaultLabels, values)
+      gauge.set({ ...this.defaultLabels, ...labels }, values)
     }
   }
 
-  // Set one or multiple values of gauge
-  increment(name: string, values?: string[]): void {
-    const counter = this.counters.get(name) || new Counter(this.createConf(name))
+  // Increment one or multiple counters
+  increment(name: string, values: string[] = [], labels?: Record<string, string>): void {
+    const counter = this.counters.get(name) || new Counter(this.createConf(name, labels ? Object.keys(labels) : []))
     this.counters.set(name, counter)
 
-    if (typeof values === 'object') {
-      values.forEach((key) => {
-        counter.inc({ ...this.defaultLabels, type: key })
-      })
+    if (typeof values === 'object' && values.length > 0) {
+      values.forEach((key) => counter.inc({ ...this.defaultLabels, ...labels, type: key }))
     } else {
-      counter.inc(this.defaultLabels)
+      counter.inc({ ...this.defaultLabels, ...labels })
     }
   }
 
-  private createConf(name: string): { help: string, labelNames: string[], name: string } {
+  private createConf(name: string, extraKeys: string[] = []): { help: string, labelNames: string[], name: string } {
     return {
       help: '-',
-      labelNames: ['type', ...Object.keys(this.defaultLabels)],
+      labelNames: ['type', ...Object.keys(this.defaultLabels), ...extraKeys],
       name: [this.prefix, name].filter(defined).join('_')
     }
   }

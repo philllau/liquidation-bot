@@ -65,12 +65,26 @@ export class PositionMonitor extends AbstractMonitor<Position> {
         .catch((e) => {
           this.context.cache.set(liquidationFailKey, true)
           this.context.metrics.increment('liquidations', ['fail'])
+          this.context.metrics.increment('liquidations_fail', [p.pair], {
+            path,
+            amount: p.amount.toString(),
+            liquidationCost: p.liquidationCost.toString(),
+            terminationReward: p.terminationReward?.toString() || '',
+          })
           addException('pair', p.pair, e, {
             message: `Failed liquidate position of ${path} ${p.trader} ${e.message}`,
           })
         }).then((v) => {
-          if (defined(v)) { // If call was successful
+          if (v && defined(v)) { // If call was successful
+            console.log(`Successful liquidate position of ${path} ${p.trader}`)
             this.context.metrics.increment('liquidations', ['successful'])
+            this.context.metrics.increment('liquidations_successful', [p.pair], {
+              path,
+              amount: p.amount.toString(),
+              transactionHash: v.transactionHash,
+              liquidationCost: p.liquidationCost.toString(),
+              terminationReward: p.terminationReward?.toString() || '',
+            })
           }
         })
     }
@@ -101,13 +115,27 @@ export class PositionMonitor extends AbstractMonitor<Position> {
         .catch((e) => {
           this.context.cache.set(terminationFailKey, true)
           this.context.metrics.increment('terminations', ['fail'])
+          this.context.metrics.increment('terminations_fail', [p.pair], {
+            path,
+            amount: p.amount.toString(),
+            liquidationCost: p.liquidationCost.toString(),
+            terminationReward: p.terminationReward?.toString() || '',
+          })
           addException('pair', p.pair, e, {
             message: `Failed terminate position of ${path} ${p.trader} ${e.message}`,
           })
         }
         ).then((v) => {
-          if (defined(v)) { // If call was successful
+          if (v && defined(v)) { // If call was successful
+            console.log(`Successful terminate position of ${path} ${p.trader}`)
             this.context.metrics.increment('terminations', ['successful'])
+            this.context.metrics.increment('terminations_successful', [p.pair], {
+              path,
+              amount: p.amount.toString(),
+              transactionHash: v.transactionHash,
+              liquidationCost: p.liquidationCost.toString(),
+              terminationReward: p.terminationReward?.toString() || '',
+            })
           }
         })
     }
