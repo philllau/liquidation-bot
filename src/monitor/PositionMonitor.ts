@@ -11,6 +11,7 @@ import { Pair, Position } from './models'
 import { healthUpdate } from '../utils/health';
 import axios from 'axios';
 import BigNumber from 'bignumber.js';
+import { IGNORED_PAIRS } from '../utils/constants'
 
 export class PositionMonitor extends AbstractMonitor<Position> {
   private repository!: DatastoreRepository<Position>
@@ -41,6 +42,9 @@ export class PositionMonitor extends AbstractMonitor<Position> {
     unhealthy = await Promise.all(unhealthy.map((p) => this.updatePosition(p)))
 
     for (let p of unhealthy.filter((p) => p.amount.gt(amount(0)))) {
+      if (IGNORED_PAIRS[this.context.chainId] && IGNORED_PAIRS[this.context.chainId].includes(p.pair)) {
+        continue
+      }
       const { path, tradableToken } = await p.getPath(this.context.db)
 
       let amount = p.amount
