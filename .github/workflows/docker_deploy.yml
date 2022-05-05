@@ -3,8 +3,8 @@ name: docker_deploy
 on:
   push:
     branches:
-      - binance/deploy
       - master
+      - develop
 
 jobs:
   build:
