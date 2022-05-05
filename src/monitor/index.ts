@@ -11,7 +11,7 @@ import { PositionMonitor } from "./PositionMonitor";
 import { TokenMonitor } from "./TokenMonitor";
 import { TotalValueMonitor } from "./ValueMonitor";
 import { HealthMonitor } from "./HealthMonitor";
-import { Context } from '@wowswap/evm-sdk';
+import { Context } from '@wowswap-io/evm-sdk';
 import { initMetrics, Metrics } from '../utils/metrics';
 import { sdkInit } from '../sdk';
 import cors from 'cors';

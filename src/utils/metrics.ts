@@ -2,7 +2,7 @@ import { Counter, Gauge, collectDefaultMetrics, register } from 'prom-client'
 import { Express, default as initExpress } from 'express'
 import BigNumber from 'bignumber.js'
 import cors from 'cors'
-import { defined } from '@wowswap/evm-sdk'
+import { defined } from '@wowswap-io/evm-sdk'
 import { healthEndpoint } from './health'
 
 export class Metrics {

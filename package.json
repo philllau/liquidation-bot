@@ -22,7 +22,7 @@
     "@types/leveldown": "4.0.3",
     "@types/levelup": "4.3.3",
     "@types/node": "^16.10.2",
-    "@wowswap/evm-sdk": "git+https://github.com/wowswap-io/evm-sdk.git#e37c9b19d920ccbccdd9df246ad1180c0eb3cfce",
+    "@wowswap-io/evm-sdk": "^1.0.0",
     "axios": "^0.21.1",
     "class-transformer": "0.4.0",
     "cors": "^2.8.5",
