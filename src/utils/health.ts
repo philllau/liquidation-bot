@@ -1,6 +1,6 @@
 import { Request, Response } from 'express'
 import { Metrics } from './metrics'
-import { defined } from '@wowswap/evm-sdk'
+import { defined } from '@wowswap-io/evm-sdk'
 
 let lastUpdated = Date.now()
 const healthTimeout = (process.env.HEALTH_TIMEOUT ? parseInt(process.env.HEALTH_TIMEOUT, 10) : 120) * 1_000

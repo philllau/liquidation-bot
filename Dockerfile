@@ -6,7 +6,7 @@ ENV NODE_ENV production
 # Prepare system dependencies
 ##
 
-RUN apk add --no-cache bash ca-certificates git openssh-client
+RUN apk add --no-cache bash ca-certificates git
 
 ##
 # Build app dependencies
@@ -15,10 +15,8 @@ RUN apk add --no-cache bash ca-certificates git openssh-client
 USER root
 WORKDIR /app
 COPY package.json yarn.lock /app/
-# Setup SSH access
-RUN --mount=type=ssh mkdir -p -m 0600 ~/.ssh &&  \
-    ssh-keyscan github.com >> ~/.ssh/known_hosts && \
-    echo -e '[url "git@github.com:wowswap-io/"]\n  insteadOf = https://github.com/wowswap-io/' > /root/.gitconfig && \
+# Setup NPM access
+RUN --mount=type=secret,id=npmrc,dst=/root/.npmrc \
     # Build
     mkdir /yarncache && \
     yarn install --production --network-concurrency 1 --cache-folder /yarncache --frozen-lockfile && \
