@@ -3,8 +3,8 @@ name: docker_deploy
 on:
   push:
     branches:
-      - binance/deploy
       - master
+      - develop
 
 jobs:
   build:
@@ -21,9 +21,13 @@ jobs:
           GIT_BRANCH=${GITHUB_BASE_REF:-${GITHUB_REF#refs/heads/}}
           GIT_BRANCH=${GIT_BRANCH//\//_} # Replace / with _
           echo "GIT_BRANCH=$GIT_BRANCH" >> $GITHUB_ENV
-      - uses: webfactory/ssh-agent@v0.5.4
-        with:
-          ssh-private-key: ${{ secrets.SSH_CLONE_KEY }}
+
+      # Setup dependencies access
+      - run: |
+          npm config set //npm.pkg.github.com/:_authToken $TOKEN
+          npm config set @wowswap-io:registry https://npm.pkg.github.com/
+        env:
+          TOKEN: ${{secrets.WOWSWAPCI_NPM_TOKEN}}
 
       # Enable Docker layer caching. Restores cache and saves layers after job finished
       - uses: satackey/action-docker-layer-caching@v0.0.11
@@ -31,7 +35,7 @@ jobs:
         continue-on-error: true
 
       - name: Build image
-        run: docker build --ssh default --tag liquidation-bot:$GIT_BRANCH .
+        run: docker build --secret id=npmrc,src=$HOME/.npmrc --tag liquidation-bot:$GIT_BRANCH .
 
       - name: Push to ECR
         id: ecr

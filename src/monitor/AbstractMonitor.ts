@@ -1,7 +1,7 @@
 import { Observable, Subject } from "observable-fns";
 import { ExecutionContext } from ".";
 import { addException } from '../sentry';
-import { sleep } from '@wowswap/evm-sdk';
+import { sleep } from '@wowswap-io/evm-sdk';
 
 export abstract class AbstractMonitor<T> {
   constructor(protected context: ExecutionContext) {}

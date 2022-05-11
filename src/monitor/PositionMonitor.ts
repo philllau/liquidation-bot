@@ -1,8 +1,8 @@
 import { ethers } from 'ethers'
-import { oneEther, protocol } from '@wowswap/evm-sdk'
+import { protocol } from '@wowswap-io/evm-sdk'
 import { Observable } from 'observable-fns'
 import { DatastoreRepository } from '../db/repository'
-import { amount, bn, oneRay, toBN } from '../math'
+import { amount, bn, oneEther, oneRay, toBN } from '../math'
 import { addBreadcrumb, addException } from '../sentry'
 import { defined, fewRetry, infRetry } from '../utils'
 import { AbstractMonitor } from './AbstractMonitor'
@@ -11,6 +11,7 @@ import { Pair, Position } from './models'
 import { healthUpdate } from '../utils/health';
 import axios from 'axios';
 import BigNumber from 'bignumber.js';
+import { IGNORED_PAIRS } from '../utils/constants'
 
 export class PositionMonitor extends AbstractMonitor<Position> {
   private repository!: DatastoreRepository<Position>
@@ -41,6 +42,9 @@ export class PositionMonitor extends AbstractMonitor<Position> {
     unhealthy = await Promise.all(unhealthy.map((p) => this.updatePosition(p)))
 
     for (let p of unhealthy.filter((p) => p.amount.gt(amount(0)))) {
+      if (IGNORED_PAIRS[this.context.chainId] && IGNORED_PAIRS[this.context.chainId].includes(p.pair)) {
+        continue
+      }
       const { path, tradableToken } = await p.getPath(this.context.db)
 
       let amount = p.amount
@@ -51,14 +55,20 @@ export class PositionMonitor extends AbstractMonitor<Position> {
         + `${p.trader} - ${amount.toString()} ${tradableToken?.symbol}, `
         + `health: ${p.health.decimalPlaces(27).dividedBy(oneRay)}`);
 
+      const liquidationFailKey = ['liquidationFail', p.pair, p.trader].join(':')
+      const cached = await this.context.cache.get<boolean>(liquidationFailKey)
+      if (cached) continue
+
       await protocol.IPair__factory.connect(p.pair, this.context.signer)
         .liquidatePosition(p.trader, this.context.signer.address)
         .then((tx) => tx.wait())
-        .catch((e) =>
+        .catch((e) => {
+          this.context.cache.set(liquidationFailKey, true)
+          this.context.metrics.increment('liquidations', ['fail'])
           addException('pair', p.pair, e, {
             message: `Failed liquidate position of ${path} ${p.trader} ${e.message}`,
-          }),
-        ).then((v) => {
+          })
+        }).then((v) => {
           if (defined(v)) { // If call was successful
             this.context.metrics.increment('liquidations', ['successful'])
           }
@@ -81,13 +91,20 @@ export class PositionMonitor extends AbstractMonitor<Position> {
       addBreadcrumb('pair', p.pair, `Terminate position: ${path} `
         + `${p.trader} - ${amount.toString()} ${tradableToken?.symbol}`);
 
+      const terminationFailKey = ['terminationFail', p.pair, p.trader].join(':')
+      const cached = await this.context.cache.get<boolean>(terminationFailKey)
+      if (cached) continue
+
       await protocol.IPair__factory.connect(p.pair, this.context.signer)
         .terminatePosition(p.trader)
         .then((tx) => tx.wait())
-        .catch((e) =>
+        .catch((e) => {
+          this.context.cache.set(terminationFailKey, true)
+          this.context.metrics.increment('terminations', ['fail'])
           addException('pair', p.pair, e, {
             message: `Failed terminate position of ${path} ${p.trader} ${e.message}`,
-          }),
+          })
+        }
         ).then((v) => {
           if (defined(v)) { // If call was successful
             this.context.metrics.increment('terminations', ['successful'])

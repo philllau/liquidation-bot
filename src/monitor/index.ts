@@ -11,11 +11,12 @@ import { PositionMonitor } from "./PositionMonitor";
 import { TokenMonitor } from "./TokenMonitor";
 import { TotalValueMonitor } from "./ValueMonitor";
 import { HealthMonitor } from "./HealthMonitor";
-import { Context } from '@wowswap/evm-sdk';
+import { Context } from '@wowswap-io/evm-sdk';
 import { initMetrics, Metrics } from '../utils/metrics';
 import { sdkInit } from '../sdk';
 import cors from 'cors';
 import { healthEndpoint } from '../utils/health';
+import cacheManager, { Cache } from 'cache-manager';
 
 
 export type Ctor<T> = new (context: ExecutionContext) => T;
@@ -26,6 +27,7 @@ export type InitializeParams = Readonly<{
   sleepTime: number;
   transferEventsLimit: number;
   covalentApiKey: string;
+  cacheTTL: number;
 }>;
 
 const monitors = [
@@ -62,6 +64,9 @@ export class ExecutionContext implements InitializeParams {
   get covalentApiKey(): string {
     return this.params.covalentApiKey
   }
+  get cacheTTL(): number {
+    return this.params.cacheTTL
+  }
 
   monitors: {
     [key: number]: InstanceType<typeof monitors[typeof key]>;
@@ -80,6 +85,8 @@ export class ExecutionContext implements InitializeParams {
 
   signer!: Wallet
 
+  cache!: Cache
+
   metrics!: Metrics
 
   constructor(private params: InitializeParams) {}
@@ -89,6 +96,7 @@ export class ExecutionContext implements InitializeParams {
     this.chainId = await this.ctx.provider.getNetwork().then((network) => network.chainId)
     this.db = connect(`.snapshot/instance-${this.chainId}`)
     this.signer = new Wallet(this.privateKey, this.ctx.provider)
+    this.cache = cacheManager.caching({ store: 'memory', ttl: this.cacheTTL })
 
     this.api();
     this.runMonitor(HeightMonitor);

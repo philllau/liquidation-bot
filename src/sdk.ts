@@ -1,4 +1,4 @@
-import { Context } from '@wowswap/evm-sdk'
+import { Context } from '@wowswap-io/evm-sdk'
 import { JsonRpcProvider, WebSocketProvider } from '@ethersproject/providers'
 import YAML from 'yaml'
 import { promises as fs } from 'fs'

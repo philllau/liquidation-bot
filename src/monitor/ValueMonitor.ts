@@ -6,7 +6,7 @@ import { HeightMonitor } from "./HeightMonitor";
 import { Pair, Token } from "./models";
 import { PairMonitor } from "./PairMonitor";
 import { TokenMonitor } from "./TokenMonitor";
-import { protocol } from '@wowswap/evm-sdk';
+import { protocol } from '@wowswap-io/evm-sdk';
 
 export enum LockType {
   Staked,
