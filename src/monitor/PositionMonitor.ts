@@ -55,14 +55,20 @@ export class PositionMonitor extends AbstractMonitor<Position> {
         + `${p.trader} - ${amount.toString()} ${tradableToken?.symbol}, `
         + `health: ${p.health.decimalPlaces(27).dividedBy(oneRay)}`);
 
+      const liquidationFailKey = ['liquidationFail', p.pair, p.trader].join(':')
+      const cached = await this.context.cache.get<boolean>(liquidationFailKey)
+      if (cached) continue
+
       await protocol.IPair__factory.connect(p.pair, this.context.signer)
         .liquidatePosition(p.trader, this.context.signer.address)
         .then((tx) => tx.wait())
-        .catch((e) =>
+        .catch((e) => {
+          this.context.cache.set(liquidationFailKey, true)
+          this.context.metrics.increment('liquidations', ['fail'])
           addException('pair', p.pair, e, {
             message: `Failed liquidate position of ${path} ${p.trader} ${e.message}`,
-          }),
-        ).then((v) => {
+          })
+        }).then((v) => {
           if (defined(v)) { // If call was successful
             this.context.metrics.increment('liquidations', ['successful'])
           }
@@ -85,13 +91,20 @@ export class PositionMonitor extends AbstractMonitor<Position> {
       addBreadcrumb('pair', p.pair, `Terminate position: ${path} `
         + `${p.trader} - ${amount.toString()} ${tradableToken?.symbol}`);
 
+      const terminationFailKey = ['terminationFail', p.pair, p.trader].join(':')
+      const cached = await this.context.cache.get<boolean>(terminationFailKey)
+      if (cached) continue
+
       await protocol.IPair__factory.connect(p.pair, this.context.signer)
         .terminatePosition(p.trader)
         .then((tx) => tx.wait())
-        .catch((e) =>
+        .catch((e) => {
+          this.context.cache.set(terminationFailKey, true)
+          this.context.metrics.increment('terminations', ['fail'])
           addException('pair', p.pair, e, {
             message: `Failed terminate position of ${path} ${p.trader} ${e.message}`,
-          }),
+          })
+        }
         ).then((v) => {
           if (defined(v)) { // If call was successful
             this.context.metrics.increment('terminations', ['successful'])
